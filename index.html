@@ -150,7 +150,7 @@
       </nav>
     </div>
 
-    <!-- Drawer Footer / Session Status -->
+    <!-- Drawer Footer -->
     <div class="pt-4 border-t border-darkBorder text-xs space-y-3">
       <div class="flex items-center justify-between text-[11px] text-slate-400">
         <span>Logged in as:</span>
@@ -160,6 +160,54 @@
         <i class="fa-solid fa-right-from-bracket"></i> Log Out
       </button>
     </div>
+  </div>
+
+  <!-- ==================== DEDICATED TICKET CHAT DRAWER ==================== -->
+  <div id="ticketChatBackdrop" onclick="closeTicketChatRoom()" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm transition-opacity"></div>
+  <div id="ticketChatDrawer" class="fixed top-0 right-0 h-full w-96 max-w-[90vw] bg-darkCard border-l border-darkBorder z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between font-mono p-4 shadow-2xl">
+    <!-- Header -->
+    <div class="pb-3 border-b border-darkBorder">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="h-8 w-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <i class="fa-solid fa-headset text-sm"></i>
+          </div>
+          <div>
+            <div id="activeTicketTitle" class="text-xs font-bold text-slate-100">Ticket #---</div>
+            <div id="activeTicketUser" class="text-[10px] text-slate-400">@user</div>
+          </div>
+        </div>
+        <button onclick="closeTicketChatRoom()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <!-- Staff Close Ticket Control -->
+      <div id="ticketCloseBar" class="mt-2.5 pt-2 border-t border-darkBorder/60 flex items-center justify-between">
+        <span id="activeTicketStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">Active Chat</span>
+        <button id="staffCloseTicketBtn" onclick="staffCloseCurrentTicket()" class="hidden px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 border border-rose-500/40 text-rose-300 text-[10px] font-bold transition">
+          <i class="fa-solid fa-check-double mr-1"></i> Close Ticket
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Scroll Area -->
+    <div id="ticketChatMessages" class="flex-1 overflow-y-auto py-3 space-y-2 text-xs scrollbar-thin">
+      <div class="text-slate-500 text-center py-4 text-[11px]">Loading chat history...</div>
+    </div>
+
+    <!-- Chat Input Form -->
+    <form id="ticketChatForm" onsubmit="handleSendTicketMessage(event)" class="pt-3 border-t border-darkBorder space-y-1.5">
+      <div class="flex gap-1.5">
+        <input type="text" id="ticketChatInput" placeholder="Reply to ticket..." maxlength="200" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-neonCyan">
+        <button type="submit" id="ticketSendBtn" class="px-3.5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+      <div id="ticketClosedNotice" class="hidden text-center text-[10px] text-rose-400 font-bold py-1">
+        This ticket is closed. New replies are disabled.
+      </div>
+    </form>
   </div>
 
   <!-- ==================== LOGIN SCREEN MODAL ==================== -->
@@ -225,7 +273,6 @@
         <div class="flex items-center gap-1.5 pl-2 border-l border-darkBorder">
           <span id="currentUserDisplay" class="text-xs font-mono text-slate-300 font-semibold max-w-[80px] sm:max-w-none truncate hidden sm:inline">@guest</span>
           
-          <!-- Unified Menu Icon Button -->
           <button onclick="toggleMenuDrawer()" title="Open Main Menu" class="px-2.5 py-1.5 rounded-xl bg-darkCard hover:bg-darkBorder border border-darkBorder text-amber-300 transition text-sm flex items-center gap-1.5">
             <i class="fa-solid fa-bars text-base"></i>
           </button>
@@ -717,7 +764,6 @@
 
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // Firebase credentials from gemluck-a5d70
     const firebaseConfig = {
       apiKey: "AIzaSyDdsIHkwzg5llxiVW2Z6H6bE6d-k07jUe8",
       authDomain: "gemluck-a5d70.firebaseapp.com",
@@ -760,6 +806,9 @@
     let activeSessionListener = null;
     let liveTicketsList = [];
 
+    let currentActiveTicketId = null;
+    let activeTicketListener = null;
+
     /* ====================================================================
        ALL-IN-ONE SLIDING MENU DRAWER LOGIC
     ==================================================================== */
@@ -794,7 +843,7 @@
     }
 
     /* ====================================================================
-       1. LIVE SUPPORT TICKETS DESK (USER + STAFF ISOLATION)
+       1. LIVE SUPPORT TICKETS DESK & DEDICATED CHAT ROOM
     ==================================================================== */
     function initLiveSupportTickets() {
       const ticketsRef = db.ref('support_tickets');
@@ -812,9 +861,9 @@
 
     function renderVisibleTickets() {
       const logs = document.getElementById('supportChatLogs');
+      if (!logs) return;
       logs.innerHTML = '';
 
-      // Determine visibility: Staff see all; players only see their own
       const visible = liveTicketsList.filter(t => {
         if (user.isStaff) return true;
         return t.username && t.username.toLowerCase() === user.username.toLowerCase();
@@ -823,47 +872,59 @@
       document.getElementById('ticketViewerScope').textContent = user.isStaff ? 'All Incoming Tickets (Staff View)' : 'My Tickets';
 
       if (visible.length === 0) {
-        logs.innerHTML = '<div class="text-slate-500 text-center py-4">No active tickets for this account. Create one below.</div>';
+        logs.innerHTML = '<div class="text-slate-500 text-center py-4">No active tickets found. Create one below.</div>';
         return;
       }
 
       visible.forEach(ticket => {
         const ticketDiv = document.createElement('div');
-        ticketDiv.className = 'p-3 rounded-xl bg-darkCard border border-darkBorder text-slate-200 space-y-1.5';
+        ticketDiv.className = 'p-3 rounded-xl bg-darkCard border border-darkBorder text-slate-200 space-y-2';
 
-        const isOwner = ticket.username.toLowerCase() === user.username.toLowerCase();
-        let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${ticket.status === 'Resolved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-300'}">${ticket.status || 'Pending Review'}</span>`;
+        const isClosed = ticket.status === 'Closed';
+        const isApproved = ticket.status === 'Approved';
 
-        let staffActions = '';
-        if (user.isStaff && ticket.status !== 'Resolved') {
-          staffActions = `
-            <div class="pt-2 flex gap-2 border-t border-darkBorder/40">
-              <button onclick="staffQuickResolveTicket('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
-                Approve &amp; Adjust
+        let badgeClass = 'bg-amber-500/20 text-amber-300';
+        if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
+        if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
+
+        let actionButtons = `
+          <div class="pt-2 flex flex-wrap gap-2 border-t border-darkBorder/40">
+            <button onclick="openTicketChatRoom('${ticket.id}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-bold text-[10px] transition flex items-center gap-1.5">
+              <i class="fa-solid fa-comments"></i> Open Chat
+            </button>
+        `;
+
+        if (user.isStaff) {
+          if (!isApproved && !isClosed) {
+            actionButtons += `
+              <button onclick="staffApproveAndOpenChat('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
+                Approve &amp; Open Chat
               </button>
-              <button onclick="staffDismissTicket('${ticket.id}')" class="px-3 py-1 rounded bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
-                Dismiss
+            `;
+          }
+          if (!isClosed) {
+            actionButtons += `
+              <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
+                Close
               </button>
-            </div>
-          `;
+            `;
+          }
         }
+        actionButtons += `</div>`;
 
         let html = `
           <div class="flex justify-between items-center">
             <span class="text-cyan-400 font-bold">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
-            <div class="flex items-center gap-2">
-              ${statusBadge}
-              <span class="text-[10px] text-slate-500">${ticket.time || 'Just now'}</span>
-            </div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${ticket.status || 'Pending Review'}</span>
           </div>
-          <div class="text-slate-300 text-xs">${ticket.message || 'No additional text'}</div>
+          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
         `;
 
         if (ticket.image) {
-          html += `<div class="mt-2"><img src="${ticket.image}" class="rounded-lg max-h-40 border border-darkBorder object-contain"></div>`;
+          html += `<div class="mt-1"><img src="${ticket.image}" class="rounded-lg max-h-36 border border-darkBorder object-contain"></div>`;
         }
 
-        html += staffActions;
+        html += actionButtons;
         ticketDiv.innerHTML = html;
         logs.appendChild(ticketDiv);
       });
@@ -901,7 +962,7 @@
 
       if (!text && !attachedImageBase64 && diamonds <= 0) return;
 
-      await db.ref('support_tickets').push({
+      const newRef = await db.ref('support_tickets').push({
         username: user.username,
         type: type,
         diamonds: diamonds,
@@ -923,7 +984,7 @@
       document.getElementById('supportImageInput').value = '';
       document.getElementById('supportFileLabel').textContent = 'Attach Image Proof';
       attachedImageBase64 = null;
-      alert("Ticket submitted successfully! It is now visible to you and live support staff.");
+      alert("Ticket submitted successfully! Visible in your menu and live staff view.");
     }
 
     function handleSupportFileUpload(e) {
@@ -936,34 +997,158 @@
       }
     }
 
-    async function staffQuickResolveTicket(ticketId, targetUser, diamonds, type) {
+    async function staffApproveAndOpenChat(ticketId, targetUser, diamonds, type) {
       if (!user.isStaff) return;
-      const delta = type === 'Deposit' ? diamonds : (type === 'Withdrawal' ? 0 : 0);
 
-      if (delta > 0) {
+      if (type === 'Deposit' && diamonds > 0) {
         const targetRef = db.ref('leaderboards/' + targetUser.toLowerCase());
         const snap = await targetRef.once('value');
         const prof = snap.val() || { user: targetUser, balance: 10000000, wagered: 0 };
-        prof.balance = (prof.balance || 0) + delta;
+        prof.balance = (prof.balance || 0) + diamonds;
         await targetRef.set(prof);
 
         if (targetUser.toLowerCase() === user.username.toLowerCase()) {
-          updateBalance(delta);
+          updateBalance(diamonds);
         }
       }
 
       await db.ref('support_tickets/' + ticketId).update({
-        status: 'Resolved',
-        resolvedBy: user.username
+        status: 'Approved',
+        approvedBy: user.username
       });
-      alert(`Ticket resolved for @${targetUser}!`);
+
+      await db.ref(`support_tickets/${ticketId}/messages`).push({
+        sender: 'AuraSupport',
+        text: `Ticket approved by staff @${user.username}. Chat is now active.`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      openTicketChatRoom(ticketId);
     }
 
-    async function staffDismissTicket(ticketId) {
-      if (!user.isStaff) return;
-      await db.ref('support_tickets/' + ticketId).update({
-        status: 'Dismissed'
+    function openTicketChatRoom(ticketId) {
+      currentActiveTicketId = ticketId;
+      const ticket = liveTicketsList.find(t => t.id === ticketId);
+      if (!ticket) return;
+
+      document.getElementById('activeTicketTitle').textContent = `Ticket #${ticketId.slice(-5)}`;
+      document.getElementById('activeTicketUser').textContent = `@${ticket.username} (${ticket.type})`;
+
+      const statusBadge = document.getElementById('activeTicketStatusBadge');
+      statusBadge.textContent = ticket.status || 'Pending';
+      statusBadge.className = `text-[10px] px-2 py-0.5 rounded font-bold ${ticket.status === 'Closed' ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500/20 text-emerald-400'}`;
+
+      const closeBtn = document.getElementById('staffCloseTicketBtn');
+      if (user.isStaff && ticket.status !== 'Closed') {
+        closeBtn.classList.remove('hidden');
+      } else {
+        closeBtn.classList.add('hidden');
+      }
+
+      const chatInput = document.getElementById('ticketChatInput');
+      const sendBtn = document.getElementById('ticketSendBtn');
+      const closedNotice = document.getElementById('ticketClosedNotice');
+      if (ticket.status === 'Closed') {
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        closedNotice.classList.remove('hidden');
+      } else {
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        closedNotice.classList.add('hidden');
+      }
+
+      document.getElementById('ticketChatDrawer').classList.remove('translate-x-full');
+      document.getElementById('ticketChatBackdrop').classList.remove('hidden');
+
+      const messagesBox = document.getElementById('ticketChatMessages');
+      messagesBox.innerHTML = '';
+
+      const msgsRef = db.ref(`support_tickets/${ticketId}/messages`);
+      if (activeTicketListener) msgsRef.off('child_added', activeTicketListener);
+
+      activeTicketListener = msgsRef.on('child_added', (snap) => {
+        const msg = snap.val();
+        if (msg) renderSingleTicketMessage(msg);
       });
+    }
+
+    function renderSingleTicketMessage(msg) {
+      const box = document.getElementById('ticketChatMessages');
+      const isMe = msg.sender.toLowerCase() === user.username.toLowerCase();
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+      msgDiv.innerHTML = `
+        <div class="text-[9px] text-slate-400 mb-0.5 font-mono">
+          <span class="${msg.isStaff ? 'text-amber-400 font-bold' : 'text-cyan-400'}">@${msg.sender}</span> • ${msg.time || ''}
+        </div>
+        <div class="p-2 rounded-xl text-xs max-w-[85%] ${isMe ? 'bg-cyan-600/30 border border-cyan-500/40 text-cyan-100' : 'bg-darkSurface border border-darkBorder text-slate-200'}">
+          ${msg.text}
+        </div>
+      `;
+      box.appendChild(msgDiv);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function handleSendTicketMessage(e) {
+      e.preventDefault();
+      if (!currentActiveTicketId) return;
+
+      const input = document.getElementById('ticketChatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      await db.ref(`support_tickets/${currentActiveTicketId}/messages`).push({
+        sender: user.username,
+        text: text,
+        isStaff: user.isStaff,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      input.value = '';
+    }
+
+    async function staffCloseCurrentTicket() {
+      if (!user.isStaff || !currentActiveTicketId) return;
+      if (!confirm("Are you sure you want to close this ticket?")) return;
+
+      await db.ref('support_tickets/' + currentActiveTicketId).update({
+        status: 'Closed',
+        closedBy: user.username,
+        closedAt: Date.now()
+      });
+
+      await db.ref(`support_tickets/${currentActiveTicketId}/messages`).push({
+        sender: 'AuraSupport',
+        text: `Ticket closed by staff @${user.username}.`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      openTicketChatRoom(currentActiveTicketId);
+    }
+
+    async function staffCloseTicketDirect(ticketId) {
+      if (!user.isStaff) return;
+      if (!confirm("Close this ticket?")) return;
+      await db.ref('support_tickets/' + ticketId).update({
+        status: 'Closed',
+        closedBy: user.username
+      });
+    }
+
+    function closeTicketChatRoom() {
+      if (currentActiveTicketId && activeTicketListener) {
+        db.ref(`support_tickets/${currentActiveTicketId}/messages`).off('child_added', activeTicketListener);
+      }
+      currentActiveTicketId = null;
+      document.getElementById('ticketChatDrawer').classList.add('translate-x-full');
+      document.getElementById('ticketChatBackdrop').classList.add('hidden');
     }
 
     /* ====================================================================
@@ -1136,7 +1321,7 @@
         const now = Date.now();
         if (currentData && currentData.token && currentData.token !== myDeviceToken) {
           if (now - currentData.lastSeen < 12000) {
-            return; // Abort
+            return;
           }
         }
         return {
@@ -1357,7 +1542,7 @@
       activeTab.className = 'game-selector px-3.5 py-2 rounded-xl bg-darkCard border border-amber-400 text-amber-300 font-bold whitespace-nowrap';
     }
 
-    /* 1. MINES (5x5 - 8x8) */
+    /* 1. MINES (5x5 - 8x8) - REDUCED MULTIPLIER (0.84 BASE) */
     let minesGrid = 5;
     let minesQuantity = 3;
     let minesActive = false;
@@ -1399,7 +1584,7 @@
       for (let i = 0; i < opened; i++) {
         p *= (total - mines - i) / (total - i);
       }
-      return Math.max(1.01, Math.floor((0.97 / p) * 100) / 100);
+      return Math.max(1.01, Math.floor((0.84 / p) * 100) / 100);
     }
 
     function updateMinesOdds() {
