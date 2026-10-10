@@ -10,6 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Proven Universal Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -93,6 +97,22 @@
 
 <body class="min-h-screen text-slate-100 font-sans flex flex-col justify-between">
 
+  <!-- ==================== SESSION KICK MODAL ==================== -->
+  <div id="sessionKickOverlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 font-mono">
+    <div class="w-full max-w-md bg-darkCard border border-rose-500/50 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+      <div class="h-14 w-14 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 text-2xl">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h3 class="text-base font-bold text-rose-400 uppercase tracking-wider">Account Active Elsewhere</h3>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        This account logged in from another browser or device. Multiple simultaneous entries are blocked.
+      </p>
+      <button onclick="location.reload()" class="w-full py-2.5 rounded-xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
+        Reconnect On This Browser
+      </button>
+    </div>
+  </div>
+
   <!-- ==================== LOGIN SCREEN MODAL ==================== -->
   <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
     <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl relative">
@@ -122,13 +142,13 @@
           <p class="text-[10px] text-slate-400 mt-1">Join official server: <a href="https://discord.gg/vGkHmVBEJ" target="_blank" class="text-indigo-400 underline">discord.gg/vGkHmVBEJ</a></p>
         </div>
 
-        <!-- Single-Device Lock Warning Banner -->
+        <!-- Single Device Rejection Warning -->
         <div id="loginErrorAlert" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2">
-          <i class="fa-solid fa-lock text-rose-400 mt-0.5"></i>
-          <span id="loginErrorMsg">Account is currently logged in elsewhere. You must log out from the other browser/device first.</span>
+          <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
+          <span id="loginErrorMsg">Account is currently online on another device or browser! You must log out from the other browser first.</span>
         </div>
 
-        <button type="submit" class="w-full py-3 rounded-xl font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
+        <button type="submit" id="loginSubmitBtn" class="w-full py-3 rounded-xl font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
           Enter VIP Arena
         </button>
       </form>
@@ -167,7 +187,7 @@
         </button>
       </nav>
 
-      <!-- Balance, Profile & Logout Button -->
+      <!-- Balance & Logout Controls -->
       <div class="flex items-center gap-2">
         <div class="bg-darkBg border border-darkBorder px-3 py-1.5 rounded-xl flex items-center gap-2 font-mono text-xs sm:text-sm shadow-inner">
           <i class="fa-solid fa-gem text-cyan-400"></i>
@@ -175,7 +195,7 @@
         </div>
         <div class="flex items-center gap-1.5 pl-2 border-l border-darkBorder">
           <span id="currentUserDisplay" class="text-xs font-mono text-slate-300 font-semibold max-w-[80px] sm:max-w-none truncate">@guest</span>
-          <button onclick="handleLogout()" title="Log out to permit login on other device" class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-mono transition">
+          <button onclick="handleLogout()" title="Log out from this device" class="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-mono transition">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
         </div>
@@ -196,7 +216,7 @@
   <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
   <main class="max-w-7xl mx-auto p-3 sm:p-4 w-full grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1">
     
-    <!-- LEFT & CENTER: GAMES & ARENA (8 Cols) -->
+    <!-- LEFT & CENTER: GAMES (8 Cols) -->
     <div class="lg:col-span-8 flex flex-col gap-4">
       
       <!-- VIP 30X EXCLUSIVE REWARD BANNER -->
@@ -237,7 +257,7 @@
       <!-- ==================== GAME CONTAINERS ==================== -->
       <div class="bg-darkCard border border-darkBorder rounded-2xl p-4 sm:p-5 shadow-2xl relative min-h-[460px]">
         
-        <!-- 1. MINES GAME VIEW -->
+        <!-- 1. MINES (5x5 to 8x8) -->
         <div id="game-mines-view" class="flex flex-col md:flex-row gap-5">
           <div class="w-full md:w-60 flex flex-col gap-3 font-mono text-xs">
             <div>
@@ -289,13 +309,12 @@
             </button>
           </div>
 
-          <!-- Board Area -->
           <div class="flex-1 flex items-center justify-center bg-darkSurface rounded-2xl p-3 border border-darkBorder/60 min-h-[340px]">
             <div id="minesBoard" class="grid gap-1.5 w-full max-w-[380px] aspect-square transition-all"></div>
           </div>
         </div>
 
-        <!-- 2. PVP COIN FLIP VIEW -->
+        <!-- 2. PVP COIN FLIP -->
         <div id="game-coinflip-view" class="hidden flex flex-col md:flex-row gap-6 items-center">
           <div class="w-full md:w-64 space-y-3 font-mono text-xs">
             <div>
@@ -350,7 +369,7 @@
           </div>
         </div>
 
-        <!-- 3. PVP DICE VIEW -->
+        <!-- 3. PVP DICE -->
         <div id="game-dice-view" class="hidden flex flex-col md:flex-row gap-6 items-center">
           <div class="w-full md:w-64 space-y-3 font-mono text-xs">
             <div>
@@ -392,7 +411,7 @@
           </div>
         </div>
 
-        <!-- 4. VIP ROULETTE VIEW -->
+        <!-- 4. VIP ROULETTE -->
         <div id="game-roulette-view" class="hidden flex flex-col gap-4">
           <div class="flex flex-col md:flex-row gap-4 items-center">
             <div class="w-full md:w-60 space-y-3 font-mono text-xs">
@@ -415,7 +434,6 @@
               </button>
             </div>
 
-            <!-- Visual Wheel Tape Display -->
             <div class="flex-1 flex flex-col items-center justify-center p-4 bg-darkSurface rounded-2xl border border-darkBorder/60 w-full overflow-hidden">
               <div id="rouletteResultNumber" class="font-serif text-5xl font-black text-slate-200 mb-2">--</div>
               <div id="rouletteStatus" class="font-mono text-xs uppercase text-slate-400 font-bold">Place bet and spin</div>
@@ -423,7 +441,7 @@
           </div>
         </div>
 
-        <!-- 5. BLACKJACK 21 VIEW -->
+        <!-- 5. BLACKJACK 21 -->
         <div id="game-blackjack-view" class="hidden flex flex-col gap-4 font-mono text-xs">
           <div class="flex flex-col md:flex-row gap-4 justify-between items-start">
             <div class="w-full md:w-56 space-y-3">
@@ -444,7 +462,6 @@
               </div>
             </div>
 
-            <!-- Table View -->
             <div class="flex-1 w-full bg-darkSurface p-4 rounded-2xl border border-darkBorder/60 flex flex-col gap-4 min-h-[260px] justify-between">
               <div>
                 <div class="flex justify-between items-center mb-1 text-[11px] text-slate-400">
@@ -499,14 +516,12 @@
           </span>
         </div>
 
-        <!-- Chat Messages -->
         <div id="generalChatBox" class="flex-1 overflow-y-auto space-y-2.5 py-3 font-mono text-xs scrollbar-thin">
           <div class="p-2 rounded-lg bg-darkSurface/60 border border-darkBorder/40 text-slate-400 text-[11px]">
             <span class="text-amber-400 font-bold">[VIP Bot]:</span> Welcome to Aura Royale. Min threshold for bets, deposits & withdrawals is 4,000,000 💎. Log out before switching devices.
           </div>
         </div>
 
-        <!-- Chat Input Form -->
         <form id="chatForm" onsubmit="handleSendChat(event)" class="mt-2 space-y-1.5">
           <div class="flex gap-1.5">
             <input type="text" id="chatInput" placeholder="Message chat..." maxlength="120" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-neonCyan">
@@ -623,14 +638,12 @@
         </button>
       </div>
 
-      <!-- Support Messages Thread -->
       <div id="supportChatLogs" class="flex-1 overflow-y-auto p-3 space-y-2.5 font-mono text-xs my-3 bg-darkSurface rounded-xl border border-darkBorder/60 max-h-[280px] scrollbar-thin">
         <div class="p-2.5 rounded-lg bg-darkCard/80 border border-darkBorder/40 text-slate-300">
           <span class="text-cyan-400 font-bold">[Cashier Policy]:</span> Minimum deposit and withdrawal is <b class="text-cyan-300">4,000,000 💎 (4M)</b>. You must wager your withdrawal amount before submitting.
         </div>
       </div>
 
-      <!-- Live Staff Control Console -->
       <div id="staffControlPanel" class="hidden mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 font-mono text-xs">
         <div class="font-bold text-amber-300 flex items-center justify-between mb-2">
           <span><i class="fa-solid fa-shield-halved"></i> LIVE SUPPORT STAFF OVERRIDE</span>
@@ -645,7 +658,6 @@
         </div>
       </div>
 
-      <!-- Ticket Creation Form -->
       <div class="space-y-2">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none">
@@ -673,15 +685,29 @@
 
   <!-- ==================== CORE JAVASCRIPT ==================== -->
   <script>
+    // Configured directly with your registered Firebase project
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdsIHkwzg5llxiVW2Z6H6bE6d-k07jUe8",
+      authDomain: "gemluck-a5d70.firebaseapp.com",
+      databaseURL: "https://gemluck-a5d70-default-rtdb.firebaseio.com",
+      projectId: "gemluck-a5d70",
+      storageBucket: "gemluck-a5d70.firebasestorage.app",
+      messagingSenderId: "931167816034",
+      appId: "1:931167816034:web:1ec4110ee156d9a9da82aa"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const AUTHORIZED_STAFF = ['dalawar_alt', 'darkrulerx7'];
     const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
     const MIN_THRESHOLD = 4000000; // 4,000,000 💎
 
-    // Retrieve or establish persistent browser session token
-    let mySessionToken = localStorage.getItem('aura_persistent_token');
-    if (!mySessionToken) {
-      mySessionToken = 'sess_' + Math.random().toString(36).substring(2) + Date.now();
-      localStorage.setItem('aura_persistent_token', mySessionToken);
+    // Stable, isolated device signature
+    let myDeviceToken = localStorage.getItem('aura_cloud_device_token');
+    if (!myDeviceToken) {
+      myDeviceToken = 'dev_' + Math.random().toString(36).substring(2) + Date.now();
+      localStorage.setItem('aura_cloud_device_token', myDeviceToken);
     }
 
     let user = {
@@ -707,20 +733,91 @@
     ];
 
     let attachedImageBase64 = null;
-    let heartbeatInterval = null;
+    let cloudHeartbeatTimer = null;
+    let activeSessionListener = null;
 
     /* ====================================================================
-       PERSISTENT PROFILE STORAGE & 1-DEVICE LOCK
+       ATOMIC CLOUD TRANSACTION LOCK (FIREBASE REALTIME DB)
     ==================================================================== */
+    async function verifyAndLockCloudSession(username) {
+      const cleanUser = username.toLowerCase();
+      const sessionRef = db.ref('active_sessions/' + cleanUser);
+
+      // Atomic lock evaluation via runTransaction
+      const result = await sessionRef.transaction((currentData) => {
+        const now = Date.now();
+        // If an active session exists on another browser (heartbeat active in last 12 seconds), abort
+        if (currentData && currentData.token && currentData.token !== myDeviceToken) {
+          if (now - currentData.lastSeen < 12000) {
+            return; // Abort transaction (return undefined preserves current ownership)
+          }
+        }
+        // Grant/renew lock to this browser
+        return {
+          token: myDeviceToken,
+          lastSeen: now
+        };
+      });
+
+      if (!result.committed) {
+        return false; // Rejected: Locked on another browser
+      }
+
+      // Establish real-time eviction listener: If another browser steals the lock, boot this browser immediately
+      if (activeSessionListener) sessionRef.off('value', activeSessionListener);
+      activeSessionListener = sessionRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.token && data.token !== myDeviceToken) {
+          triggerRemoteSessionEviction();
+        }
+      });
+
+      // Maintain cloud heartbeat every 4 seconds
+      if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
+      cloudHeartbeatTimer = setInterval(() => {
+        if (user.username !== 'guest') {
+          sessionRef.update({ lastSeen: Date.now() });
+        }
+      }, 4000);
+
+      // Clean up lock in cloud if this tab/window is closed
+      sessionRef.onDisconnect().remove();
+
+      return true;
+    }
+
+    function triggerRemoteSessionEviction() {
+      if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
+      user.username = 'guest';
+      minesActive = false;
+      localStorage.removeItem('aura_logged_in_username');
+      document.getElementById('sessionKickOverlay').classList.remove('hidden');
+      document.body.style.pointerEvents = 'none';
+      document.getElementById('sessionKickOverlay').style.pointerEvents = 'auto';
+    }
+
+    async function handleLogout() {
+      if (confirm("Log out from this device? This will release the account so you can enter on another device/browser.")) {
+        if (user.username !== 'guest') {
+          const sessionRef = db.ref('active_sessions/' + user.username.toLowerCase());
+          if (activeSessionListener) sessionRef.off('value', activeSessionListener);
+          await sessionRef.remove();
+        }
+        localStorage.removeItem('aura_logged_in_username');
+        if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
+        location.reload();
+      }
+    }
+
     function saveUserState() {
       if (user.username !== 'guest') {
-        localStorage.setItem('aura_saved_user_' + user.username.toLowerCase(), JSON.stringify(user));
-        localStorage.setItem('aura_last_logged_in_user', user.username.toLowerCase());
+        localStorage.setItem('aura_saved_profile_' + user.username.toLowerCase(), JSON.stringify(user));
+        localStorage.setItem('aura_logged_in_username', user.username.toLowerCase());
       }
     }
 
     function loadUserState(username) {
-      const raw = localStorage.getItem('aura_saved_user_' + username.toLowerCase());
+      const raw = localStorage.getItem('aura_saved_profile_' + username.toLowerCase());
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
@@ -729,63 +826,11 @@
       }
     }
 
-    function checkActiveDeviceLock(username) {
-      const lockKey = 'device_session_lock_' + username.toLowerCase();
-      const raw = localStorage.getItem(lockKey);
-      if (!raw) return true;
-
-      try {
-        const lock = JSON.parse(raw);
-        const now = Date.now();
-        // If locked by another session token within the last 12 seconds, reject
-        if (lock.token !== mySessionToken && (now - lock.lastSeen < 12000)) {
-          return false;
-        }
-      } catch (e) {}
-
-      return true;
-    }
-
-    function lockSessionForThisDevice(username) {
-      const lockKey = 'device_session_lock_' + username.toLowerCase();
-      const lockData = {
-        user: username.toLowerCase(),
-        token: mySessionToken,
-        lastSeen: Date.now()
-      };
-      localStorage.setItem(lockKey, JSON.stringify(lockData));
-
-      if (heartbeatInterval) clearInterval(heartbeatInterval);
-      heartbeatInterval = setInterval(() => {
-        if (user.username !== 'guest') {
-          lockData.lastSeen = Date.now();
-          localStorage.setItem(lockKey, JSON.stringify(lockData));
-        }
-      }, 3000);
-    }
-
-    function releaseSessionLock() {
-      if (user.username !== 'guest') {
-        const lockKey = 'device_session_lock_' + user.username.toLowerCase();
-        localStorage.removeItem(lockKey);
-        localStorage.removeItem('aura_last_logged_in_user');
-      }
-      if (heartbeatInterval) clearInterval(heartbeatInterval);
-    }
-
-    function handleLogout() {
-      if (confirm("Log out from this device? This will free your account to log in on other devices/browsers.")) {
-        releaseSessionLock();
-        location.reload();
-      }
-    }
-
     function activateUserSession(rawUser, rawDiscord = '') {
       user.username = rawUser;
       user.discord = rawDiscord || user.discord;
       user.isStaff = AUTHORIZED_STAFF.includes(rawUser.toLowerCase());
 
-      lockSessionForThisDevice(user.username);
       saveUserState();
 
       document.getElementById('currentUserDisplay').textContent = `@${user.username}`;
@@ -805,43 +850,57 @@
       initMinesBoard();
     }
 
-    // Auto-login on page refresh if active session exists
-    window.addEventListener('DOMContentLoaded', () => {
-      const rememberedUser = localStorage.getItem('aura_last_logged_in_user');
-      if (rememberedUser) {
-        const lockKey = 'device_session_lock_' + rememberedUser;
-        const lockRaw = localStorage.getItem(lockKey);
-        if (lockRaw) {
-          try {
-            const lock = JSON.parse(lockRaw);
-            if (lock.token === mySessionToken) {
-              loadUserState(rememberedUser);
-              activateUserSession(user.username, user.discord);
-            }
-          } catch(e) {}
+    // Auto-login on refresh for this specific browser
+    window.addEventListener('DOMContentLoaded', async () => {
+      const savedUser = localStorage.getItem('aura_logged_in_username');
+      if (savedUser) {
+        try {
+          const allowed = await verifyAndLockCloudSession(savedUser);
+          if (allowed) {
+            loadUserState(savedUser);
+            activateUserSession(user.username, user.discord);
+          } else {
+            localStorage.removeItem('aura_logged_in_username');
+          }
+        } catch(err) {
+          console.error("Firebase connection error:", err);
         }
       }
     });
 
-    // Login Form Submit
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
+    // Login Form Submit with Atomic Cloud Lock
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const rawUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
       const rawDiscord = document.getElementById('discordInput').value.trim();
       const errBox = document.getElementById('loginErrorAlert');
+      const submitBtn = document.getElementById('loginSubmitBtn');
 
       if (!rawUser) return;
 
-      if (!checkActiveDeviceLock(rawUser)) {
-        errBox.classList.remove('hidden');
-        document.getElementById('loginErrorMsg').textContent = 
-          `@${rawUser} is already logged in on another device or browser! You must click "Log Out" on that browser first.`;
-        return;
-      }
+      submitBtn.textContent = "Verifying Entry...";
+      submitBtn.disabled = true;
 
-      errBox.classList.add('hidden');
-      loadUserState(rawUser);
-      activateUserSession(rawUser, rawDiscord);
+      try {
+        const isAllowed = await verifyAndLockCloudSession(rawUser);
+
+        if (!isAllowed) {
+          submitBtn.textContent = "Enter VIP Arena";
+          submitBtn.disabled = false;
+          errBox.classList.remove('hidden');
+          document.getElementById('loginErrorMsg').textContent = 
+            `@${rawUser} is already logged in on another device or browser! You must log out from the other browser first.`;
+          return;
+        }
+
+        errBox.classList.add('hidden');
+        loadUserState(rawUser);
+        activateUserSession(rawUser, rawDiscord);
+      } catch (err) {
+        alert("Firebase Realtime Database Error! Make sure your Rules tab has .read: true and .write: true published.");
+        submitBtn.textContent = "Enter VIP Arena";
+        submitBtn.disabled = false;
+      }
     });
 
     function toggleModal(modalId) {
