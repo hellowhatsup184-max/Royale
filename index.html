@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Proven Universal Firebase SDKs -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -105,7 +105,7 @@
       </div>
       <h3 class="text-base font-bold text-rose-400 uppercase tracking-wider">Account Active Elsewhere</h3>
       <p class="text-xs text-slate-300 leading-relaxed">
-        This account logged in from another browser or device. Multiple simultaneous entries are blocked.
+        This account logged in from another browser or device. Simultaneous entries are blocked.
       </p>
       <button onclick="location.reload()" class="w-full py-2.5 rounded-xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Browser
@@ -142,7 +142,6 @@
           <p class="text-[10px] text-slate-400 mt-1">Join official server: <a href="https://discord.gg/vGkHmVBEJ" target="_blank" class="text-indigo-400 underline">discord.gg/vGkHmVBEJ</a></p>
         </div>
 
-        <!-- Single Device Rejection Warning -->
         <div id="loginErrorAlert" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2">
           <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
           <span id="loginErrorMsg">Account is currently online on another device or browser! You must log out from the other browser first.</span>
@@ -182,12 +181,13 @@
         <button onclick="toggleModal('tipModal')" class="px-3 py-1.5 rounded-lg text-amber-300 hover:bg-amber-500/10 transition">
           <i class="fa-solid fa-hand-holding-dollar mr-1"></i> Tip
         </button>
-        <button onclick="toggleModal('supportModal')" class="px-3 py-1.5 rounded-lg text-cyan-300 hover:bg-cyan-500/10 transition">
+        <button onclick="toggleModal('supportModal')" class="px-3 py-1.5 rounded-lg text-cyan-300 hover:bg-cyan-500/10 transition relative">
           <i class="fa-solid fa-headset mr-1"></i> Support
+          <span id="supportBadge" class="hidden absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-2 h-2"></span>
         </button>
       </nav>
 
-      <!-- Balance & Logout Controls -->
+      <!-- Balance & Logout -->
       <div class="flex items-center gap-2">
         <div class="bg-darkBg border border-darkBorder px-3 py-1.5 rounded-xl flex items-center gap-2 font-mono text-xs sm:text-sm shadow-inner">
           <i class="fa-solid fa-gem text-cyan-400"></i>
@@ -503,7 +503,7 @@
 
     </div>
 
-    <!-- RIGHT: GENERAL CHAT & LIVE COMMUNITY (4 Cols) -->
+    <!-- RIGHT: CLOUD GENERAL CHAT (4 Cols) -->
     <div class="lg:col-span-4 flex flex-col gap-4">
       <div class="bg-darkCard border border-darkBorder rounded-2xl p-4 shadow-xl flex flex-col h-[600px]">
         <div class="flex items-center justify-between pb-3 border-b border-darkBorder">
@@ -512,13 +512,13 @@
             <h3 class="font-mono text-xs uppercase font-bold tracking-wider text-slate-200">VIP General Lounge</h3>
           </div>
           <span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> 18 Online
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Cloud Synced
           </span>
         </div>
 
         <div id="generalChatBox" class="flex-1 overflow-y-auto space-y-2.5 py-3 font-mono text-xs scrollbar-thin">
           <div class="p-2 rounded-lg bg-darkSurface/60 border border-darkBorder/40 text-slate-400 text-[11px]">
-            <span class="text-amber-400 font-bold">[VIP Bot]:</span> Welcome to Aura Royale. Min threshold for bets, deposits & withdrawals is 4,000,000 💎. Log out before switching devices.
+            <span class="text-amber-400 font-bold">[VIP Bot]:</span> Welcome to Aura Royale. Chat is live and permanent. Min threshold for bets & withdrawals is 4,000,000 💎.
           </div>
         </div>
 
@@ -535,7 +535,7 @@
     </div>
   </main>
 
-  <!-- ==================== LEADERBOARD MODAL ==================== -->
+  <!-- ==================== CLOUD LEADERBOARD MODAL ==================== -->
   <div id="leaderboardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
     <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl font-mono">
       <div class="flex justify-between items-center pb-3 border-b border-darkBorder">
@@ -550,7 +550,9 @@
         <button onclick="switchLeaderboard('balance')" id="lbTabBalance" class="py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold">Highest Balance</button>
       </div>
 
-      <div id="leaderboardList" class="space-y-2 text-xs max-h-64 overflow-y-auto scrollbar-thin"></div>
+      <div id="leaderboardList" class="space-y-2 text-xs max-h-64 overflow-y-auto scrollbar-thin">
+        <div class="text-center py-4 text-slate-500">Loading live rankings...</div>
+      </div>
     </div>
   </div>
 
@@ -623,7 +625,7 @@
     </div>
   </div>
 
-  <!-- ==================== LIVE SUPPORT & CASHIER MODAL ==================== -->
+  <!-- ==================== LIVE SUPPORT & CLOUD TICKETS MODAL ==================== -->
   <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
     <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
       <div class="flex items-center justify-between pb-3 border-b border-darkBorder">
@@ -638,12 +640,14 @@
         </button>
       </div>
 
+      <!-- Cloud Synchronized Support & Ticket Thread -->
       <div id="supportChatLogs" class="flex-1 overflow-y-auto p-3 space-y-2.5 font-mono text-xs my-3 bg-darkSurface rounded-xl border border-darkBorder/60 max-h-[280px] scrollbar-thin">
         <div class="p-2.5 rounded-lg bg-darkCard/80 border border-darkBorder/40 text-slate-300">
-          <span class="text-cyan-400 font-bold">[Cashier Policy]:</span> Minimum deposit and withdrawal is <b class="text-cyan-300">4,000,000 💎 (4M)</b>. You must wager your withdrawal amount before submitting.
+          <span class="text-cyan-400 font-bold">[Cashier Policy]:</span> Minimum deposit & withdrawal is <b class="text-cyan-300">4,000,000 💎 (4M)</b>. You must wager your withdrawal amount before submitting.
         </div>
       </div>
 
+      <!-- Staff Override Console -->
       <div id="staffControlPanel" class="hidden mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 font-mono text-xs">
         <div class="font-bold text-amber-300 flex items-center justify-between mb-2">
           <span><i class="fa-solid fa-shield-halved"></i> LIVE SUPPORT STAFF OVERRIDE</span>
@@ -658,6 +662,7 @@
         </div>
       </div>
 
+      <!-- Submit Ticket Form -->
       <div class="space-y-2">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none">
@@ -685,7 +690,6 @@
 
   <!-- ==================== CORE JAVASCRIPT ==================== -->
   <script>
-    // Configured directly with your registered Firebase project
     const firebaseConfig = {
       apiKey: "AIzaSyDdsIHkwzg5llxiVW2Z6H6bE6d-k07jUe8",
       authDomain: "gemluck-a5d70.firebaseapp.com",
@@ -703,7 +707,6 @@
     const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
     const MIN_THRESHOLD = 4000000; // 4,000,000 💎
 
-    // Stable, isolated device signature
     let myDeviceToken = localStorage.getItem('aura_cloud_device_token');
     if (!myDeviceToken) {
       myDeviceToken = 'dev_' + Math.random().toString(36).substring(2) + Date.now();
@@ -724,46 +727,248 @@
       roundsPlayed: []
     };
 
-    let mockLeaderboard = [
-      { user: 'darkrulerx7', wagered: 142000000, balance: 48000000 },
-      { user: 'Dalawar_alt', wagered: 118000000, balance: 35000000 },
-      { user: 'VipHighRoller', wagered: 89000000, balance: 22000000 },
-      { user: 'RobloxKing99', wagered: 67000000, balance: 14000000 },
-      { user: 'GemMaster', wagered: 42000000, balance: 8000000 }
-    ];
-
     let attachedImageBase64 = null;
     let cloudHeartbeatTimer = null;
     let activeSessionListener = null;
 
     /* ====================================================================
-       ATOMIC CLOUD TRANSACTION LOCK (FIREBASE REALTIME DB)
+       1. LIVE CLOUD CHAT (FIREBASE SYNCED)
+    ==================================================================== */
+    function initLiveCloudChat() {
+      const chatRef = db.ref('chat_messages');
+      // Load last 40 messages and listen for new ones
+      chatRef.limitToLast(40).on('child_added', (snapshot) => {
+        const msg = snapshot.val();
+        if (msg) renderChatMessage(msg.sender, msg.text, msg.isStaff, msg.time);
+      });
+    }
+
+    function renderChatMessage(sender, text, isStaff, time) {
+      const box = document.getElementById('generalChatBox');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'p-2 rounded-xl bg-darkSurface/90 border border-darkBorder/60';
+      msgDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-0.5">
+          <span class="${isStaff ? 'text-amber-400 font-bold' : 'text-cyan-400 font-semibold'}">@${sender}</span>
+          <span class="text-[9px] text-slate-500">${time || 'Just now'}</span>
+        </div>
+        <div class="text-slate-200 text-xs">${text}</div>
+      `;
+      box.appendChild(msgDiv);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function handleSendChat(e) {
+      e.preventDefault();
+      if (user.username === 'guest') return alert("Please log in first!");
+
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      const warning = document.getElementById('chatWarning');
+
+      if (!text) return;
+
+      const forbiddenPatterns = [/discord\.gg\/ravage/i, /discord\.com\/invite\/ravage/i];
+      if (forbiddenPatterns.some(pattern => pattern.test(text))) {
+        warning.textContent = "Security Notice: Secret VIP Server link cannot be shared in public chat.";
+        warning.classList.remove('hidden');
+        return;
+      }
+      warning.classList.add('hidden');
+
+      // Save directly to Firebase
+      await db.ref('chat_messages').push({
+        sender: user.username,
+        text: text,
+        isStaff: user.isStaff,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      input.value = '';
+    }
+
+    /* ====================================================================
+       2. LIVE SUPPORT & CASHIER TICKETS (FIREBASE SYNCED)
+    ==================================================================== */
+    function initLiveSupportTickets() {
+      const ticketsRef = db.ref('support_tickets');
+      ticketsRef.limitToLast(25).on('child_added', (snapshot) => {
+        const ticket = snapshot.val();
+        if (!ticket) return;
+
+        // Display ticket if the user is staff OR if it belongs to this player
+        if (user.isStaff || ticket.username.toLowerCase() === user.username.toLowerCase()) {
+          renderTicketMessage(ticket);
+        }
+      });
+    }
+
+    function renderTicketMessage(ticket) {
+      const logs = document.getElementById('supportChatLogs');
+      const ticketDiv = document.createElement('div');
+      ticketDiv.className = 'p-2.5 rounded-xl bg-darkCard border border-darkBorder text-slate-200';
+      
+      let html = `<div class="flex justify-between items-center mb-1">
+                    <span class="text-cyan-400 font-bold">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
+                    <span class="text-[10px] text-slate-500">${ticket.time || 'Just now'}</span>
+                  </div>
+                  <div>${ticket.message || ''}</div>`;
+      if (ticket.image) {
+        html += `<img src="${ticket.image}" class="mt-2 rounded-lg max-h-36 border border-darkBorder object-contain">`;
+      }
+      ticketDiv.innerHTML = html;
+      logs.appendChild(ticketDiv);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function handleSupportFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('supportFileLabel').textContent = file.name.substring(0, 15) + '...';
+        const reader = new FileReader();
+        reader.onload = (evt) => { attachedImageBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function sendSupportTicket() {
+      if (user.username === 'guest') return alert("Please log in first!");
+
+      const type = document.getElementById('supportTicketType').value;
+      const diamonds = parseInt(document.getElementById('supportTicketDiamonds').value) || 0;
+      const text = document.getElementById('supportMessageInput').value.trim();
+
+      if (type === 'Deposit' && diamonds < MIN_THRESHOLD) {
+        alert(`Minimum deposit threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+        return;
+      }
+
+      if (type === 'Withdrawal') {
+        if (diamonds < MIN_THRESHOLD) {
+          alert(`Minimum withdrawal threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+          return;
+        }
+        if (diamonds > user.balance) {
+          alert("Insufficient diamond balance!");
+          return;
+        }
+        if (user.totalWagered < diamonds) {
+          const needed = diamonds - user.totalWagered;
+          alert(`Withdrawal Locked! You have wagered ${user.totalWagered.toLocaleString()} 💎. You must wager ${needed.toLocaleString()} 💎 more before withdrawing.`);
+          return;
+        }
+      }
+
+      if (!text && !attachedImageBase64 && diamonds <= 0) return;
+
+      // Push to Firebase Realtime Database
+      await db.ref('support_tickets').push({
+        username: user.username,
+        type: type,
+        diamonds: diamonds,
+        message: text,
+        image: attachedImageBase64 || null,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      if (type === 'Withdrawal') {
+        updateBalance(-diamonds);
+        user.totalWithdrawals += diamonds;
+        updateAccountUI();
+      }
+
+      document.getElementById('supportMessageInput').value = '';
+      document.getElementById('supportTicketDiamonds').value = '';
+      document.getElementById('supportImageInput').value = '';
+      document.getElementById('supportFileLabel').textContent = 'Attach Image Proof';
+      attachedImageBase64 = null;
+    }
+
+    /* ====================================================================
+       3. DYNAMIC CLOUD LEADERBOARD (FIREBASE SYNCED)
+    ==================================================================== */
+    async function syncUserToCloudLeaderboard() {
+      if (user.username === 'guest') return;
+      await db.ref('leaderboards/' + user.username.toLowerCase()).set({
+        user: user.username,
+        wagered: user.totalWagered,
+        balance: user.balance,
+        lastUpdated: Date.now()
+      });
+    }
+
+    function initLeaderboardSync() {
+      db.ref('leaderboards').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          mockLeaderboard = Object.values(val);
+          renderLeaderboard(currentLeaderboardTab);
+        }
+      });
+    }
+
+    let currentLeaderboardTab = 'wagered';
+    function switchLeaderboard(type) {
+      currentLeaderboardTab = type;
+      if (type === 'wagered') {
+        document.getElementById('lbTabWagered').className = 'py-1.5 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabBalance').className = 'py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+      } else {
+        document.getElementById('lbTabBalance').className = 'py-1.5 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabWagered').className = 'py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+      }
+      renderLeaderboard(type);
+    }
+
+    function renderLeaderboard(sortKey) {
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '';
+      const sorted = [...mockLeaderboard].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+      if (sorted.length === 0) {
+        list.innerHTML = '<div class="text-center py-4 text-slate-500">No active players ranked yet.</div>';
+        return;
+      }
+      sorted.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'p-2 rounded-xl bg-darkSurface border border-darkBorder flex justify-between items-center';
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-5 text-center font-bold text-amber-400">#${index+1}</span>
+            <span class="text-slate-200">@${item.user}</span>
+          </div>
+          <div class="text-right">
+            <div class="text-amber-400 font-bold">${(item[sortKey] || 0).toLocaleString()} 💎</div>
+            <div class="text-[9px] text-slate-500 uppercase">${sortKey}</div>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    /* ====================================================================
+       ATOMIC CLOUD TRANSACTION LOCK & PROFILE PERSISTENCE
     ==================================================================== */
     async function verifyAndLockCloudSession(username) {
       const cleanUser = username.toLowerCase();
       const sessionRef = db.ref('active_sessions/' + cleanUser);
 
-      // Atomic lock evaluation via runTransaction
       const result = await sessionRef.transaction((currentData) => {
         const now = Date.now();
-        // If an active session exists on another browser (heartbeat active in last 12 seconds), abort
         if (currentData && currentData.token && currentData.token !== myDeviceToken) {
           if (now - currentData.lastSeen < 12000) {
-            return; // Abort transaction (return undefined preserves current ownership)
+            return; // Abort: active on another device
           }
         }
-        // Grant/renew lock to this browser
         return {
           token: myDeviceToken,
           lastSeen: now
         };
       });
 
-      if (!result.committed) {
-        return false; // Rejected: Locked on another browser
-      }
+      if (!result.committed) return false;
 
-      // Establish real-time eviction listener: If another browser steals the lock, boot this browser immediately
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
       activeSessionListener = sessionRef.on('value', (snapshot) => {
         const data = snapshot.val();
@@ -772,7 +977,6 @@
         }
       });
 
-      // Maintain cloud heartbeat every 4 seconds
       if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
       cloudHeartbeatTimer = setInterval(() => {
         if (user.username !== 'guest') {
@@ -780,9 +984,7 @@
         }
       }, 4000);
 
-      // Clean up lock in cloud if this tab/window is closed
       sessionRef.onDisconnect().remove();
-
       return true;
     }
 
@@ -813,6 +1015,7 @@
       if (user.username !== 'guest') {
         localStorage.setItem('aura_saved_profile_' + user.username.toLowerCase(), JSON.stringify(user));
         localStorage.setItem('aura_logged_in_username', user.username.toLowerCase());
+        syncUserToCloudLeaderboard();
       }
     }
 
@@ -850,8 +1053,12 @@
       initMinesBoard();
     }
 
-    // Auto-login on refresh for this specific browser
+    // Auto-login on refresh
     window.addEventListener('DOMContentLoaded', async () => {
+      initLiveCloudChat();
+      initLiveSupportTickets();
+      initLeaderboardSync();
+
       const savedUser = localStorage.getItem('aura_logged_in_username');
       if (savedUser) {
         try {
@@ -868,7 +1075,7 @@
       }
     });
 
-    // Login Form Submit with Atomic Cloud Lock
+    // Login Form Submit
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const rawUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
@@ -905,7 +1112,7 @@
 
     function toggleModal(modalId) {
       document.getElementById(modalId).classList.toggle('hidden');
-      if (modalId === 'leaderboardModal') renderLeaderboard('wagered');
+      if (modalId === 'leaderboardModal') renderLeaderboard(currentLeaderboardTab);
       if (modalId === 'accountModal') updateAccountUI();
     }
 
@@ -1437,120 +1644,8 @@
       }
     }
 
-    /* GENERAL CHAT */
-    function handleSendChat(e) {
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      const warning = document.getElementById('chatWarning');
-
-      if (!text) return;
-
-      const forbiddenPatterns = [/discord\.gg\/ravage/i, /discord\.com\/invite\/ravage/i];
-      const hasLeak = forbiddenPatterns.some(pattern => pattern.test(text));
-
-      if (hasLeak) {
-        warning.textContent = "Security Notice: Secret VIP Server link cannot be shared in public chat.";
-        warning.classList.remove('hidden');
-        return;
-      }
-      warning.classList.add('hidden');
-
-      appendChatMessage(user.username, text, user.isStaff);
-      input.value = '';
-    }
-
-    function appendChatMessage(sender, msg, isStaff) {
-      const box = document.getElementById('generalChatBox');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'p-2 rounded-xl bg-darkSurface/90 border border-darkBorder/60';
-      msgDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-0.5">
-          <span class="${isStaff ? 'text-amber-400 font-bold' : 'text-cyan-400 font-semibold'}">@${sender}</span>
-          <span class="text-[9px] text-slate-500">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-        </div>
-        <div class="text-slate-200 text-xs">${msg}</div>
-      `;
-      box.appendChild(msgDiv);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    /* LIVE SUPPORT & CASHIER */
-    function handleSupportFileUpload(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('supportFileLabel').textContent = file.name.substring(0, 15) + '...';
-        const reader = new FileReader();
-        reader.onload = (evt) => { attachedImageBase64 = evt.target.result; };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function sendSupportTicket() {
-      const type = document.getElementById('supportTicketType').value;
-      const diamonds = parseInt(document.getElementById('supportTicketDiamonds').value) || 0;
-      const text = document.getElementById('supportMessageInput').value.trim();
-      const logs = document.getElementById('supportChatLogs');
-
-      if (type === 'Deposit' && diamonds < MIN_THRESHOLD) {
-        alert(`Minimum deposit threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-        return;
-      }
-
-      if (type === 'Withdrawal') {
-        if (diamonds < MIN_THRESHOLD) {
-          alert(`Minimum withdrawal threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-          return;
-        }
-        if (diamonds > user.balance) {
-          alert("Insufficient diamond balance!");
-          return;
-        }
-        if (user.totalWagered < diamonds) {
-          const needed = diamonds - user.totalWagered;
-          alert(`Withdrawal Locked! You have wagered ${user.totalWagered.toLocaleString()} 💎. You must wager ${needed.toLocaleString()} 💎 more before withdrawing.`);
-          return;
-        }
-      }
-
-      if (!text && !attachedImageBase64 && diamonds <= 0) return;
-
-      const ticketDiv = document.createElement('div');
-      ticketDiv.className = 'p-2.5 rounded-xl bg-darkCard border border-darkBorder text-slate-200';
-      let html = `<div class="flex justify-between items-center mb-1">
-                    <span class="text-cyan-400 font-bold">@${user.username} [${type} - ${diamonds ? diamonds.toLocaleString() + ' 💎' : 'Info'}]</span>
-                    <span class="text-[10px] text-slate-500">Just now</span>
-                  </div>
-                  <div>${text}</div>`;
-      if (attachedImageBase64) {
-        html += `<img src="${attachedImageBase64}" class="mt-2 rounded-lg max-h-36 border border-darkBorder object-contain">`;
-      }
-      ticketDiv.innerHTML = html;
-      logs.appendChild(ticketDiv);
-      logs.scrollTop = logs.scrollHeight;
-
-      if (type === 'Withdrawal') {
-        updateBalance(-diamonds);
-        user.totalWithdrawals += diamonds;
-        updateAccountUI();
-      }
-
-      document.getElementById('supportMessageInput').value = '';
-      document.getElementById('supportTicketDiamonds').value = '';
-      document.getElementById('supportImageInput').value = '';
-      document.getElementById('supportFileLabel').textContent = 'Attach Image Proof';
-      attachedImageBase64 = null;
-
-      setTimeout(() => {
-        const staffResp = document.createElement('div');
-        staffResp.className = 'p-2 rounded-lg bg-darkSurface border border-amber-500/30 text-amber-300 text-xs';
-        staffResp.innerHTML = `<span class="font-bold">@Dalawar_alt [Staff]:</span> Ticket and proof verified under 4M threshold criteria.`;
-        logs.appendChild(staffResp);
-        logs.scrollTop = logs.scrollHeight;
-      }, 1000);
-    }
-
-    function staffModifyBalance() {
+    /* STAFF OVERRIDE */
+    async function staffModifyBalance() {
       if (!user.isStaff) return;
       const target = document.getElementById('staffTargetUser').value.trim().replace(/^@/, '');
       const delta = parseInt(document.getElementById('staffAmountDelta').value);
@@ -1562,12 +1657,22 @@
         if (delta > 0) user.totalDeposits += delta;
       }
 
-      const logs = document.getElementById('supportChatLogs');
-      const record = document.createElement('div');
-      record.className = 'p-2 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs';
-      record.innerHTML = `<i class="fa-solid fa-check"></i> Staff Modified: <b>${delta >= 0 ? '+' + delta.toLocaleString() : delta.toLocaleString()} 💎</b> for <b>@${target}</b>`;
-      logs.appendChild(record);
-      logs.scrollTop = logs.scrollHeight;
+      // Sync updated balance to the target's cloud profile
+      const targetRef = db.ref('leaderboards/' + target.toLowerCase());
+      const snapshot = await targetRef.once('value');
+      const current = snapshot.val() || { user: target, wagered: 0, balance: 10000000 };
+      current.balance = Math.max(0, (current.balance || 0) + delta);
+      await targetRef.set(current);
+
+      // Announce approval in tickets
+      await db.ref('support_tickets').push({
+        username: user.username,
+        type: 'Staff Action',
+        diamonds: delta,
+        message: `Staff adjusted ${delta >= 0 ? '+' + delta.toLocaleString() : delta.toLocaleString()} 💎 for @${target}`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
 
       document.getElementById('staffAmountDelta').value = '';
     }
@@ -1583,41 +1688,15 @@
       updateBalance(-amount);
       toggleModal('tipModal');
 
-      appendChatMessage('AuraSystem', `@${user.username} sent a tip of ${amount.toLocaleString()} 💎 to @${recipient}!`, true);
-      alert(`Sent tip of ${amount.toLocaleString()} 💎 to @${recipient}!`);
-    }
-
-    /* LEADERBOARD & ACCOUNT */
-    function switchLeaderboard(type) {
-      if (type === 'wagered') {
-        document.getElementById('lbTabWagered').className = 'py-1.5 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
-        document.getElementById('lbTabBalance').className = 'py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
-      } else {
-        document.getElementById('lbTabBalance').className = 'py-1.5 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
-        document.getElementById('lbTabWagered').className = 'py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
-      }
-      renderLeaderboard(type);
-    }
-
-    function renderLeaderboard(sortKey) {
-      const list = document.getElementById('leaderboardList');
-      list.innerHTML = '';
-      const sorted = [...mockLeaderboard].sort((a,b) => b[sortKey] - a[sortKey]);
-      sorted.forEach((item, index) => {
-        const row = document.createElement('div');
-        row.className = 'p-2 rounded-xl bg-darkSurface border border-darkBorder flex justify-between items-center';
-        row.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="w-5 text-center font-bold text-amber-400">#${index+1}</span>
-            <span class="text-slate-200">@${item.user}</span>
-          </div>
-          <div class="text-right">
-            <div class="text-amber-400 font-bold">${item[sortKey].toLocaleString()} 💎</div>
-            <div class="text-[9px] text-slate-500 uppercase">${sortKey}</div>
-          </div>
-        `;
-        list.appendChild(row);
+      db.ref('chat_messages').push({
+        sender: 'AuraSystem',
+        text: `@${user.username} sent a tip of ${amount.toLocaleString()} 💎 to @${recipient}!`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
       });
+
+      alert(`Sent tip of ${amount.toLocaleString()} 💎 to @${recipient}!`);
     }
 
     function updateAccountUI() {
