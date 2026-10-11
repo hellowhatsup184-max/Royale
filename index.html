@@ -295,7 +295,6 @@
         </div>
       </div>
 
-      <!-- Cashier Buttons, Channels, Balance & Menu Drawer Trigger -->
       <div class="flex items-center gap-3 font-mono">
         <div class="hidden sm:flex items-center gap-2">
           <button onclick="openCashierModal('Deposit')" class="px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5">
@@ -760,7 +759,7 @@
         </div>
       </div>
 
-      <!-- Staff Balance Override: STRICTLY RESTRICTED TO PRIMARY ADMINS -->
+      <!-- Staff Balance Override -->
       <div id="staffControlPanel" class="hidden mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs">
         <div class="font-bold text-amber-300 flex items-center justify-between mb-2.5">
           <span><i class="fa-solid fa-shield-halved"></i> PRIMARY ADMIN BALANCE OVERRIDE</span>
@@ -1481,43 +1480,62 @@
     }
 
     /* ====================================================================
-       AUTHENTICATION & SESSION ENGINE
+       BULLETPROOF SINGLE-DEVICE ATOMIC LOCK
     ==================================================================== */
     async function verifyAndLockCloudSession(username) {
       const cleanUser = username.toLowerCase();
       const sessionRef = db.ref('active_sessions/' + cleanUser);
 
-      const result = await sessionRef.transaction((currentData) => {
-        const now = Date.now();
-        if (currentData && currentData.token && currentData.token !== myDeviceToken) {
-          if (now - currentData.lastSeen < 12000) {
-            return;
+      // 1. Fetch current live session state
+      const snapshot = await sessionRef.once('value');
+      const sessionData = snapshot.val();
+      const now = Date.now();
+
+      // 2. Reject if another device holds an active heartbeat (< 15s ago)
+      if (sessionData && sessionData.token && sessionData.token !== myDeviceToken) {
+        if (now - (sessionData.lastSeen || 0) < 15000) {
+          return false; // REJECT: Another device is currently active
+        }
+      }
+
+      // 3. Atomically claim session for this specific device
+      const txResult = await sessionRef.transaction((current) => {
+        const currentTime = Date.now();
+        if (current && current.token && current.token !== myDeviceToken) {
+          if (currentTime - (current.lastSeen || 0) < 15000) {
+            return; // Abort transaction
           }
         }
         return {
           token: myDeviceToken,
-          lastSeen: now
+          lastSeen: currentTime
         };
       });
 
-      if (!result.committed) return false;
+      if (!txResult.committed) {
+        return false;
+      }
 
+      // 4. Detach old listener if any and attach live eviction listener
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
-      activeSessionListener = sessionRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.token && data.token !== myDeviceToken) {
+      activeSessionListener = sessionRef.on('value', (snap) => {
+        const val = snap.val();
+        if (val && val.token && val.token !== myDeviceToken) {
           triggerRemoteSessionEviction();
         }
       });
 
+      // 5. Active heartbeat every 3 seconds to keep lock fresh
       if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
       cloudHeartbeatTimer = setInterval(() => {
         if (user.username !== 'guest') {
           sessionRef.update({ lastSeen: Date.now() });
         }
-      }, 4000);
+      }, 3000);
 
+      // 6. Clean up on disconnect / closed tab
       sessionRef.onDisconnect().remove();
+
       return true;
     }
 
@@ -1608,7 +1626,7 @@
 
       if (!rawUser) return;
 
-      submitBtn.textContent = "Verifying Entry...";
+      submitBtn.textContent = "Verifying Single Device...";
       submitBtn.disabled = true;
 
       try {
@@ -1619,14 +1637,15 @@
           submitBtn.disabled = false;
           errBox.classList.remove('hidden');
           document.getElementById('loginErrorMsg').textContent = 
-            `@${rawUser} is already logged in on another device or browser! You must log out from the other browser first.`;
+            `@${rawUser} is currently logged in on another device/browser! You must log out there first.`;
           return;
         }
 
         errBox.classList.add('hidden');
         await activateUserSession(rawUser, rawDiscord);
       } catch (err) {
-        alert("Firebase Realtime Database Error! Make sure your Rules tab has .read: true and .write: true published.");
+        console.error(err);
+        alert("Connection Error! Verify your Firebase database rules allow read/write.");
         submitBtn.textContent = "Enter VIP Arena";
         submitBtn.disabled = false;
       }
