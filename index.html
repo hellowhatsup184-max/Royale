@@ -6,9 +6,8 @@
   <title>Aura Royale VIP - Diamond Arcade & Social Casino</title>
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Premium Modern Typography Pairing -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -108,7 +107,7 @@
       </div>
       <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Device Firewall Activated</h3>
       <p class="text-xs text-slate-300 leading-relaxed font-sans">
-        This account is active on another device or browser session. Multiple concurrent logins are blocked by the firewall.
+        This account is active on another device or browser. Concurrent access is strictly disabled.
       </p>
       <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Device
@@ -130,7 +129,6 @@
         </button>
       </div>
 
-      <!-- Quick Cashier Buttons in Drawer -->
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="openCashierModal('Deposit')" class="py-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-circle-plus"></i> Deposit
@@ -148,7 +146,6 @@
         <i class="fa-solid fa-comments"></i> Active Channels
       </button>
 
-      <!-- Navigation Links -->
       <nav class="space-y-2 mt-5 text-xs">
         <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
           <i class="fa-solid fa-gamepad text-sky-400 w-5"></i> Casino Games
@@ -830,7 +827,7 @@
     </div>
   </div>
 
-  <!-- ==================== CORE SCRIPT & FIREWALL ENGINE ==================== -->
+  <!-- ==================== CORE SCRIPT & BULLETPROOF FIREWALL ==================== -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDdsIHkwzg5llxiVW2Z6H6bE6d-k07jUe8",
@@ -880,7 +877,7 @@
     let activeChannelListener = null;
 
     /* ====================================================================
-       SINGLE-DEVICE FIREWALL (SYNCHRONOUS LEASE MUTEX)
+       RELIABLE SINGLE-DEVICE CLOUD FIREWALL (PERSISTS ON REFRESH)
     ==================================================================== */
     async function verifyAndLockCloudSession(username) {
       const cleanUser = username.toLowerCase();
@@ -891,56 +888,73 @@
         const data = snap.val();
         const now = Date.now();
 
-        // If another device holds an active lease (< 8s old), DENY IMMEDIATELY
+        // 1. REFRESH CHECK: If this device ALREADY holds the token, grant immediately!
+        if (data && data.token === myDeviceToken) {
+          await sessionRef.update({
+            lastSeen: now,
+            expiresAt: now + 16000
+          });
+          setupSessionGuards(sessionRef);
+          return true;
+        }
+
+        // 2. CONCURRENT CHECK: If another device has an active lease (<16s), REJECT!
         if (data && data.token && data.token !== myDeviceToken) {
-          if (data.lastSeen && (now - data.lastSeen < 8000)) {
-            return false;
+          const expiration = data.expiresAt || (data.lastSeen ? data.lastSeen + 16000 : 0);
+          if (now < expiration) {
+            return false; // Actively held by another device
           }
         }
 
-        let lockAcquired = false;
+        // 3. ATOMIC CLAIM: Take over lock safely with 16-second window
+        let acquired = false;
         await sessionRef.transaction((curr) => {
           const txNow = Date.now();
           if (curr && curr.token && curr.token !== myDeviceToken) {
-            if (curr.lastSeen && (txNow - curr.lastSeen < 8000)) {
-              lockAcquired = false;
-              return; // Abort
+            const currExp = curr.expiresAt || (curr.lastSeen ? curr.lastSeen + 16000 : 0);
+            if (txNow < currExp) {
+              acquired = false;
+              return; // Another device grabbed it
             }
           }
-          lockAcquired = true;
+          acquired = true;
           return {
             token: myDeviceToken,
-            lastSeen: txNow
+            lastSeen: txNow,
+            expiresAt: txNow + 16000
           };
         });
 
-        if (!lockAcquired) return false;
+        if (!acquired) return false;
 
-        // Auto-remove lock when browser tab closes or disconnects
-        sessionRef.onDisconnect().remove();
-
-        // Real-time eviction sentry
-        if (activeSessionListener) sessionRef.off('value', activeSessionListener);
-        activeSessionListener = sessionRef.on('value', (s) => {
-          const val = s.val();
-          if (val && val.token && val.token !== myDeviceToken) {
-            triggerRemoteSessionEviction();
-          }
-        });
-
-        // 3-second heartbeat keep-alive
-        if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
-        cloudHeartbeatTimer = setInterval(() => {
-          if (user.username !== 'guest') {
-            sessionRef.update({ lastSeen: Date.now() });
-          }
-        }, 3000);
-
+        setupSessionGuards(sessionRef);
         return true;
       } catch (err) {
-        console.error("Lock error:", err);
+        console.error("Lock verification error:", err);
         return false;
       }
+    }
+
+    function setupSessionGuards(sessionRef) {
+      // Real-time eviction sentry: if another browser takes the lease, evict this one
+      if (activeSessionListener) sessionRef.off('value', activeSessionListener);
+      activeSessionListener = sessionRef.on('value', (snap) => {
+        const val = snap.val();
+        if (val && val.token && val.token !== myDeviceToken) {
+          triggerRemoteSessionEviction();
+        }
+      });
+
+      // 4-second heartbeat to maintain the 16-second lease
+      if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
+      cloudHeartbeatTimer = setInterval(() => {
+        if (user.username !== 'guest') {
+          sessionRef.update({
+            lastSeen: Date.now(),
+            expiresAt: Date.now() + 16000
+          });
+        }
+      }, 4000);
     }
 
     function triggerRemoteSessionEviction() {
