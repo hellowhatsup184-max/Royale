@@ -6,7 +6,6 @@
   <title>Aura Royale VIP - Diamond Arcade & Social Casino</title>
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Premium Modern Typography Pairing -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -108,7 +107,7 @@
       </div>
       <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Device Firewall Activated</h3>
       <p class="text-xs text-slate-300 leading-relaxed font-sans">
-        This account is currently active on another device or browser session. Multiple concurrent logins are blocked by the firewall.
+        This account is active on another device or browser. Concurrent access is strictly disabled.
       </p>
       <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Device
@@ -252,7 +251,7 @@
           <h3 class="font-display text-lg font-black text-amber-300 flex items-center gap-2.5">
             <i class="fa-solid fa-shield-halved text-amber-400"></i> Staff Operations &amp; Approvals
           </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Authorised Officers: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
+          <p class="text-xs text-slate-400 mt-0.5">Officers: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
         </div>
         <button onclick="toggleModal('staffPortalModal')" class="text-slate-400 hover:text-white p-2">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -350,7 +349,7 @@
             <span class="absolute left-3.5 top-3.5 text-slate-500 font-mono">@</span>
             <input type="text" id="robloxInput" required placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-9 pr-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
           </div>
-          <p class="text-[10px] text-slate-500 mt-1.5 font-mono">Support Duty: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
+          <p class="text-[10px] text-slate-500 mt-1.5 font-mono">Authorized: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
         </div>
 
         <div>
@@ -365,7 +364,7 @@
 
         <div id="loginErrorAlert" class="hidden p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2.5">
           <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
-          <span id="loginErrorMsg">Account is currently online on another device or browser!</span>
+          <span id="loginErrorMsg">Account active on another browser/device!</span>
         </div>
 
         <button type="submit" id="loginSubmitBtn" class="w-full py-3.5 rounded-2xl font-display font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
@@ -425,7 +424,6 @@
     <!-- LEFT & CENTER: GAMES (2 Columns) -->
     <div class="lg:col-span-2 flex flex-col gap-6">
       
-      <!-- VIP 30X EXCLUSIVE REWARD BANNER -->
       <div id="vipRewardBanner" class="p-4 sm:p-5 rounded-3xl border border-darkBorder bg-darkCard/90 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono shadow-xl backdrop-blur-xl">
         <div class="flex items-center gap-3.5">
           <div class="h-10 w-10 rounded-2xl bg-purple-900/40 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xl">
@@ -1025,7 +1023,7 @@
 
       if (relevant.length === 0) {
         container.innerHTML = `
-          <div class="text-slate-500 text-center py-8 text-xs">
+          <div class="text-slate-500 text-center py-8 text-xs font-sans">
             No active channels yet.<br>Channels are opened once a ticket is approved by staff.
           </div>
         `;
@@ -1561,47 +1559,47 @@
     }
 
     /* ====================================================================
-       STRICT REALTIME SINGLE-DEVICE FIREWALL (SERVER TIMESTAMP)
+       STRICT SINGLE-DEVICE MUTEX FIREWALL
     ==================================================================== */
     async function verifyAndLockCloudSession(username) {
       const cleanUser = username.toLowerCase();
       const sessionRef = db.ref('active_sessions/' + cleanUser);
 
-      // 1. Fetch current server time offset to eliminate client clock discrepancies
-      const offsetSnap = await db.ref('.info/serverTimeOffset').once('value');
-      const offset = offsetSnap.val() || 0;
-      const serverNow = Date.now() + offset;
-
-      // 2. Fetch active session state
+      // 1. Check existing state
       const snap = await sessionRef.once('value');
       const data = snap.val();
 
+      // If active session belongs to someone else and was touched within 12 seconds, DENY
       if (data && data.token && data.token !== myDeviceToken) {
-        if (data.expiresAt && data.expiresAt > serverNow) {
-          return false; // Active lock held by other device
+        const now = Date.now();
+        if (data.lastSeen && (now - data.lastSeen < 12000)) {
+          return false;
         }
       }
 
-      // 3. Atomically register lock with lease in Firebase
-      const tx = await sessionRef.transaction((current) => {
-        const estServerNow = Date.now() + offset;
-        if (current && current.token && current.token !== myDeviceToken) {
-          if (current.expiresAt && current.expiresAt > estServerNow) {
-            return; // Abort: other session is active
+      // 2. Atomic Lock Ownership
+      let granted = false;
+      await sessionRef.transaction((curr) => {
+        const now = Date.now();
+        if (curr && curr.token && curr.token !== myDeviceToken) {
+          if (curr.lastSeen && (now - curr.lastSeen < 12000)) {
+            granted = false;
+            return; // Abort: lock held
           }
         }
+        granted = true;
         return {
           token: myDeviceToken,
-          expiresAt: estServerNow + 10000,
-          updatedAt: firebase.database.ServerValue.TIMESTAMP
+          lastSeen: now
         };
       });
 
-      if (!tx.committed) {
-        return false;
-      }
+      if (!granted) return false;
 
-      // 4. Attach real-time kick listener
+      // 3. Set automated removal when this browser disconnects or closes
+      sessionRef.onDisconnect().remove();
+
+      // 4. Attach remote eviction sentry
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
       activeSessionListener = sessionRef.on('value', (s) => {
         const val = s.val();
@@ -1610,21 +1608,16 @@
         }
       });
 
-      // 5. Active 3-second heartbeat to maintain lease
+      // 5. Active heartbeat keep-alive
       if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
-      cloudHeartbeatTimer = setInterval(async () => {
+      cloudHeartbeatTimer = setInterval(() => {
         if (user.username !== 'guest') {
-          const offSnap = await db.ref('.info/serverTimeOffset').once('value');
-          const off = offSnap.val() || 0;
           sessionRef.update({
-            expiresAt: Date.now() + off + 10000,
-            updatedAt: firebase.database.ServerValue.TIMESTAMP
+            lastSeen: Date.now()
           });
         }
       }, 3000);
 
-      // Clean up lock on tab close or navigation
-      sessionRef.onDisconnect().remove();
       return true;
     }
 
@@ -1732,7 +1725,7 @@
           submitBtn.disabled = false;
           errBox.classList.remove('hidden');
           document.getElementById('loginErrorMsg').textContent = 
-            `@${rawUser} is currently logged in on another device or browser! You must log out there first.`;
+            `@${rawUser} is already logged in on another device or browser! You must log out there first.`;
           return;
         }
 
@@ -1901,7 +1894,7 @@
     }
 
     /* ====================================================================
-       RIGGED GAME ENGINES & LOGIC
+       GAME ENGINES & LOGIC
     ==================================================================== */
     function toggleModal(modalId) {
       document.getElementById(modalId).classList.toggle('hidden');
