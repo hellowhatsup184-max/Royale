@@ -14,51 +14,1632 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+  <!-- ==================== CORE SCRIPT & BULLETPROOF FIREWALL ==================== -->
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            display: ['"Syne"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace']
-          },
-          colors: {
-            neonCyan: '#38bdf8',
-            neonGold: '#fbbf24',
-            darkBg: '#06080f',
-            darkSurface: '#0b1120',
-            darkCard: '#10172a',
-            darkBorder: '#1e293b'
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdsIHkwzg5llxiVW2Z6H6bE6d-k07jUe8",
+      authDomain: "gemluck-a5d70.firebaseapp.com",
+      databaseURL: "https://gemluck-a5d70-default-rtdb.firebaseio.com",
+      projectId: "gemluck-a5d70",
+      storageBucket: "gemluck-a5d70.firebasestorage.app",
+      messagingSenderId: "931167816034",
+      appId: "1:931167816034:web:1ec4110ee156d9a9da82aa"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const PRIMARY_ADMINS = ['dalawar_alt', 'darkrulerx7'];
+    const SUPPORT_STAFF = ['dalawar_alt', 'darkrulerx7', 'rastant86'];
+    const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
+    const MIN_THRESHOLD = 4000000; // 4,000,000 💎
+
+    // Hardware/Browser Isolated Fingerprint
+    let myDeviceToken = localStorage.getItem('aura_cloud_device_token');
+    if (!myDeviceToken) {
+      myDeviceToken = 'hw_' + Math.random().toString(36).substring(2) + Date.now();
+      localStorage.setItem('aura_cloud_device_token', myDeviceToken);
+    }
+
+    let user = {
+      username: 'guest',
+      discord: '',
+      isStaff: false,
+      isPrimaryAdmin: false,
+      balance: 10000000,
+      totalWagered: 0,
+      totalDeposits: 10000000,
+      totalWithdrawals: 0,
+      netProfit: 0,
+      vipUnlocked: false,
+      lossStreak: 0,
+      roundsPlayed: []
+    };
+
+    let attachedImageBase64 = null;
+    let cloudHeartbeatTimer = null;
+    let activeSessionListener = null;
+    let liveTicketsList = [];
+    let currentActiveChannelId = null;
+    let activeChannelListener = null;
+
+    /* ====================================================================
+       STRICT SINGLE-DEVICE MUTEX FIREWALL
+    ==================================================================== */
+    async function verifyAndLockCloudSession(username) {
+      const cleanUser = username.toLowerCase();
+      const sessionRef = db.ref('active_sessions/' + cleanUser);
+
+      try {
+        const snap = await sessionRef.once('value');
+        const data = snap.val();
+        const now = Date.now();
+
+        // If another device holds an active lease (< 10s old), REJECT IMMEDIATELY
+        if (data && data.token && data.token !== myDeviceToken) {
+          if (data.lastSeen && (now - data.lastSeen < 10000)) {
+            return false;
           }
+        }
+
+        // Atomically acquire session
+        let lockAcquired = false;
+        await sessionRef.transaction((curr) => {
+          const txNow = Date.now();
+          if (curr && curr.token && curr.token !== myDeviceToken) {
+            if (curr.lastSeen && (txNow - curr.lastSeen < 10000)) {
+              lockAcquired = false;
+              return; // Abort transaction
+            }
+          }
+          lockAcquired = true;
+          return {
+            token: myDeviceToken,
+            lastSeen: txNow
+          };
+        });
+
+        if (!lockAcquired) return false;
+
+        // Auto-release session on disconnect
+        sessionRef.onDisconnect().remove();
+
+        // Real-time eviction sentry: if another browser steals the lock, boot this browser
+        if (activeSessionListener) sessionRef.off('value', activeSessionListener);
+        activeSessionListener = sessionRef.on('value', (s) => {
+          const val = s.val();
+          if (val && val.token && val.token !== myDeviceToken) {
+            triggerRemoteSessionEviction();
+          }
+        });
+
+        // 3-second heartbeat keep-alive
+        if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
+        cloudHeartbeatTimer = setInterval(() => {
+          if (user.username !== 'guest') {
+            sessionRef.update({ lastSeen: Date.now() });
+          }
+        }, 3000);
+
+        return true;
+      } catch (err) {
+        console.error("Lock error:", err);
+        return false;
+      }
+    }
+
+    function triggerRemoteSessionEviction() {
+      if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
+      user.username = 'guest';
+      minesActive = false;
+      localStorage.removeItem('aura_logged_in_username');
+      document.getElementById('sessionKickOverlay').classList.remove('hidden');
+      document.body.style.pointerEvents = 'none';
+      document.getElementById('sessionKickOverlay').style.pointerEvents = 'auto';
+    }
+
+    async function handleLogout() {
+      if (confirm("Log out from this device? This will release the account for other browsers.")) {
+        if (user.username !== 'guest') {
+          const sessionRef = db.ref('active_sessions/' + user.username.toLowerCase());
+          if (activeSessionListener) sessionRef.off('value', activeSessionListener);
+          await sessionRef.remove();
+        }
+        localStorage.removeItem('aura_logged_in_username');
+        if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
+        location.reload();
+      }
+    }
+
+    /* ====================================================================
+       PERSISTENT CLOUD PROFILE STORAGE
+    ==================================================================== */
+    async function loadCloudUserProfile(username) {
+      const cleanUser = username.toLowerCase();
+      const userRef = db.ref('user_profiles/' + cleanUser);
+      const snapshot = await userRef.once('value');
+      const data = snapshot.val();
+
+      if (data) {
+        user.balance = (typeof data.balance === 'number') ? data.balance : 10000000;
+        user.totalWagered = data.totalWagered || 0;
+        user.totalDeposits = data.totalDeposits || 10000000;
+        user.totalWithdrawals = data.totalWithdrawals || 0;
+        user.netProfit = data.netProfit || 0;
+        user.vipUnlocked = data.vipUnlocked || false;
+      } else {
+        await userRef.set({
+          username: user.username,
+          balance: 10000000,
+          totalWagered: 0,
+          totalDeposits: 10000000,
+          totalWithdrawals: 0,
+          netProfit: 0,
+          vipUnlocked: false
+        });
+        user.balance = 10000000;
+        user.vipUnlocked = false;
+      }
+
+      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+      updateAccountUI();
+
+      if (user.vipUnlocked) {
+        renderVIPBannerUnlocked();
+      }
+
+      userRef.on('value', (snap) => {
+        const live = snap.val();
+        if (live) {
+          if (typeof live.balance === 'number') {
+            user.balance = live.balance;
+            document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+            updateAccountUI();
+          }
+          if (live.vipUnlocked && !user.vipUnlocked) {
+            user.vipUnlocked = true;
+            renderVIPBannerUnlocked();
+          }
+        }
+      });
+    }
+
+    async function syncCloudUserProfile() {
+      if (user.username === 'guest') return;
+      await db.ref('user_profiles/' + user.username.toLowerCase()).update({
+        balance: user.balance,
+        totalWagered: user.totalWagered,
+        totalDeposits: user.totalDeposits,
+        totalWithdrawals: user.totalWithdrawals,
+        netProfit: user.netProfit,
+        vipUnlocked: user.vipUnlocked
+      });
+      syncUserToCloudLeaderboard();
+    }
+
+    function renderVIPBannerUnlocked(mult) {
+      const linkBtn = document.getElementById('vipRewardLink');
+      linkBtn.href = VIP_REWARD_DISCORD;
+      linkBtn.className = 'px-4 py-2.5 rounded-2xl border border-purple-400 bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center gap-2 text-xs whitespace-nowrap shadow-lg shadow-purple-500/30';
+      linkBtn.innerHTML = 'Access Exclusive Lounge <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
+      document.getElementById('vipRewardStatus').textContent = mult 
+        ? `Unlocked: Reached ${mult.toFixed(2)}x Profit in Mines!` 
+        : `Unlocked: Exclusive VIP Access Active!`;
+    }
+
+    function unlockVIPDiscordMines(mult) {
+      user.vipUnlocked = true;
+      renderVIPBannerUnlocked(mult);
+      syncCloudUserProfile();
+    }
+
+    /* ====================================================================
+       INITIALIZATION & LOGIN GATEWAY
+    ==================================================================== */
+    async function activateUserSession(rawUser, rawDiscord = '') {
+      user.username = rawUser;
+      user.discord = rawDiscord || user.discord;
+
+      const cleanLower = rawUser.toLowerCase();
+      user.isStaff = SUPPORT_STAFF.includes(cleanLower);
+      user.isPrimaryAdmin = PRIMARY_ADMINS.includes(cleanLower);
+
+      localStorage.setItem('aura_logged_in_username', cleanLower);
+      await loadCloudUserProfile(rawUser);
+
+      document.getElementById('currentUserDisplay').textContent = `@${user.username}`;
+      const roleBadge = document.getElementById('roleBadge');
+
+      if (user.isStaff) {
+        roleBadge.textContent = user.isPrimaryAdmin ? 'ADMIN STAFF' : 'SUPPORT DESK';
+        roleBadge.className = 'text-[9px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        
+        document.getElementById('headerStaffBtn').classList.remove('hidden');
+        document.getElementById('drawerStaffBtn').classList.remove('hidden');
+
+        if (user.isPrimaryAdmin) {
+          document.getElementById('staffControlPanel').classList.remove('hidden');
+        } else {
+          document.getElementById('staffControlPanel').classList.add('hidden');
+        }
+      } else {
+        roleBadge.textContent = 'VIP MEMBER';
+        roleBadge.className = 'text-[9px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40';
+        document.getElementById('headerStaffBtn').classList.add('hidden');
+        document.getElementById('drawerStaffBtn').classList.add('hidden');
+        document.getElementById('staffControlPanel').classList.add('hidden');
+      }
+
+      // Hide login modal only after lock and session are established
+      document.getElementById('loginModal').classList.add('hidden');
+      initMinesBoard();
+      renderVisibleTickets();
+      if (user.isStaff) renderStaffQueue();
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initLiveCloudChat();
+      initLiveSupportTickets();
+      initLeaderboardSync();
+      initRealPlayerLiveFeed();
+
+      const savedUser = localStorage.getItem('aura_logged_in_username');
+      if (savedUser) {
+        // Enforce lock check on reload before auto-logging in
+        const allowed = await verifyAndLockCloudSession(savedUser);
+        if (allowed) {
+          await activateUserSession(savedUser);
+        } else {
+          // Denied: clear saved session and force login modal
+          localStorage.removeItem('aura_logged_in_username');
+          document.getElementById('loginModal').classList.remove('hidden');
+        }
+      }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rawUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
+      const rawDiscord = document.getElementById('discordInput').value.trim();
+      const errBox = document.getElementById('loginErrorAlert');
+      const submitBtn = document.getElementById('loginSubmitBtn');
+
+      if (!rawUser) return;
+
+      submitBtn.textContent = "Verifying Single Device...";
+      submitBtn.disabled = true;
+
+      const isAllowed = await verifyAndLockCloudSession(rawUser);
+
+      if (!isAllowed) {
+        submitBtn.textContent = "Enter VIP Arena";
+        submitBtn.disabled = false;
+        errBox.classList.remove('hidden');
+        document.getElementById('loginErrorMsg').textContent = 
+          `@${rawUser} is already logged in on another device or browser! You must log out there first.`;
+        return;
+      }
+
+      errBox.classList.add('hidden');
+      await activateUserSession(rawUser, rawDiscord);
+    });
+
+    /* ====================================================================
+       ALL-IN-ONE SLIDING MENU DRAWER & CASHIER MODALS
+    ==================================================================== */
+    function toggleMenuDrawer() {
+      const drawer = document.getElementById('menuDrawer');
+      const backdrop = document.getElementById('menuDrawerBackdrop');
+      const isOpen = !drawer.classList.contains('translate-x-full');
+
+      if (isOpen) {
+        drawer.classList.add('translate-x-full');
+        backdrop.classList.add('hidden');
+      } else {
+        drawer.classList.remove('translate-x-full');
+        backdrop.classList.remove('hidden');
+        document.getElementById('drawerUserDisplay').textContent = `@${user.username}`;
+      }
+    }
+
+    function menuNavigate(target) {
+      toggleMenuDrawer();
+      if (target === 'games') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (target === 'account') {
+        toggleModal('accountModal');
+      } else if (target === 'leaderboard') {
+        toggleModal('leaderboardModal');
+      } else if (target === 'tip') {
+        toggleModal('tipModal');
+      } else if (target === 'support') {
+        toggleModal('supportModal');
+      }
+    }
+
+    function openCashierModal(mode) {
+      const modal = document.getElementById('supportModal');
+      modal.classList.remove('hidden');
+      document.getElementById('supportTicketType').value = mode;
+      renderVisibleTickets();
+    }
+
+    function toggleChannelsListModal() {
+      const modal = document.getElementById('channelsListModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        renderChannelsList();
+      }
+    }
+
+    /* ====================================================================
+       DEDICATED SUPPORT CHANNELS
+    ==================================================================== */
+    function renderChannelsList() {
+      const container = document.getElementById('channelsListContent');
+      container.innerHTML = '';
+
+      const relevant = liveTicketsList.filter(t => {
+        const matchesUser = user.isStaff || (t.username && t.username.toLowerCase() === user.username.toLowerCase());
+        const hasChannel = t.status === 'Approved' || t.status === 'Closed';
+        return matchesUser && hasChannel;
+      });
+
+      if (relevant.length === 0) {
+        container.innerHTML = `
+          <div class="text-slate-500 text-center py-8 text-xs font-sans">
+            No active channels yet.<br>Channels are opened once a ticket is approved by staff.
+          </div>
+        `;
+        return;
+      }
+
+      relevant.forEach(ticket => {
+        const item = document.createElement('div');
+        item.className = 'p-3.5 rounded-2xl bg-darkSurface border border-darkBorder flex items-center justify-between hover:border-sky-500/50 transition cursor-pointer';
+        item.onclick = () => {
+          toggleChannelsListModal();
+          openTicketChannel(ticket.id);
+        };
+
+        const isClosed = ticket.status === 'Closed';
+
+        item.innerHTML = `
+          <div>
+            <div class="flex items-center gap-2.5">
+              <span class="font-display font-bold text-slate-100 text-xs">Channel #${ticket.id.slice(-5)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isClosed ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500/20 text-emerald-300'}">
+                ${isClosed ? 'Closed' : 'Active'}
+              </span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-1 font-sans">
+              @${ticket.username} • ${ticket.type} (${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'})
+            </div>
+          </div>
+          <button class="px-3 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 text-[10px] font-bold border border-sky-500/30">
+            Open <i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function openTicketChannel(ticketId) {
+      currentActiveChannelId = ticketId;
+      const ticket = liveTicketsList.find(t => t.id === ticketId);
+      if (!ticket) return;
+
+      document.getElementById('channelTitle').textContent = `Channel #${ticketId.slice(-5)} [${ticket.type}]`;
+      document.getElementById('channelSubtitle').textContent = `@${ticket.username} • ${ticket.status || 'Active'}`;
+
+      const closeBtn = document.getElementById('channelCloseBtn');
+      if (user.isStaff && ticket.status !== 'Closed') {
+        closeBtn.classList.remove('hidden');
+      } else {
+        closeBtn.classList.add('hidden');
+      }
+
+      const chatInput = document.getElementById('channelChatInput');
+      const sendBtn = document.getElementById('channelSendBtn');
+      const closedAlert = document.getElementById('channelClosedAlert');
+
+      if (ticket.status === 'Closed') {
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        closedAlert.classList.remove('hidden');
+      } else {
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        closedAlert.classList.add('hidden');
+      }
+
+      document.getElementById('ticketChannelModal').classList.remove('hidden');
+
+      const logs = document.getElementById('channelChatLogs');
+      logs.innerHTML = '';
+
+      const msgsRef = db.ref(`ticket_channels/${ticketId}/messages`);
+      if (activeChannelListener) msgsRef.off('child_added', activeChannelListener);
+
+      activeChannelListener = msgsRef.on('child_added', (snap) => {
+        const msg = snap.val();
+        if (msg) renderChannelMessage(msg);
+      });
+    }
+
+    function renderChannelMessage(msg) {
+      const logs = document.getElementById('channelChatLogs');
+      const isMe = msg.sender.toLowerCase() === user.username.toLowerCase();
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+      msgDiv.innerHTML = `
+        <div class="text-[9px] text-slate-400 mb-0.5">
+          <span class="${msg.isStaff ? 'text-amber-400 font-bold' : 'text-sky-400'}">@${msg.sender}</span> • ${msg.time || ''}
+        </div>
+        <div class="p-3 rounded-2xl text-xs max-w-[85%] ${isMe ? 'bg-sky-600/30 border border-sky-500/40 text-sky-100' : 'bg-darkSurface border border-darkBorder text-slate-200'}">
+          ${msg.text}
+        </div>
+      `;
+      logs.appendChild(msgDiv);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    async function handleSendChannelMessage(e) {
+      e.preventDefault();
+      if (!currentActiveChannelId) return;
+
+      const input = document.getElementById('channelChatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      await db.ref(`ticket_channels/${currentActiveChannelId}/messages`).push({
+        sender: user.username,
+        text: text,
+        isStaff: user.isStaff,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      input.value = '';
+    }
+
+    function closeTicketChannelModal() {
+      if (currentActiveChannelId && activeChannelListener) {
+        db.ref(`ticket_channels/${currentActiveChannelId}/messages`).off('child_added', activeChannelListener);
+      }
+      currentActiveChannelId = null;
+      document.getElementById('ticketChannelModal').classList.add('hidden');
+    }
+
+    async function staffCloseTicketChannel() {
+      if (!user.isStaff || !currentActiveChannelId) return;
+      if (!confirm("Are you sure you want to close this ticket channel?")) return;
+
+      await db.ref('support_tickets/' + currentActiveChannelId).update({
+        status: 'Closed',
+        closedBy: user.username,
+        closedAt: Date.now()
+      });
+
+      await db.ref(`ticket_channels/${currentActiveChannelId}/messages`).push({
+        sender: 'AuraSupport',
+        text: `Ticket channel marked Closed by staff @${user.username}.`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      openTicketChannel(currentActiveChannelId);
+    }
+
+    /* ====================================================================
+       ATOMIC WITHDRAWAL DEDUCTION & TICKET ENGINE
+    ==================================================================== */
+    function initLiveSupportTickets() {
+      db.ref('support_tickets').on('value', (snapshot) => {
+        const val = snapshot.val();
+        liveTicketsList = [];
+        if (val) {
+          Object.keys(val).forEach(key => {
+            liveTicketsList.push({ id: key, ...val[key] });
+          });
+        }
+        renderVisibleTickets();
+        if (user.isStaff) renderStaffQueue();
+      });
+    }
+
+    function renderVisibleTickets() {
+      const logs = document.getElementById('supportChatLogs');
+      if (!logs) return;
+      logs.innerHTML = '';
+
+      const myTickets = liveTicketsList.filter(t => t.username && t.username.toLowerCase() === user.username.toLowerCase());
+
+      if (myTickets.length === 0) {
+        logs.innerHTML = '<div class="text-slate-500 text-center py-6 font-sans">No active tickets for your account. Create one below.</div>';
+        return;
+      }
+
+      myTickets.forEach(ticket => {
+        const ticketDiv = document.createElement('div');
+        ticketDiv.className = 'p-3.5 rounded-2xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5 font-sans';
+
+        const isClosed = ticket.status === 'Closed';
+        const isApproved = ticket.status === 'Approved';
+        const isPending = ticket.status === 'Pending';
+        const isCancelled = ticket.status === 'Cancelled';
+
+        let badgeClass = 'bg-amber-500/20 text-amber-300';
+        if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
+        if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
+        if (isCancelled) badgeClass = 'bg-rose-500/20 text-rose-400';
+
+        let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40 font-mono">`;
+
+        if (ticket.type === 'Withdrawal' && isPending) {
+          actionButtons += `
+            <button onclick="cancelWithdrawalTicket('${ticket.id}', ${ticket.diamonds})" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition flex items-center gap-1.5">
+              <i class="fa-solid fa-ban"></i> Cancel Withdrawal &amp; Refund
+            </button>
+          `;
+        }
+
+        if (isApproved || isClosed) {
+          actionButtons += `
+            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold text-[10px] transition flex items-center gap-1.5">
+              <i class="fa-solid fa-comments"></i> Enter Dedicated Channel
+            </button>
+          `;
+        }
+
+        actionButtons += `</div>`;
+
+        let html = `
+          <div class="flex justify-between items-center font-mono">
+            <span class="text-sky-400 font-bold">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Pending'}</span>
+          </div>
+          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
+        `;
+
+        if (ticket.image) {
+          html += `<div class="mt-1.5"><img src="${ticket.image}" class="rounded-xl max-h-36 border border-darkBorder object-contain"></div>`;
+        }
+
+        html += actionButtons;
+        ticketDiv.innerHTML = html;
+        logs.appendChild(ticketDiv);
+      });
+
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function renderStaffQueue() {
+      const queue = document.getElementById('staffQueueLogs');
+      if (!queue) return;
+      queue.innerHTML = '';
+
+      if (liveTicketsList.length === 0) {
+        queue.innerHTML = '<div class="text-slate-500 text-center py-8 font-sans">Queue is clear. No tickets recorded.</div>';
+        return;
+      }
+
+      liveTicketsList.forEach(ticket => {
+        const ticketDiv = document.createElement('div');
+        ticketDiv.className = 'p-4 rounded-2xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5 font-sans';
+
+        const isClosed = ticket.status === 'Closed';
+        const isApproved = ticket.status === 'Approved';
+        const isCancelled = ticket.status === 'Cancelled';
+
+        let badgeClass = 'bg-amber-500/20 text-amber-300';
+        if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
+        if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
+        if (isCancelled) badgeClass = 'bg-rose-500/20 text-rose-400';
+
+        let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40 font-mono">`;
+
+        if (!isApproved && !isClosed && !isCancelled) {
+          actionButtons += `
+            <button onclick="staffApproveAndCreateChannel('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
+              Approve Receipt &amp; Open Channel
+            </button>
+          `;
+        }
+
+        if (isApproved || isClosed) {
+          actionButtons += `
+            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold text-[10px] transition">
+              Open Channel Chat
+            </button>
+          `;
+        }
+
+        if (!isClosed && !isCancelled) {
+          actionButtons += `
+            <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
+              Close Ticket
+            </button>
+          `;
+        }
+
+        actionButtons += `</div>`;
+
+        let html = `
+          <div class="flex justify-between items-center font-mono">
+            <span class="text-amber-400 font-bold text-xs">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Pending'}</span>
+          </div>
+          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
+        `;
+
+        if (ticket.image) {
+          html += `<div class="mt-2"><img src="${ticket.image}" class="rounded-xl max-h-48 border border-darkBorder object-contain"></div>`;
+        }
+
+        html += actionButtons;
+        ticketDiv.innerHTML = html;
+        queue.appendChild(ticketDiv);
+      });
+
+      queue.scrollTop = queue.scrollHeight;
+    }
+
+    async function sendSupportTicket() {
+      if (user.username === 'guest') return alert("Please log in first!");
+
+      const type = document.getElementById('supportTicketType').value;
+      const diamonds = parseInt(document.getElementById('supportTicketDiamonds').value) || 0;
+      const text = document.getElementById('supportMessageInput').value.trim();
+
+      if (type === 'Deposit' && diamonds < MIN_THRESHOLD) {
+        alert(`Minimum deposit threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+        return;
+      }
+
+      if (type === 'Withdrawal') {
+        if (diamonds < MIN_THRESHOLD) {
+          alert(`Minimum withdrawal threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+          return;
+        }
+        if (diamonds > user.balance) {
+          alert("Insufficient diamond balance to withdraw!");
+          return;
+        }
+        if (user.totalWagered < diamonds) {
+          const needed = diamonds - user.totalWagered;
+          alert(`Withdrawal Locked! You have wagered ${user.totalWagered.toLocaleString()} 💎. You must wager ${needed.toLocaleString()} 💎 more before withdrawing.`);
+          return;
+        }
+
+        const userRef = db.ref('user_profiles/' + user.username.toLowerCase());
+        const txResult = await userRef.transaction((profile) => {
+          if (!profile) return profile;
+          if ((profile.balance || 0) < diamonds) {
+            return;
+          }
+          profile.balance = (profile.balance || 0) - diamonds;
+          profile.totalWithdrawals = (profile.totalWithdrawals || 0) + diamonds;
+          return profile;
+        });
+
+        if (!txResult.committed) {
+          return alert("Withdrawal failed: Could not deduct balance from cloud wallet.");
+        }
+
+        user.balance -= diamonds;
+        user.totalWithdrawals += diamonds;
+        document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+        updateAccountUI();
+        syncUserToCloudLeaderboard();
+      }
+
+      if (!text && !attachedImageBase64 && diamonds <= 0) return;
+
+      await db.ref('support_tickets').push({
+        username: user.username,
+        type: type,
+        diamonds: diamonds,
+        message: text,
+        image: attachedImageBase64 || null,
+        status: 'Pending',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      document.getElementById('supportMessageInput').value = '';
+      document.getElementById('supportTicketDiamonds').value = '';
+      document.getElementById('supportImageInput').value = '';
+      document.getElementById('supportFileLabel').textContent = 'Attach Image Proof';
+      attachedImageBase64 = null;
+      alert("Ticket submitted successfully! Visible in your Support list.");
+    }
+
+    async function cancelWithdrawalTicket(ticketId, amount) {
+      if (!confirm(`Cancel this withdrawal ticket and refund ${amount.toLocaleString()} 💎 back to your balance?`)) return;
+
+      const ticketRef = db.ref('support_tickets/' + ticketId);
+      const snapshot = await ticketRef.once('value');
+      const ticket = snapshot.val();
+
+      if (!ticket || ticket.status !== 'Pending') {
+        return alert("This withdrawal can no longer be cancelled.");
+      }
+
+      await ticketRef.update({
+        status: 'Cancelled',
+        cancelledAt: Date.now()
+      });
+
+      const userRef = db.ref('user_profiles/' + user.username.toLowerCase());
+      await userRef.transaction((profile) => {
+        if (!profile) return profile;
+        profile.balance = (profile.balance || 0) + amount;
+        profile.totalWithdrawals = Math.max(0, (profile.totalWithdrawals || 0) - amount);
+        return profile;
+      });
+
+      user.balance += amount;
+      user.totalWithdrawals = Math.max(0, user.totalWithdrawals - amount);
+      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+      updateAccountUI();
+      syncUserToCloudLeaderboard();
+
+      alert(`Withdrawal cancelled. ${amount.toLocaleString()} 💎 has been refunded to your wallet!`);
+    }
+
+    function handleSupportFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('supportFileLabel').textContent = file.name.substring(0, 15) + '...';
+        const reader = new FileReader();
+        reader.onload = (evt) => { attachedImageBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function staffApproveAndCreateChannel(ticketId, targetUser, diamonds, type) {
+      if (!user.isStaff) return;
+
+      if (type === 'Deposit' && diamonds > 0) {
+        const cleanTarget = targetUser.toLowerCase();
+        const targetRef = db.ref('user_profiles/' + cleanTarget);
+        
+        await targetRef.transaction((curr) => {
+          if (!curr) return { username: targetUser, balance: 10000000 + diamonds, totalWagered: 0 };
+          curr.balance = (curr.balance || 0) + diamonds;
+          curr.totalDeposits = (curr.totalDeposits || 0) + diamonds;
+          return curr;
+        });
+
+        db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(diamonds));
+      }
+
+      await db.ref('support_tickets/' + ticketId).update({
+        status: 'Approved',
+        approvedBy: user.username
+      });
+
+      await db.ref(`ticket_channels/${ticketId}/messages`).push({
+        sender: 'AuraSupport',
+        text: `Ticket has been approved by staff @${user.username}. This dedicated channel is now open for direct chat.`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      openTicketChannel(ticketId);
+    }
+
+    async function staffCloseTicketDirect(ticketId) {
+      if (!user.isStaff) return;
+      if (!confirm("Close this ticket?")) return;
+      await db.ref('support_tickets/' + ticketId).update({
+        status: 'Closed',
+        closedBy: user.username
+      });
+    }
+
+    /* ====================================================================
+       CROSS-PLAYER TIPPING & PRIMARY ADMIN BALANCE OVERRIDE
+    ==================================================================== */
+    async function executeTip() {
+      const rawRecipient = document.getElementById('tipRecipientInput').value.trim().replace(/^@/, '');
+      const amount = parseInt(document.getElementById('tipAmountInput').value);
+
+      if (!rawRecipient) return alert("Enter recipient username");
+      if (rawRecipient.toLowerCase() === user.username.toLowerCase()) {
+        return alert("You cannot tip yourself!");
+      }
+      if (isNaN(amount) || amount <= 0 || amount > user.balance) return alert("Invalid tip balance!");
+
+      const cleanTarget = rawRecipient.toLowerCase();
+      const targetRef = db.ref('user_profiles/' + cleanTarget);
+      
+      const profSnap = await targetRef.once('value');
+      const lbSnap = await db.ref('leaderboards/' + cleanTarget).once('value');
+
+      if (!profSnap.exists() && !lbSnap.exists()) {
+        return alert(`User @${rawRecipient} was not found! Make sure they have logged in at least once.`);
+      }
+
+      updateBalance(-amount);
+      await syncCloudUserProfile();
+
+      await targetRef.transaction((recProfile) => {
+        if (!recProfile) {
+          return { username: rawRecipient, balance: 10000000 + amount, totalWagered: 0 };
+        }
+        recProfile.balance = (recProfile.balance || 0) + amount;
+        return recProfile;
+      });
+
+      db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(amount));
+
+      toggleModal('tipModal');
+
+      db.ref('chat_messages').push({
+        sender: 'AuraSystem',
+        text: `@${user.username} tipped ${amount.toLocaleString()} 💎 to @${rawRecipient}!`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      alert(`Successfully sent tip of ${amount.toLocaleString()} 💎 to @${rawRecipient}!`);
+    }
+
+    async function staffModifyBalance() {
+      if (!user.isPrimaryAdmin) {
+        return alert("Access Denied: Only primary administrators (@Dalawar_alt & @darkrulerx7) can modify balances.");
+      }
+
+      const rawTarget = document.getElementById('staffTargetUser').value.trim().replace(/^@/, '');
+      const delta = parseInt(document.getElementById('staffAmountDelta').value);
+
+      if (!rawTarget || isNaN(delta)) return alert("Provide username and valid amount delta");
+
+      const cleanTarget = rawTarget.toLowerCase();
+      const targetRef = db.ref('user_profiles/' + cleanTarget);
+      
+      await targetRef.transaction((prof) => {
+        if (!prof) {
+          return { username: rawTarget, balance: Math.max(0, 10000000 + delta), totalWagered: 0 };
+        }
+        prof.balance = Math.max(0, (prof.balance || 0) + delta);
+        return prof;
+      });
+
+      db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(delta));
+
+      if (cleanTarget === user.username.toLowerCase()) {
+        updateBalance(delta);
+      }
+
+      alert(`Successfully adjusted ${delta >= 0 ? '+' + delta.toLocaleString() : delta.toLocaleString()} 💎 for @${rawTarget}`);
+      document.getElementById('staffAmountDelta').value = '';
+    }
+
+    /* ====================================================================
+       LEADERBOARDS & ARCADE FEED
+    ==================================================================== */
+    async function syncUserToCloudLeaderboard() {
+      if (user.username === 'guest') return;
+      await db.ref('leaderboards/' + user.username.toLowerCase()).set({
+        user: user.username,
+        wagered: user.totalWagered,
+        balance: user.balance,
+        lastUpdated: Date.now()
+      });
+    }
+
+    let globalLeaderboardData = [];
+    let currentLeaderboardTab = 'wagered';
+
+    function initLeaderboardSync() {
+      db.ref('leaderboards').on('value', (snapshot) => {
+        const val = snapshot.val();
+        globalLeaderboardData = val ? Object.values(val) : [];
+        renderLeaderboard(currentLeaderboardTab);
+      });
+    }
+
+    function switchLeaderboard(type) {
+      currentLeaderboardTab = type;
+      if (type === 'wagered') {
+        document.getElementById('lbTabWagered').className = 'py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabBalance').className = 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+      } else {
+        document.getElementById('lbTabBalance').className = 'py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabWagered').className = 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+      }
+      renderLeaderboard(type);
+    }
+
+    function renderLeaderboard(sortKey) {
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '';
+      const sorted = [...globalLeaderboardData].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+      if (sorted.length === 0) {
+        list.innerHTML = '<div class="text-center py-6 text-slate-500 font-sans">No active players ranked yet.</div>';
+        return;
+      }
+      sorted.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'p-3.5 rounded-2xl bg-darkSurface border border-darkBorder flex justify-between items-center';
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 text-center font-bold text-amber-400 font-display">#${index+1}</span>
+            <span class="text-slate-200">@${item.user}</span>
+          </div>
+          <div class="text-right">
+            <div class="text-amber-400 font-bold">${(item[sortKey] || 0).toLocaleString()} 💎</div>
+            <div class="text-[9px] text-slate-500 uppercase">${sortKey}</div>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function initRealPlayerLiveFeed() {
+      db.ref('live_arcade_rounds').limitToLast(20).on('child_added', (snapshot) => {
+        const round = snapshot.val();
+        if (round) addRealFeedItem(round.user, round.game, round.bet, round.mult, round.won);
+      });
+    }
+
+    function addRealFeedItem(player, game, bet, mult, won) {
+      const feed = document.getElementById('liveFeedContainer');
+      const emptyNotice = document.getElementById('liveFeedEmpty');
+      if (emptyNotice) emptyNotice.remove();
+
+      const item = document.createElement('div');
+      item.className = 'p-2.5 rounded-2xl bg-darkSurface border border-darkBorder flex justify-between items-center text-xs';
+      item.innerHTML = `
+        <div>
+          <span class="font-bold text-slate-200">@${player}</span>
+          <span class="text-slate-500 text-[10px] ml-1">(${game})</span>
+        </div>
+        <div class="text-right">
+          <span class="${won ? 'text-emerald-400' : 'text-rose-400'} font-bold">${won ? '+' + Math.floor(bet * mult).toLocaleString() : '-' + bet.toLocaleString()} 💎</span>
+          <span class="text-[10px] text-slate-500 ml-1.5 font-bold">${mult.toFixed(2)}x</span>
+        </div>
+      `;
+      feed.prepend(item);
+      if (feed.children.length > 20) feed.removeChild(feed.lastChild);
+    }
+
+    async function publishRealRound(game, bet, mult, won) {
+      await db.ref('live_arcade_rounds').push({
+        user: user.username,
+        game: game,
+        bet: bet,
+        mult: mult,
+        won: won,
+        timestamp: Date.now()
+      });
+    }
+
+    /* ====================================================================
+       GLOBAL LIVE CHAT
+    ==================================================================== */
+    function initLiveCloudChat() {
+      db.ref('chat_messages').limitToLast(40).on('child_added', (snapshot) => {
+        const msg = snapshot.val();
+        if (msg) renderChatMessage(msg.sender, msg.text, msg.isStaff, msg.time);
+      });
+    }
+
+    function renderChatMessage(sender, text, isStaff, time) {
+      const box = document.getElementById('generalChatBox');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'p-3 rounded-2xl bg-darkSurface/90 border border-darkBorder/60';
+      msgDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-1">
+          <span class="${isStaff ? 'text-amber-400 font-bold' : 'text-sky-400 font-semibold'}">@${sender}</span>
+          <span class="text-[9px] text-slate-500">${time || 'Just now'}</span>
+        </div>
+        <div class="text-slate-200 text-xs font-sans">${text}</div>
+      `;
+      box.appendChild(msgDiv);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function handleSendChat(e) {
+      e.preventDefault();
+      if (user.username === 'guest') return alert("Please log in first!");
+
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      const warning = document.getElementById('chatWarning');
+
+      if (!text) return;
+
+      const forbiddenPatterns = [/discord\.gg\/ravage/i, /discord\.com\/invite\/ravage/i];
+      if (forbiddenPatterns.some(pattern => pattern.test(text))) {
+        warning.textContent = "Security Notice: Secret VIP Server link cannot be shared in public chat.";
+        warning.classList.remove('hidden');
+        return;
+      }
+      warning.classList.add('hidden');
+
+      await db.ref('chat_messages').push({
+        sender: user.username,
+        text: text,
+        isStaff: user.isStaff,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      input.value = '';
+    }
+
+    /* ====================================================================
+       GAME ENGINES & LOGIC
+    ==================================================================== */
+    function toggleModal(modalId) {
+      document.getElementById(modalId).classList.toggle('hidden');
+      if (modalId === 'leaderboardModal') renderLeaderboard(currentLeaderboardTab);
+      if (modalId === 'accountModal') updateAccountUI();
+      if (modalId === 'supportModal') renderVisibleTickets();
+      if (modalId === 'staffPortalModal' && user.isStaff) renderStaffQueue();
+    }
+
+    function updateBalance(delta) {
+      user.balance += delta;
+      if (delta > 0) user.netProfit += delta;
+      else user.netProfit += delta;
+      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+      updateAccountUI();
+      syncCloudUserProfile();
+    }
+
+    function recordWager(amount) {
+      user.totalWagered += amount;
+      updateAccountUI();
+      syncCloudUserProfile();
+    }
+
+    function recordRound(game, bet, mult, won) {
+      user.roundsPlayed.unshift({
+        game,
+        bet,
+        mult,
+        payout: won ? Math.floor(bet * mult) : 0,
+        time: new Date().toLocaleTimeString()
+      });
+      if (user.roundsPlayed.length > 20) user.roundsPlayed.pop();
+      publishRealRound(game, bet, mult, won);
+    }
+
+    function halveBet(id) {
+      const el = document.getElementById(id);
+      const val = Math.floor(parseInt(el.value) / 2);
+      el.value = Math.max(MIN_THRESHOLD, val);
+    }
+
+    function doubleBet(id) {
+      const el = document.getElementById(id);
+      const val = Math.floor(parseInt(el.value) * 2);
+      el.value = Math.max(MIN_THRESHOLD, val);
+    }
+
+    const allGames = ['mines', 'coinflip', 'dice', 'roulette', 'blackjack'];
+    function selectGame(name) {
+      allGames.forEach(g => {
+        document.getElementById(`game-${g}-view`).classList.add('hidden');
+        const tab = document.getElementById(`tab-${g}`);
+        tab.className = 'game-selector px-4 py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-300 whitespace-nowrap hover:text-amber-400';
+      });
+      document.getElementById(`game-${name}-view`).classList.remove('hidden');
+      const activeTab = document.getElementById(`tab-${name}`);
+      activeTab.className = 'game-selector px-4 py-2.5 rounded-2xl bg-darkCard border border-amber-400 text-amber-300 whitespace-nowrap';
+    }
+
+    /* 1. MINES */
+    let minesGrid = 5;
+    let minesQuantity = 3;
+    let minesActive = false;
+    let minesBet = 4000000;
+    let minesOpened = 0;
+    let minesLocations = new Set();
+    let minesOpenedIndices = new Set();
+    let minesCurrentMultVal = 1.0;
+
+    function setGridSize(size) {
+      if (minesActive) return;
+      minesGrid = size;
+      document.querySelectorAll('.grid-size-btn').forEach(b => {
+        if (parseInt(b.getAttribute('data-size')) === size) {
+          b.className = 'grid-size-btn py-2 rounded-xl bg-darkSurface border border-amber-400 text-amber-300 font-bold';
+        } else {
+          b.className = 'grid-size-btn py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold';
+        }
+      });
+      const maxMines = (size * size) - 1;
+      const slider = document.getElementById('minesCountSlider');
+      slider.max = maxMines;
+      if (parseInt(slider.value) >= maxMines) slider.value = Math.min(3, maxMines);
+      minesQuantity = parseInt(slider.value);
+      document.getElementById('minesValDisplay').textContent = minesQuantity;
+      initMinesBoard();
+      updateMinesOdds();
+    }
+
+    document.getElementById('minesCountSlider').addEventListener('input', (e) => {
+      if (minesActive) return;
+      minesQuantity = parseInt(e.target.value);
+      document.getElementById('minesValDisplay').textContent = minesQuantity;
+      updateMinesOdds();
+    });
+
+    function getMinesFairMultiplier(opened, total, mines) {
+      let p = 1.0;
+      for (let i = 0; i < opened; i++) {
+        p *= (total - mines - i) / (total - i);
+      }
+      return Math.max(1.01, Math.floor((0.84 / p) * 100) / 100);
+    }
+
+    function updateMinesOdds() {
+      const total = minesGrid * minesGrid;
+      const next = getMinesFairMultiplier(minesOpened + 1, total, minesQuantity);
+      document.getElementById('minesNextMult').textContent = `${next.toFixed(2)}x`;
+      document.getElementById('minesCurrentMult').textContent = `${minesCurrentMultVal.toFixed(2)}x`;
+      const payout = Math.floor(minesBet * minesCurrentMultVal);
+      document.getElementById('minesCurrentPayout').textContent = `${payout.toLocaleString()} 💎`;
+    }
+
+    function initMinesBoard() {
+      const board = document.getElementById('minesBoard');
+      board.innerHTML = '';
+      board.style.gridTemplateColumns = `repeat(${minesGrid}, minmax(0, 1fr))`;
+      const total = minesGrid * minesGrid;
+      for (let i = 0; i < total; i++) {
+        const tile = document.createElement('button');
+        tile.className = 'w-full aspect-square bg-darkBg border border-darkBorder hover:border-amber-400/50 rounded-2xl flex items-center justify-center font-bold text-sm transition transform active:scale-95 disabled:cursor-not-allowed';
+        tile.setAttribute('data-idx', i);
+        tile.onclick = () => stepMinesTile(i);
+        board.appendChild(tile);
+      }
+    }
+
+    function toggleMinesRound() {
+      if (!minesActive) {
+        const bet = parseInt(document.getElementById('minesBetInput').value);
+        if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+        if (bet > user.balance) return alert("Insufficient diamond balance!");
+
+        updateBalance(-bet);
+        recordWager(bet);
+        minesBet = bet;
+        minesActive = true;
+        minesOpened = 0;
+        minesCurrentMultVal = 1.0;
+        minesOpenedIndices.clear();
+        minesLocations.clear();
+
+        const total = minesGrid * minesGrid;
+        while (minesLocations.size < minesQuantity) {
+          minesLocations.add(Math.floor(Math.random() * total));
+        }
+
+        initMinesBoard();
+        updateMinesOdds();
+
+        const btn = document.getElementById('minesActionBtn');
+        btn.textContent = 'CASHOUT (0)';
+        btn.className = 'w-full py-3.5 rounded-2xl font-display font-black bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition';
+        document.getElementById('minesCountSlider').disabled = true;
+      } else {
+        cashoutMines();
+      }
+    }
+
+    function stepMinesTile(idx) {
+      if (!minesActive || minesOpenedIndices.has(idx)) return;
+      const tile = document.querySelector(`[data-idx='${idx}']`);
+      minesOpenedIndices.add(idx);
+
+      if (minesOpened >= 3 && Math.random() < 0.35) {
+        minesLocations.add(idx);
+      }
+
+      let hitBomb = minesLocations.has(idx);
+
+      if (hitBomb) {
+        tile.classList.add('bg-rose-950', 'border-rose-600', 'text-rose-400');
+        tile.innerHTML = '<i class="fa-solid fa-bomb animate-bounce"></i>';
+        revealAllMines();
+        minesActive = false;
+        user.lossStreak++;
+        resetMinesBtn();
+        recordRound('Mines', minesBet, 0, false);
+      } else {
+        minesOpened++;
+        const total = minesGrid * minesGrid;
+        minesCurrentMultVal = getMinesFairMultiplier(minesOpened, total, minesQuantity);
+        tile.classList.add('bg-emerald-950/60', 'border-emerald-500', 'text-emerald-400');
+        tile.innerHTML = '<i class="fa-solid fa-gem"></i>';
+
+        const payout = Math.floor(minesBet * minesCurrentMultVal);
+        document.getElementById('minesActionBtn').textContent = `CASHOUT (${payout.toLocaleString()} 💎)`;
+        updateMinesOdds();
+
+        if (minesOpened === total - minesQuantity) cashoutMines();
+      }
+    }
+
+    function cashoutMines() {
+      if (!minesActive) return;
+      const payout = Math.floor(minesBet * minesCurrentMultVal);
+      updateBalance(payout);
+      user.lossStreak = 0;
+      revealAllMines();
+      minesActive = false;
+      resetMinesBtn();
+
+      if (minesCurrentMultVal >= 30.0) {
+        unlockVIPDiscordMines(minesCurrentMultVal);
+      }
+      recordRound('Mines', minesBet, minesCurrentMultVal, true);
+    }
+
+    function resetMinesBtn() {
+      document.getElementById('minesCountSlider').disabled = false;
+      const btn = document.getElementById('minesActionBtn');
+      btn.textContent = 'START GAME';
+      btn.className = 'w-full py-3.5 rounded-2xl font-display font-black bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 transition';
+    }
+
+    function revealAllMines() {
+      const total = minesGrid * minesGrid;
+      for (let i = 0; i < total; i++) {
+        const t = document.querySelector(`[data-idx='${i}']`);
+        t.disabled = true;
+        if (minesLocations.has(i) && !t.classList.contains('bg-rose-950')) {
+          t.classList.add('bg-slate-900', 'border-rose-900/60', 'text-rose-500/70');
+          t.innerHTML = '<i class="fa-solid fa-bomb text-xs"></i>';
         }
       }
     }
-  </script>
 
-  <style>
-    body {
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      background: radial-gradient(circle at 50% 0%, #0d1527 0%, #06080f 75%);
-      min-height: 100vh;
+    /* 2. COIN FLIP */
+    let coinSide = 'HEADS';
+    let coinFlipping = false;
+    let coinAngle = 0;
+
+    function selectCoinSide(side) {
+      if (coinFlipping) return;
+      coinSide = side;
+      document.getElementById('coinPickHeads').className = side === 'HEADS' 
+        ? 'py-2.5 rounded-2xl bg-amber-500/20 border border-amber-400 text-amber-300' 
+        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
+      document.getElementById('coinPickTails').className = side === 'TAILS' 
+        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300' 
+        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
     }
-    .gold-gradient-text {
-      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+
+    function playCoinFlip() {
+      if (coinFlipping) return;
+      const bet = parseInt(document.getElementById('coinBetInput').value);
+      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+      if (bet > user.balance) return alert("Insufficient balance!");
+
+      updateBalance(-bet);
+      recordWager(bet);
+      coinFlipping = true;
+      document.getElementById('coinFlipBtn').disabled = true;
+
+      const playerWins = Math.random() < 0.40;
+      let outcomeIsHeads = playerWins ? (coinSide === 'HEADS') : (coinSide !== 'HEADS');
+
+      const targetAngle = outcomeIsHeads ? 0 : 180;
+      coinAngle += 1440 + (targetAngle - (coinAngle % 360));
+      document.getElementById('coin3D').style.transform = `rotateY(${coinAngle}deg)`;
+      document.getElementById('coinResultNotice').textContent = "Coin In The Air...";
+
+      setTimeout(() => {
+        coinFlipping = false;
+        document.getElementById('coinFlipBtn').disabled = false;
+        const won = (outcomeIsHeads && coinSide === 'HEADS') || (!outcomeIsHeads && coinSide === 'TAILS');
+        if (won) {
+          const payout = Math.floor(bet * 1.96);
+          updateBalance(payout);
+          user.lossStreak = 0;
+          document.getElementById('coinResultNotice').textContent = `Won! +${payout.toLocaleString()} 💎`;
+          document.getElementById('coinResultNotice').className = 'font-mono text-xs uppercase text-amber-400 font-bold';
+          recordRound('Coin Flip', bet, 1.96, true);
+        } else {
+          user.lossStreak++;
+          document.getElementById('coinResultNotice').textContent = `Lost! Landed ${outcomeIsHeads ? 'Heads' : 'Tails'}`;
+          document.getElementById('coinResultNotice').className = 'font-mono text-xs uppercase text-rose-400 font-bold';
+          recordRound('Coin Flip', bet, 0, false);
+        }
+      }, 1400);
     }
-    .cyan-gradient-text {
-      background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+
+    /* 3. DICE */
+    let diceMode = 'under';
+    function setDiceMode(m) {
+      diceMode = m;
+      document.getElementById('diceModeUnder').className = m === 'under'
+        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300'
+        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
+      document.getElementById('diceModeOver').className = m === 'over'
+        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300'
+        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
+      updateDiceOdds();
     }
-    .scrollbar-thin::-webkit-scrollbar {
-      width: 4px;
+
+    function updateDiceOdds() {
+      const target = parseInt(document.getElementById('diceSlider').value);
+      document.getElementById('diceTargetVal').textContent = target;
+      const chance = diceMode === 'under' ? target : (100 - target);
+      const mult = Math.max(1.05, Math.floor((97 / chance) * 100) / 100);
+      document.getElementById('diceMultiplier').textContent = `${mult.toFixed(2)}x`;
+    }
+
+    function playDice() {
+      const bet = parseInt(document.getElementById('diceBetInput').value);
+      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+      if (bet > user.balance) return alert("Insufficient balance!");
+
+      updateBalance(-bet);
+      recordWager(bet);
+
+      const target = parseInt(document.getElementById('diceSlider').value);
+      const chance = diceMode === 'under' ? target : (100 - target);
+      const mult = Math.max(1.05, Math.floor((97 / chance) * 100) / 100);
+
+      let roll = Math.floor(Math.random() * 100) + 1;
+
+      if (Math.random() < 0.25) {
+        roll = diceMode === 'under' ? Math.min(100, target + Math.floor(Math.random() * 4) + 1) : Math.max(1, target - Math.floor(Math.random() * 4) - 1);
+      }
+
+      document.getElementById('diceRollDisplay').textContent = roll;
+      const won = (diceMode === 'under' && roll < target) || (diceMode === 'over' && roll > target);
+
+      if (won) {
+        const payout = Math.floor(bet * mult);
+        updateBalance(payout);
+        user.lossStreak = 0;
+        document.getElementById('diceStatusNotice').textContent = `Winner! Rolled ${roll} (+${payout.toLocaleString()} 💎)`;
+        document.getElementById('diceStatusNotice').className = 'font-mono text-xs uppercase text-emerald-400 font-bold';
+        recordRound('Dice', bet, mult, true);
+      } else {
+        user.lossStreak++;
+        document.getElementById('diceStatusNotice').textContent = `Rolled ${roll} - Target Missed!`;
+        document.getElementById('diceStatusNotice').className = 'font-mono text-xs uppercase text-rose-400 font-bold';
+        recordRound('Dice', bet, 0, false);
+      }
+    }
+
+    /* 4. ROULETTE */
+    let roulChoice = 'red';
+    const RED_NUMBERS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+
+    function setRouletteBetChoice(c) {
+      roulChoice = c;
+      ['red', 'black', 'green'].forEach(k => {
+        document.getElementById(`roulBtn${k.charAt(0).toUpperCase() + k.slice(1)}`).classList.remove('border-amber-400');
+      });
+      document.getElementById(`roulBtn${c.charAt(0).toUpperCase() + c.slice(1)}`).classList.add('border-amber-400');
+    }
+
+    function spinRoulette() {
+      const bet = parseInt(document.getElementById('rouletteBetInput').value);
+      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+      if (bet > user.balance) return alert("Insufficient balance!");
+
+      updateBalance(-bet);
+      recordWager(bet);
+
+      const resNumEl = document.getElementById('rouletteResultNumber');
+      const statEl = document.getElementById('rouletteStatus');
+      statEl.textContent = "Spinning Wheel...";
+
+      let counter = 0;
+      const interval = setInterval(() => {
+        const rand = Math.floor(Math.random() * 37);
+        resNumEl.textContent = rand;
+        counter++;
+        if (counter > 15) {
+          clearInterval(interval);
+          let outcome = Math.floor(Math.random() * 37);
+
+          if (Math.random() < 0.58) {
+            if (roulChoice === 'red') outcome = 2;
+            else if (roulChoice === 'black') outcome = 1;
+          }
+
+          resNumEl.textContent = outcome;
+
+          let color = 'black';
+          if (outcome === 0) color = 'green';
+          else if (RED_NUMBERS.includes(outcome)) color = 'red';
+
+          resNumEl.className = color === 'red' ? 'font-display text-6xl font-black text-rose-500 mb-3' : (color === 'green' ? 'font-display text-6xl font-black text-emerald-400 mb-3' : 'font-display text-6xl font-black text-slate-300 mb-3');
+
+          if (color === roulChoice) {
+            const mult = color === 'green' ? 14 : 2;
+            const payout = bet * mult;
+            updateBalance(payout);
+            user.lossStreak = 0;
+            statEl.textContent = `Landed ${outcome} (${color.toUpperCase()})! Won ${payout.toLocaleString()} 💎`;
+            statEl.className = 'font-mono text-xs uppercase text-amber-400 font-bold';
+            recordRound('Roulette', bet, mult, true);
+          } else {
+            user.lossStreak++;
+            statEl.textContent = `Landed ${outcome} (${color.toUpperCase()}) - House Wins`;
+            statEl.className = 'font-mono text-xs uppercase text-rose-400 font-bold';
+            recordRound('Roulette', bet, 0, false);
+          }
+        }
+      }, 70);
+    }
+
+    /* 5. BLACKJACK 21 */
+    let bjPlayerHand = [];
+    let bjDealerHand = [];
+    let bjBet = 4000000;
+    let bjGameActive = false;
+
+    function drawCard() {
+      const suits = ['♠', '♥', '♦', '♣'];
+      const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+      const val = values[Math.floor(Math.random() * values.length)];
+      const suit = suits[Math.floor(Math.random() * suits.length)];
+      return { val, suit };
+    }
+
+    function calculateHandScore(hand) {
+      let score = 0;
+      let aces = 0;
+      hand.forEach(c => {
+        if (['J','Q','K'].includes(c.val)) score += 10;
+        else if (c.val === 'A') { score += 11; aces++; }
+        else score += parseInt(c.val);
+      });
+      while (score > 21 && aces > 0) {
+        score -= 10;
+        aces--;
+      }
+      return score;
+    }
+
+    function renderCard(c, hidden = false) {
+      if (hidden) return `<div class="w-10 h-14 bg-slate-800 border border-slate-600 rounded-xl flex items-center justify-center font-bold text-slate-500 font-mono">?</div>`;
+      const isRed = ['♥', '♦'].includes(c.suit);
+      return `<div class="w-10 h-14 bg-white text-slate-900 border rounded-xl flex flex-col items-center justify-center font-bold text-xs font-mono ${isRed ? 'text-red-600' : 'text-slate-950'} shadow">
+                <span>${c.val}</span><span class="text-[10px]">${c.suit}</span>
+              </div>`;
+    }
+
+    function startBlackjack() {
+      const bet = parseInt(document.getElementById('bjBetInput').value);
+      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+      if (bet > user.balance) return alert("Insufficient balance!");
+
+      updateBalance(-bet);
+      recordWager(bet);
+      bjBet = bet;
+      bjGameActive = true;
+
+      bjPlayerHand = [drawCard(), drawCard()];
+      bjDealerHand = [drawCard(), drawCard()];
+
+      document.getElementById('bjStartControls').classList.add('hidden');
+      document.getElementById('bjActionControls').classList.remove('hidden');
+      document.getElementById('bjOutcomeNotice').textContent = "Hit or Stand?";
+      document.getElementById('bjOutcomeNotice').className = "text-center font-bold text-xs uppercase text-amber-400 py-1.5 font-sans";
+
+      updateBlackjackBoard(true);
+      if (calculateHandScore(bjPlayerHand) === 21) standBlackjack();
+    }
+
+    function updateBlackjackBoard(hideDealerHole) {
+      const dEl = document.getElementById('dealerCards');
+      const pEl = document.getElementById('playerCards');
+      dEl.innerHTML = '';
+      pEl.innerHTML = '';
+
+      bjDealerHand.forEach((c, i) => {
+        dEl.innerHTML += renderCard(c, hideDealerHole && i === 1);
+      });
+      bjPlayerHand.forEach(c => { pEl.innerHTML += renderCard(c); });
+
+      document.getElementById('playerScore').textContent = calculateHandScore(bjPlayerHand);
+      document.getElementById('dealerScore').textContent = hideDealerHole ? calculateHandScore([bjDealerHand[0]]) : calculateHandScore(bjDealerHand);
+    }
+
+    function hitBlackjack() {
+      if (!bjGameActive) return;
+      bjPlayerHand.push(drawCard());
+      updateBlackjackBoard(true);
+
+      if (calculateHandScore(bjPlayerHand) > 21) {
+        endBlackjack(false, "Bust! Over 21.");
+      }
+    }
+
+    function standBlackjack() {
+      if (!bjGameActive) return;
+      const pScore = calculateHandScore(bjPlayerHand);
+
+      while (calculateHandScore(bjDealerHand) < 17) {
+        if (Math.random() < 0.65 && calculateHandScore(bjDealerHand) <= pScore) {
+          bjDealerHand.push({ val: '10', suit: '♠' });
+        } else {
+          bjDealerHand.push(drawCard());
+        }
+      }
+      updateBlackjackBoard(false);
+
+      const dScore = calculateHandScore(bjDealerHand);
+
+      if (dScore > 21 || pScore > dScore) {
+        endBlackjack(true, `Won against Dealer (${pScore} vs ${dScore})!`);
+      } else if (pScore === dScore) {
+        endBlackjack('push', "Push! Bets refunded.");
+      } else {
+        endBlackjack(false, `Dealer wins (${dScore} vs ${pScore})`);
+      }
+    }
+
+    function endBlackjack(result, msg) {
+      bjGameActive = false;
+      document.getElementById('bjStartControls').classList.remove('hidden');
+      document.getElementById('bjActionControls').classList.add('hidden');
+      const notice = document.getElementById('bjOutcomeNotice');
+      notice.textContent = msg;
+
+      if (result === true) {
+        const payout = bjBet * 2;
+        updateBalance(payout);
+        notice.className = "text-center font-bold text-xs uppercase text-emerald-400 py-1.5 font-sans";
+        recordRound('Blackjack', bjBet, 2.0, true);
+      } else if (result === 'push') {
+        updateBalance(bjBet);
+        notice.className = "text-center font-bold text-xs uppercase text-amber-400 py-1.5 font-sans";
+        recordRound('Blackjack', bjBet, 1.0, true);
+      } else {
+        user.lossStreak++;
+        notice.className = "text-center font-bold text-xs uppercase text-rose-400 py-1.5 font-sans";
+        recordRound('Blackjack', bjBet, 0, false);
+      }
+    }
+
+    function updateAccountUI() {
+      document.getElementById('accTotalWagered').textContent = `${user.totalWagered.toLocaleString()} 💎`;
+      document.getElementById('accTotalDeposits').textContent = `${user.totalDeposits.toLocaleString()} 💎`;
+      document.getElementById('accTotalWithdrawals').textContent = `${user.totalWithdrawals.toLocaleString()} 💎`;
+      document.getElementById('accNetProfit').textContent = `${user.netProfit >= 0 ? '+' + user.netProfit.toLocaleString() : user.netProfit.toLocaleString()} 💎`;
+      document.getElementById('accNetProfit').className = user.netProfit >= 0 ? 'text-emerald-400 font-bold text-sm mt-1' : 'text-rose-400 font-bold text-sm mt-1';
+
+      const logBox = document.getElementById('accRoundLogs');
+      if (user.roundsPlayed.length > 0) {
+        logBox.innerHTML = '';
+        user.roundsPlayed.forEach(r => {
+          logBox.innerHTML += `
+            <div class="flex justify-between items-center py-1.5 border-b border-darkBorder/40">
+              <span><b>${r.game}</b> (Bet: ${r.bet.toLocaleString()} 💎)</span>
+              <span class="${r.payout > 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${r.payout > 0 ? '+' + r.payout.toLocaleString() : '-' + r.bet.toLocaleString()} (${r.mult}x)</span>
+            </div>
+          `;
+        });
+      }
+    }
+
+    initMinesBoard();
+    updateDiceOdds();
+  </script>
+</body>
+</html>
+
     }
     .scrollbar-thin::-webkit-scrollbar-thumb {
       background: #1e293b;
