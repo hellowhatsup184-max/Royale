@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aura Royale VIP - Diamond Arcade & Social Casino</title>
+  <title>Gemluck - Diamond Arcade & Social VIP</title>
   <script src="https://cdn.tailwindcss.com"></script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,9 +28,9 @@
           colors: {
             neonCyan: '#38bdf8',
             neonGold: '#fbbf24',
-            darkBg: '#06080f',
+            darkBg: '#05070f',
             darkSurface: '#0b1120',
-            darkCard: '#10172a',
+            darkCard: '#0f172a',
             darkBorder: '#1e293b'
           }
         }
@@ -44,7 +44,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
-      background: radial-gradient(circle at 50% 0%, #0d1527 0%, #06080f 75%);
+      background: radial-gradient(circle at 50% 0%, #0d1629 0%, #05070f 75%);
       min-height: 100vh;
     }
     .gold-gradient-text {
@@ -105,9 +105,9 @@
       <div class="h-16 w-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 text-3xl">
         <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Device Firewall Activated</h3>
+      <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Device Session Relinquished</h3>
       <p class="text-xs text-slate-300 leading-relaxed font-sans">
-        This account is active on another device or browser. Concurrent access is strictly disabled.
+        This account logged in or took over access from another browser window. Simultaneous usage is prevented.
       </p>
       <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Device
@@ -122,7 +122,7 @@
       <div class="flex items-center justify-between pb-5 border-b border-darkBorder">
         <div class="flex items-center gap-3">
           <i class="fa-solid fa-crown text-amber-400 text-xl"></i>
-          <h2 class="font-display font-black gold-gradient-text tracking-wider uppercase text-base">VIP Menu</h2>
+          <h2 class="font-display font-black gold-gradient-text tracking-wider uppercase text-base">Gemluck VIP</h2>
         </div>
         <button onclick="toggleMenuDrawer()" class="text-slate-400 hover:text-white p-2">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -188,7 +188,7 @@
           </div>
           <div>
             <div class="text-xs font-display font-black text-slate-100 uppercase tracking-wide">Direct Support Channels</div>
-            <div class="text-[10px] text-slate-400 mt-0.5 font-sans">Jump directly into approved cashier/support chats</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 font-sans">Open any active cashier/support dialogue directly</div>
           </div>
         </div>
         <button onclick="toggleChannelsListModal()" class="text-slate-400 hover:text-white p-2">
@@ -211,8 +211,8 @@
             <i class="fa-solid fa-headset text-lg"></i>
           </div>
           <div>
-            <div id="channelTitle" class="text-xs font-display font-bold text-slate-100">Support Channel #---</div>
-            <div id="channelSubtitle" class="text-[10px] text-slate-400 mt-0.5">Staff &amp; Player Live Line</div>
+            <div id="channelTitle" class="text-xs font-display font-bold text-slate-100">Ticket #---</div>
+            <div id="channelSubtitle" class="text-[10px] text-slate-400 mt-0.5">Staff &amp; Player Line</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -230,12 +230,17 @@
       </div>
 
       <form id="channelChatForm" onsubmit="handleSendChannelMessage(event)" class="pt-3 border-t border-darkBorder space-y-2">
-        <div class="flex gap-2">
-          <input type="text" id="channelChatInput" placeholder="Reply to channel..." maxlength="200" class="flex-1 bg-darkSurface border border-darkBorder rounded-2xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+        <div class="flex gap-2 items-center">
+          <label class="cursor-pointer p-2.5 rounded-2xl bg-darkSurface border border-darkBorder hover:text-sky-300 text-slate-400 text-sm transition">
+            <i class="fa-solid fa-image"></i>
+            <input type="file" id="channelMsgFile" accept="image/*" class="hidden" onchange="handleChannelImageUpload(event)">
+          </label>
+          <input type="text" id="channelChatInput" placeholder="Message or attach image..." maxlength="200" class="flex-1 bg-darkSurface border border-darkBorder rounded-2xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
           <button type="submit" id="channelSendBtn" class="px-5 py-2.5 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
         </div>
+        <div id="channelImagePreviewNote" class="hidden text-[10px] text-sky-400 px-1 font-mono">Image attached ready to send</div>
         <div id="channelClosedAlert" class="hidden text-center text-[10px] text-rose-400 font-bold py-1">
           This channel is closed. No new messages can be sent.
         </div>
@@ -258,6 +263,7 @@
         </button>
       </div>
 
+      <!-- PRIMARY ADMIN BALANCE OVERRIDE -->
       <div id="staffControlPanel" class="hidden my-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs">
         <div class="font-bold text-amber-300 flex items-center justify-between mb-3 font-display">
           <span><i class="fa-solid fa-vault mr-1.5"></i> PRIMARY ADMIN BALANCE OVERRIDE VAULT</span>
@@ -272,6 +278,7 @@
         </div>
       </div>
 
+      <!-- Live Incoming Tickets Stream (Staff View) -->
       <div class="flex-1 overflow-hidden flex flex-col mt-2">
         <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
           <span>Incoming Tickets Queue (Pending Approvals &amp; Receipts)</span>
@@ -290,25 +297,35 @@
       <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
         <div>
           <h3 class="font-display text-base sm:text-lg font-black text-sky-300 flex items-center gap-2.5">
-            <i class="fa-solid fa-headset text-sky-400"></i> Live Support &amp; Cashier Desk
+            <i class="fa-solid fa-headset text-sky-400"></i> Cashier Desk &amp; Inquiries
           </h3>
-          <p class="text-xs text-slate-400 mt-0.5 font-sans">Submit receipts or inquiries for live staff verification.</p>
+          <p class="text-xs text-slate-400 mt-0.5 font-sans">Direct chat opens immediately upon ticket submission.</p>
         </div>
         <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-2">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
-      <div class="my-4 flex-1 overflow-hidden flex flex-col">
+      <!-- Deposit In-Game Mail Banner -->
+      <div class="mt-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-3 font-sans">
+        <i class="fa-solid fa-envelope-open-text text-amber-400 text-xl"></i>
+        <div>
+          <span class="font-bold font-display uppercase tracking-wider block">In-Game Mailbox Deposit:</span>
+          <span>Send diamond deposits to Roblox username <b class="text-white font-mono bg-amber-500/30 px-1.5 py-0.5 rounded">@Gemluck99</b> via mail. Submit transaction ID below!</span>
+        </div>
+      </div>
+
+      <div class="my-3 flex-1 overflow-hidden flex flex-col">
         <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
           <span>My Ticket History</span>
           <span class="text-sky-400 font-bold">PERSONAL DESK</span>
         </div>
-        <div id="supportChatLogs" class="overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-2xl border border-darkBorder max-h-[260px] scrollbar-thin">
+        <div id="supportChatLogs" class="overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-2xl border border-darkBorder max-h-[200px] scrollbar-thin">
           <div id="noTicketsMessage" class="text-slate-500 text-center py-6">No active tickets found for your account.</div>
         </div>
       </div>
 
+      <!-- Create Ticket Controls -->
       <div class="space-y-3 pt-3 border-t border-darkBorder font-sans">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
           <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:outline-none">
@@ -323,22 +340,22 @@
         <div class="flex items-center justify-between gap-3 font-mono">
           <label class="cursor-pointer flex items-center gap-2 text-xs text-slate-400 hover:text-sky-300 px-4 py-2.5 bg-darkSurface rounded-2xl border border-darkBorder transition">
             <i class="fa-solid fa-paperclip"></i>
-            <span id="supportFileLabel">Attach Image Proof</span>
+            <span id="supportFileLabel">Attach Proof Photo</span>
             <input type="file" id="supportImageInput" accept="image/*" class="hidden" onchange="handleSupportFileUpload(event)">
           </label>
           <button onclick="sendSupportTicket()" class="px-6 py-2.5 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
-            Submit Ticket
+            Submit &amp; Open Chat
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ==================== LOGIN SCREEN MODAL ==================== -->
+  <!-- ==================== LOGIN SCREEN MODAL WITH OVERRIDE ==================== -->
   <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
     <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-3xl p-8 shadow-2xl relative">
       <div class="text-center mb-7">
-        <h2 class="font-display text-2xl font-black gold-gradient-text uppercase tracking-widest">Aura Royale VIP</h2>
+        <h2 class="font-display text-2xl font-black gold-gradient-text uppercase tracking-widest">Gemluck VIP</h2>
         <p class="text-xs text-slate-400 font-mono mt-1.5">HIGH-ROLLER DIAMOND CASINO (MIN 4M 💎)</p>
       </div>
 
@@ -362,9 +379,14 @@
           </div>
         </div>
 
-        <div id="loginErrorAlert" class="hidden p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2.5">
-          <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
-          <span id="loginErrorMsg">Account active on another browser/device!</span>
+        <div id="loginErrorAlert" class="hidden p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs space-y-2">
+          <div class="flex items-start gap-2.5">
+            <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
+            <span id="loginErrorMsg">Account active on another browser/device!</span>
+          </div>
+          <button type="button" onclick="forceTakeoverLogin()" class="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 font-bold rounded-xl text-[11px] transition uppercase">
+            Force Relinquish Other Device &amp; Enter Here
+          </button>
         </div>
 
         <button type="submit" id="loginSubmitBtn" class="w-full py-3.5 rounded-2xl font-display font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
@@ -382,7 +404,7 @@
           <i class="fa-solid fa-crown text-lg"></i>
         </div>
         <div>
-          <h1 class="font-display text-lg sm:text-xl font-black gold-gradient-text tracking-wide leading-tight">AURA ROYALE</h1>
+          <h1 class="font-display text-lg sm:text-xl font-black gold-gradient-text tracking-wide leading-tight">GEMLUCK</h1>
           <span id="roleBadge" class="text-[9px] uppercase font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Guest</span>
         </div>
       </div>
@@ -424,17 +446,23 @@
     <!-- LEFT & CENTER: GAMES (2 Columns) -->
     <div class="lg:col-span-2 flex flex-col gap-6">
       
-      <div id="vipRewardBanner" class="p-4 sm:p-5 rounded-3xl border border-darkBorder bg-darkCard/90 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono shadow-xl backdrop-blur-xl">
-        <div class="flex items-center gap-3.5">
-          <div class="h-10 w-10 rounded-2xl bg-purple-900/40 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xl">
-            <i class="fa-solid fa-gift"></i>
+      <!-- EXCLUSIVE LEAKS & LIVE VIP BANNER -->
+      <div id="vipRewardBanner" class="p-4 sm:p-5 rounded-3xl border border-darkBorder bg-darkCard/90 flex flex-col sm:flex-row items-center justify-between gap-5 shadow-xl backdrop-blur-xl relative overflow-hidden">
+        <div class="flex items-center gap-4">
+          <div class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/50 shadow-md shrink-0">
+            <img src="https://img.magnific.com/free-photo/medium-shot-woman-posing-outdoors_23-2149870212.jpg?semt=ais_hybrid&w=740&q=80" alt="VIP Model Host" class="w-full h-full object-cover">
+            <span class="absolute top-1 right-1 h-2.5 w-2.5 bg-rose-500 rounded-full animate-ping"></span>
           </div>
           <div>
-            <div class="font-display font-black text-slate-200 text-sm">VIP Reward: Secret Lounge Access</div>
-            <div id="vipRewardStatus" class="text-slate-400 text-xs mt-0.5 font-sans">Reach <b class="text-amber-400">30x profit</b> in Mines to unlock server link.</div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-bold font-mono">18+ VIP PRIVATE</span>
+              <span class="text-rose-400 font-bold text-xs flex items-center gap-1 font-mono"><i class="fa-solid fa-circle text-[8px] animate-pulse"></i> LIVE</span>
+            </div>
+            <div class="font-display font-black text-slate-100 text-sm mt-1">Exclusive Leaks &amp; Live Private Streams</div>
+            <div id="vipRewardStatus" class="text-slate-400 text-xs mt-0.5 font-sans">Reach <b class="text-amber-400">30x profit</b> in Mines to unlock private VIP channel link.</div>
           </div>
         </div>
-        <a id="vipRewardLink" href="#" target="_blank" class="pointer-events-none opacity-40 px-4 py-2.5 rounded-2xl border border-purple-500/50 bg-purple-600/20 text-purple-300 font-bold transition flex items-center gap-2 text-xs whitespace-nowrap font-sans">
+        <a id="vipRewardLink" href="#" target="_blank" class="pointer-events-none opacity-40 px-5 py-3 rounded-2xl border border-purple-500/50 bg-purple-600/20 text-purple-200 font-bold transition flex items-center gap-2 text-xs whitespace-nowrap font-sans shrink-0">
           <span>Locked</span> <i class="fa-solid fa-lock text-xs"></i>
         </a>
       </div>
@@ -705,7 +733,7 @@
 
     </div>
 
-    <!-- RIGHT: GENERAL CHAT (1 Column) -->
+    <!-- RIGHT: GENERAL CHAT WITH USER AVATARS -->
     <div class="lg:col-span-1 flex flex-col gap-6">
       <div class="bg-darkCard/90 border border-darkBorder rounded-3xl p-5 shadow-xl flex flex-col h-[650px] backdrop-blur-xl">
         <div class="flex items-center justify-between pb-3.5 border-b border-darkBorder">
@@ -719,8 +747,13 @@
         </div>
 
         <div id="generalChatBox" class="flex-1 overflow-y-auto space-y-3 py-4 font-mono text-xs scrollbar-thin">
-          <div class="p-3 rounded-2xl bg-darkSurface/60 border border-darkBorder/60 text-slate-400 text-xs font-sans">
-            <span class="text-amber-400 font-bold font-mono">[VIP Bot]:</span> Welcome to Aura Royale. All data, tickets, and balances are cloud preserved.
+          <div class="p-3 rounded-2xl bg-darkSurface/60 border border-darkBorder/60 text-slate-400 text-xs font-sans flex items-start gap-2.5">
+            <div class="h-7 w-7 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0 text-xs">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+              <span class="text-amber-400 font-bold font-mono">VIP Bot:</span> Welcome to Gemluck VIP Lounge. Chat messages, tickets, and user balances are cloud secured.
+            </div>
           </div>
         </div>
 
@@ -827,7 +860,7 @@
     </div>
   </div>
 
-  <!-- ==================== CORE SCRIPT & BULLETPROOF FIREWALL ==================== -->
+  <!-- ==================== CORE SCRIPT & FIREWALL ENGINE ==================== -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDdsIHkwzg5llxiVW2Z6H6bE6d-k07jUe8",
@@ -847,7 +880,7 @@
     const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
     const MIN_THRESHOLD = 4000000; // 4,000,000 💎
 
-    // Hardware/Browser Isolated Fingerprint
+    // Unique Browser Fingerprint
     let myDeviceToken = localStorage.getItem('aura_cloud_device_token');
     if (!myDeviceToken) {
       myDeviceToken = 'hw_' + Math.random().toString(36).substring(2) + Date.now();
@@ -870,16 +903,18 @@
     };
 
     let attachedImageBase64 = null;
+    let channelPendingImageBase64 = null;
     let cloudHeartbeatTimer = null;
     let activeSessionListener = null;
     let liveTicketsList = [];
     let currentActiveChannelId = null;
     let activeChannelListener = null;
+    let pendingLoginUser = null;
 
     /* ====================================================================
-       RELIABLE SINGLE-DEVICE CLOUD FIREWALL (PERSISTS ON REFRESH)
+       SINGLE-DEVICE FIREWALL ENGINE WITH OVERRIDE HANDSHAKE
     ==================================================================== */
-    async function verifyAndLockCloudSession(username) {
+    async function verifyAndLockCloudSession(username, forceOverride = false) {
       const cleanUser = username.toLowerCase();
       const sessionRef = db.ref('active_sessions/' + cleanUser);
 
@@ -888,8 +923,8 @@
         const data = snap.val();
         const now = Date.now();
 
-        // 1. REFRESH CHECK: If this device ALREADY holds the token, grant immediately!
-        if (data && data.token === myDeviceToken) {
+        // 1. REFRESH CHECK: Same browser tab refreshing keeps access smoothly
+        if (!forceOverride && data && data.token === myDeviceToken) {
           await sessionRef.update({
             lastSeen: now,
             expiresAt: now + 16000
@@ -898,45 +933,30 @@
           return true;
         }
 
-        // 2. CONCURRENT CHECK: If another device has an active lease (<16s), REJECT!
-        if (data && data.token && data.token !== myDeviceToken) {
+        // 2. CONCURRENT CHECK: Different browser active lease check
+        if (!forceOverride && data && data.token && data.token !== myDeviceToken) {
           const expiration = data.expiresAt || (data.lastSeen ? data.lastSeen + 16000 : 0);
           if (now < expiration) {
-            return false; // Actively held by another device
+            return false; // Active lock held by other browser
           }
         }
 
-        // 3. ATOMIC CLAIM: Take over lock safely with 16-second window
-        let acquired = false;
-        await sessionRef.transaction((curr) => {
-          const txNow = Date.now();
-          if (curr && curr.token && curr.token !== myDeviceToken) {
-            const currExp = curr.expiresAt || (curr.lastSeen ? curr.lastSeen + 16000 : 0);
-            if (txNow < currExp) {
-              acquired = false;
-              return; // Another device grabbed it
-            }
-          }
-          acquired = true;
-          return {
-            token: myDeviceToken,
-            lastSeen: txNow,
-            expiresAt: txNow + 16000
-          };
+        // 3. CLAIM LOCK (Normal or Forced Takeover)
+        await sessionRef.set({
+          token: myDeviceToken,
+          lastSeen: now,
+          expiresAt: now + 16000
         });
-
-        if (!acquired) return false;
 
         setupSessionGuards(sessionRef);
         return true;
       } catch (err) {
-        console.error("Lock verification error:", err);
+        console.error("Lock error:", err);
         return false;
       }
     }
 
     function setupSessionGuards(sessionRef) {
-      // Real-time eviction sentry: if another browser takes the lease, evict this one
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
       activeSessionListener = sessionRef.on('value', (snap) => {
         const val = snap.val();
@@ -945,7 +965,6 @@
         }
       });
 
-      // 4-second heartbeat to maintain the 16-second lease
       if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
       cloudHeartbeatTimer = setInterval(() => {
         if (user.username !== 'guest') {
@@ -965,6 +984,25 @@
       document.getElementById('sessionKickOverlay').classList.remove('hidden');
       document.body.style.pointerEvents = 'none';
       document.getElementById('sessionKickOverlay').style.pointerEvents = 'auto';
+    }
+
+    async function forceTakeoverLogin() {
+      if (!pendingLoginUser) return;
+      const submitBtn = document.getElementById('loginSubmitBtn');
+      submitBtn.textContent = "Overriding Lease...";
+      submitBtn.disabled = true;
+
+      const rawDiscord = document.getElementById('discordInput').value.trim();
+      const granted = await verifyAndLockCloudSession(pendingLoginUser, true);
+
+      if (granted) {
+        document.getElementById('loginErrorAlert').classList.add('hidden');
+        await activateUserSession(pendingLoginUser, rawDiscord);
+      } else {
+        alert("Failed to override lock. Try again.");
+      }
+      submitBtn.textContent = "Enter VIP Arena";
+      submitBtn.disabled = false;
     }
 
     async function handleLogout() {
@@ -1049,11 +1087,11 @@
     function renderVIPBannerUnlocked(mult) {
       const linkBtn = document.getElementById('vipRewardLink');
       linkBtn.href = VIP_REWARD_DISCORD;
-      linkBtn.className = 'px-4 py-2.5 rounded-2xl border border-purple-400 bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center gap-2 text-xs whitespace-nowrap shadow-lg shadow-purple-500/30 font-sans';
-      linkBtn.innerHTML = 'Access Exclusive Lounge <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
+      linkBtn.className = 'px-5 py-3 rounded-2xl border border-purple-400 bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center gap-2 text-xs whitespace-nowrap shadow-lg shadow-purple-500/30 font-sans';
+      linkBtn.innerHTML = 'Join Exclusive VIP Channel <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
       document.getElementById('vipRewardStatus').textContent = mult 
-        ? `Unlocked: Reached ${mult.toFixed(2)}x Profit in Mines!` 
-        : `Unlocked: Exclusive VIP Access Active!`;
+        ? `Unlocked: Reached ${mult.toFixed(2)}x Profit in Mines! Private Leaks Available.` 
+        : `Unlocked: Exclusive Private VIP Access Active!`;
     }
 
     function unlockVIPDiscordMines(mult) {
@@ -1131,6 +1169,7 @@
       const submitBtn = document.getElementById('loginSubmitBtn');
 
       if (!rawUser) return;
+      pendingLoginUser = rawUser;
 
       submitBtn.textContent = "Verifying Single Device...";
       submitBtn.disabled = true;
@@ -1142,7 +1181,7 @@
         submitBtn.disabled = false;
         errBox.classList.remove('hidden');
         document.getElementById('loginErrorMsg').textContent = 
-          `@${rawUser} is already logged in on another device or browser! You must log out there first.`;
+          `@${rawUser} is currently logged in on another device/browser!`;
         return;
       }
 
@@ -1199,22 +1238,20 @@
     }
 
     /* ====================================================================
-       DEDICATED SUPPORT CHANNELS
+       SUPPORT CHANNELS (CHAT ACTIVE IMMEDIATELY UPON CREATION)
     ==================================================================== */
     function renderChannelsList() {
       const container = document.getElementById('channelsListContent');
       container.innerHTML = '';
 
       const relevant = liveTicketsList.filter(t => {
-        const matchesUser = user.isStaff || (t.username && t.username.toLowerCase() === user.username.toLowerCase());
-        const hasChannel = t.status === 'Approved' || t.status === 'Closed';
-        return matchesUser && hasChannel;
+        return user.isStaff || (t.username && t.username.toLowerCase() === user.username.toLowerCase());
       });
 
       if (relevant.length === 0) {
         container.innerHTML = `
           <div class="text-slate-500 text-center py-8 text-xs font-sans">
-            No active channels yet.<br>Channels are opened once a ticket is approved by staff.
+            No active channels yet.<br>Submit a ticket in Cashier Desk to start a dialogue.
           </div>
         `;
         return;
@@ -1229,13 +1266,14 @@
         };
 
         const isClosed = ticket.status === 'Closed';
+        const isApproved = ticket.status === 'Approved';
 
         item.innerHTML = `
           <div>
             <div class="flex items-center gap-2.5">
-              <span class="font-display font-bold text-slate-100 text-xs">Channel #${ticket.id.slice(-5)}</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isClosed ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500/20 text-emerald-300'}">
-                ${isClosed ? 'Closed' : 'Active'}
+              <span class="font-display font-bold text-slate-100 text-xs">Ticket #${ticket.id.slice(-5)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isApproved ? 'bg-emerald-500/20 text-emerald-300' : (isClosed ? 'bg-slate-700 text-slate-400' : 'bg-amber-500/20 text-amber-300')}">
+                ${ticket.status || 'Chat Active'}
               </span>
             </div>
             <div class="text-[10px] text-slate-400 mt-1 font-sans">
@@ -1243,7 +1281,7 @@
             </div>
           </div>
           <button class="px-3 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 text-[10px] font-bold border border-sky-500/30">
-            Open <i class="fa-solid fa-arrow-right ml-1"></i>
+            Chat <i class="fa-solid fa-arrow-right ml-1"></i>
           </button>
         `;
         container.appendChild(item);
@@ -1255,7 +1293,7 @@
       const ticket = liveTicketsList.find(t => t.id === ticketId);
       if (!ticket) return;
 
-      document.getElementById('channelTitle').textContent = `Channel #${ticketId.slice(-5)} [${ticket.type}]`;
+      document.getElementById('channelTitle').textContent = `Ticket #${ticketId.slice(-5)} [${ticket.type}]`;
       document.getElementById('channelSubtitle').textContent = `@${ticket.username} • ${ticket.status || 'Active'}`;
 
       const closeBtn = document.getElementById('channelCloseBtn');
@@ -1299,16 +1337,35 @@
 
       const msgDiv = document.createElement('div');
       msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+      
+      let imageHtml = '';
+      if (msg.image) {
+        imageHtml = `<div class="mt-1.5"><img src="${msg.image}" class="rounded-xl max-h-40 border border-darkBorder object-contain"></div>`;
+      }
+
       msgDiv.innerHTML = `
         <div class="text-[9px] text-slate-400 mb-0.5">
           <span class="${msg.isStaff ? 'text-amber-400 font-bold' : 'text-sky-400'}">@${msg.sender}</span> • ${msg.time || ''}
         </div>
         <div class="p-3 rounded-2xl text-xs max-w-[85%] ${isMe ? 'bg-sky-600/30 border border-sky-500/40 text-sky-100' : 'bg-darkSurface border border-darkBorder text-slate-200'}">
-          ${msg.text}
+          ${msg.text ? `<div>${msg.text}</div>` : ''}
+          ${imageHtml}
         </div>
       `;
       logs.appendChild(msgDiv);
       logs.scrollTop = logs.scrollHeight;
+    }
+
+    function handleChannelImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          channelPendingImageBase64 = evt.target.result;
+          document.getElementById('channelImagePreviewNote').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
     async function handleSendChannelMessage(e) {
@@ -1317,17 +1374,22 @@
 
       const input = document.getElementById('channelChatInput');
       const text = input.value.trim();
-      if (!text) return;
+
+      if (!text && !channelPendingImageBase64) return;
 
       await db.ref(`ticket_channels/${currentActiveChannelId}/messages`).push({
         sender: user.username,
-        text: text,
+        text: text || '',
+        image: channelPendingImageBase64 || null,
         isStaff: user.isStaff,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       });
 
       input.value = '';
+      channelPendingImageBase64 = null;
+      document.getElementById('channelMsgFile').value = '';
+      document.getElementById('channelImagePreviewNote').classList.add('hidden');
     }
 
     function closeTicketChannelModal() {
@@ -1349,8 +1411,8 @@
       });
 
       await db.ref(`ticket_channels/${currentActiveChannelId}/messages`).push({
-        sender: 'AuraSupport',
-        text: `Ticket channel marked Closed by staff @${user.username}.`,
+        sender: 'GemluckSupport',
+        text: `Ticket channel concluded and closed by staff @${user.username}.`,
         isStaff: true,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
@@ -1394,28 +1456,25 @@
 
         const isClosed = ticket.status === 'Closed';
         const isApproved = ticket.status === 'Approved';
-        const isPending = ticket.status === 'Pending';
-        const isCancelled = ticket.status === 'Cancelled';
+        const isPending = !isClosed && !isApproved;
 
         let badgeClass = 'bg-amber-500/20 text-amber-300';
         if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
         if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
-        if (isCancelled) badgeClass = 'bg-rose-500/20 text-rose-400';
 
         let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40 font-mono">`;
+
+        // Direct button to open chat immediately
+        actionButtons += `
+          <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-[10px] transition flex items-center gap-1.5">
+            <i class="fa-solid fa-comments"></i> Open Chat (${ticket.status || 'Active'})
+          </button>
+        `;
 
         if (ticket.type === 'Withdrawal' && isPending) {
           actionButtons += `
             <button onclick="cancelWithdrawalTicket('${ticket.id}', ${ticket.diamonds})" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition flex items-center gap-1.5">
-              <i class="fa-solid fa-ban"></i> Cancel Withdrawal &amp; Refund
-            </button>
-          `;
-        }
-
-        if (isApproved || isClosed) {
-          actionButtons += `
-            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold text-[10px] transition flex items-center gap-1.5">
-              <i class="fa-solid fa-comments"></i> Enter Dedicated Channel
+              <i class="fa-solid fa-ban"></i> Cancel &amp; Refund
             </button>
           `;
         }
@@ -1425,7 +1484,7 @@
         let html = `
           <div class="flex justify-between items-center font-mono">
             <span class="text-sky-400 font-bold">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Pending'}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Chat Active'}</span>
           </div>
           <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
         `;
@@ -1458,32 +1517,29 @@
 
         const isClosed = ticket.status === 'Closed';
         const isApproved = ticket.status === 'Approved';
-        const isCancelled = ticket.status === 'Cancelled';
 
         let badgeClass = 'bg-amber-500/20 text-amber-300';
         if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
         if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
-        if (isCancelled) badgeClass = 'bg-rose-500/20 text-rose-400';
 
         let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40 font-mono">`;
 
-        if (!isApproved && !isClosed && !isCancelled) {
+        // Staff can open channel chat at any time
+        actionButtons += `
+          <button onclick="openTicketChannel('${ticket.id}')" class="px-3.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-[10px] transition flex items-center gap-1.5">
+            <i class="fa-solid fa-comments"></i> Open Chat
+          </button>
+        `;
+
+        if (!isApproved && !isClosed) {
           actionButtons += `
-            <button onclick="staffApproveAndCreateChannel('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
-              Approve Receipt &amp; Open Channel
+            <button onclick="staffApproveDeposit('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
+              Approve (${ticket.type})
             </button>
           `;
         }
 
-        if (isApproved || isClosed) {
-          actionButtons += `
-            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold text-[10px] transition">
-              Open Channel Chat
-            </button>
-          `;
-        }
-
-        if (!isClosed && !isCancelled) {
+        if (!isClosed) {
           actionButtons += `
             <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
               Close Ticket
@@ -1496,7 +1552,7 @@
         let html = `
           <div class="flex justify-between items-center font-mono">
             <span class="text-amber-400 font-bold text-xs">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Pending'}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Chat Active'}</span>
           </div>
           <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
         `;
@@ -1564,13 +1620,22 @@
 
       if (!text && !attachedImageBase64 && diamonds <= 0) return;
 
-      await db.ref('support_tickets').push({
+      const newTicketRef = await db.ref('support_tickets').push({
         username: user.username,
         type: type,
         diamonds: diamonds,
         message: text,
         image: attachedImageBase64 || null,
-        status: 'Pending',
+        status: 'Chat Active',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      // Initialize channel chat room immediately
+      await db.ref(`ticket_channels/${newTicketRef.key}/messages`).push({
+        sender: 'GemluckSupport',
+        text: `Welcome @${user.username}. Chat is open. You can send transaction receipts, messages, and photos here directly.`,
+        isStaff: true,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       });
@@ -1578,9 +1643,44 @@
       document.getElementById('supportMessageInput').value = '';
       document.getElementById('supportTicketDiamonds').value = '';
       document.getElementById('supportImageInput').value = '';
-      document.getElementById('supportFileLabel').textContent = 'Attach Image Proof';
+      document.getElementById('supportFileLabel').textContent = 'Attach Proof Photo';
       attachedImageBase64 = null;
-      alert("Ticket submitted successfully! Visible in your Support list.");
+
+      toggleModal('supportModal');
+      openTicketChannel(newTicketRef.key);
+    }
+
+    async function staffApproveDeposit(ticketId, targetUser, diamonds, type) {
+      if (!user.isStaff) return;
+
+      if (type === 'Deposit' && diamonds > 0) {
+        const cleanTarget = targetUser.toLowerCase();
+        const targetRef = db.ref('user_profiles/' + cleanTarget);
+        
+        await targetRef.transaction((curr) => {
+          if (!curr) return { username: targetUser, balance: 10000000 + diamonds, totalWagered: 0 };
+          curr.balance = (curr.balance || 0) + diamonds;
+          curr.totalDeposits = (curr.totalDeposits || 0) + diamonds;
+          return curr;
+        });
+
+        db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(diamonds));
+      }
+
+      await db.ref('support_tickets/' + ticketId).update({
+        status: 'Approved',
+        approvedBy: user.username
+      });
+
+      await db.ref(`ticket_channels/${ticketId}/messages`).push({
+        sender: 'GemluckSupport',
+        text: `Receipt approved by staff @${user.username}. ${diamonds > 0 ? diamonds.toLocaleString() + ' 💎 credited.' : ''}`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      openTicketChannel(ticketId);
     }
 
     async function cancelWithdrawalTicket(ticketId, amount) {
@@ -1590,12 +1690,12 @@
       const snapshot = await ticketRef.once('value');
       const ticket = snapshot.val();
 
-      if (!ticket || ticket.status !== 'Pending') {
+      if (!ticket || ticket.status === 'Closed' || ticket.status === 'Approved') {
         return alert("This withdrawal can no longer be cancelled.");
       }
 
       await ticketRef.update({
-        status: 'Cancelled',
+        status: 'Closed',
         cancelledAt: Date.now()
       });
 
@@ -1624,39 +1724,6 @@
         reader.onload = (evt) => { attachedImageBase64 = evt.target.result; };
         reader.readAsDataURL(file);
       }
-    }
-
-    async function staffApproveAndCreateChannel(ticketId, targetUser, diamonds, type) {
-      if (!user.isStaff) return;
-
-      if (type === 'Deposit' && diamonds > 0) {
-        const cleanTarget = targetUser.toLowerCase();
-        const targetRef = db.ref('user_profiles/' + cleanTarget);
-        
-        await targetRef.transaction((curr) => {
-          if (!curr) return { username: targetUser, balance: 10000000 + diamonds, totalWagered: 0 };
-          curr.balance = (curr.balance || 0) + diamonds;
-          curr.totalDeposits = (curr.totalDeposits || 0) + diamonds;
-          return curr;
-        });
-
-        db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(diamonds));
-      }
-
-      await db.ref('support_tickets/' + ticketId).update({
-        status: 'Approved',
-        approvedBy: user.username
-      });
-
-      await db.ref(`ticket_channels/${ticketId}/messages`).push({
-        sender: 'AuraSupport',
-        text: `Ticket has been approved by staff @${user.username}. This dedicated channel is now open for direct chat.`,
-        isStaff: true,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-
-      openTicketChannel(ticketId);
     }
 
     async function staffCloseTicketDirect(ticketId) {
@@ -1707,7 +1774,7 @@
       toggleModal('tipModal');
 
       db.ref('chat_messages').push({
-        sender: 'AuraSystem',
+        sender: 'GemluckSystem',
         text: `@${user.username} tipped ${amount.toLocaleString()} 💎 to @${rawRecipient}!`,
         isStaff: true,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1849,7 +1916,7 @@
     }
 
     /* ====================================================================
-       GLOBAL LIVE CHAT
+       GLOBAL LIVE CHAT (WITH USER PROFILE ICONS)
     ==================================================================== */
     function initLiveCloudChat() {
       db.ref('chat_messages').limitToLast(40).on('child_added', (snapshot) => {
@@ -1861,13 +1928,22 @@
     function renderChatMessage(sender, text, isStaff, time) {
       const box = document.getElementById('generalChatBox');
       const msgDiv = document.createElement('div');
-      msgDiv.className = 'p-3 rounded-2xl bg-darkSurface/90 border border-darkBorder/60';
+      msgDiv.className = 'p-3 rounded-2xl bg-darkSurface/90 border border-darkBorder/60 flex items-start gap-2.5';
+      
+      const iconClass = isStaff ? 'fa-solid fa-crown text-amber-400' : 'fa-solid fa-user text-sky-400';
+      const iconBg = isStaff ? 'bg-amber-500/10 border-amber-500/30' : 'bg-sky-500/10 border-sky-500/30';
+
       msgDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-1">
-          <span class="${isStaff ? 'text-amber-400 font-bold' : 'text-sky-400 font-semibold'}">@${sender}</span>
-          <span class="text-[9px] text-slate-500">${time || 'Just now'}</span>
+        <div class="h-7 w-7 rounded-full ${iconBg} border flex items-center justify-center shrink-0 text-xs mt-0.5">
+          <i class="${iconClass}"></i>
         </div>
-        <div class="text-slate-200 text-xs font-sans">${text}</div>
+        <div class="flex-1">
+          <div class="flex justify-between items-center mb-0.5">
+            <span class="${isStaff ? 'text-amber-400 font-bold' : 'text-sky-400 font-semibold'}">@${sender}</span>
+            <span class="text-[9px] text-slate-500">${time || 'Just now'}</span>
+          </div>
+          <div class="text-slate-200 text-xs font-sans">${text}</div>
+        </div>
       `;
       box.appendChild(msgDiv);
       box.scrollTop = box.scrollHeight;
@@ -2192,10 +2268,10 @@
     function setDiceMode(m) {
       diceMode = m;
       document.getElementById('diceModeUnder').className = m === 'under'
-        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300'
+        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300' 
         : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
       document.getElementById('diceModeOver').className = m === 'over'
-        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300'
+        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300' 
         : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
       updateDiceOdds();
     }
