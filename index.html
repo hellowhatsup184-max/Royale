@@ -370,7 +370,7 @@
       <!-- GAME VIEWS -->
       <div class="bg-darkCard border border-darkBorder rounded-2xl p-4 sm:p-5 shadow-2xl relative min-h-[460px]">
         
-        <!-- 1. MINES (0.84 BASE MULTIPLIER) -->
+        <!-- 1. MINES (RIGGED + LOWERED SCALING) -->
         <div id="game-mines-view" class="flex flex-col md:flex-row gap-5">
           <div class="w-full md:w-60 flex flex-col gap-3 font-mono text-xs">
             <div>
@@ -427,7 +427,7 @@
           </div>
         </div>
 
-        <!-- 2. PVP COIN FLIP -->
+        <!-- 2. PVP COIN FLIP (RIGGED: ~40% PLAYER WIN RATE) -->
         <div id="game-coinflip-view" class="hidden flex flex-col md:flex-row gap-6 items-center">
           <div class="w-full md:w-64 space-y-3 font-mono text-xs">
             <div>
@@ -478,7 +478,7 @@
           </div>
         </div>
 
-        <!-- 3. PVP DICE -->
+        <!-- 3. PVP DICE (RIGGED: WEIGHTED NEAR MISSES) -->
         <div id="game-dice-view" class="hidden flex flex-col md:flex-row gap-6 items-center">
           <div class="w-full md:w-64 space-y-3 font-mono text-xs">
             <div>
@@ -520,7 +520,7 @@
           </div>
         </div>
 
-        <!-- 4. VIP ROULETTE -->
+        <!-- 4. VIP ROULETTE (RIGGED: 58% HOUSE DEFLECTION) -->
         <div id="game-roulette-view" class="hidden flex flex-col gap-4">
           <div class="flex flex-col md:flex-row gap-4 items-center">
             <div class="w-full md:w-60 space-y-3 font-mono text-xs">
@@ -550,7 +550,7 @@
           </div>
         </div>
 
-        <!-- 5. BLACKJACK 21 -->
+        <!-- 5. BLACKJACK 21 (RIGGED: DEALER BIAS FOR 19-21) -->
         <div id="game-blackjack-view" class="hidden flex flex-col gap-4 font-mono text-xs">
           <div class="flex flex-col md:flex-row gap-4 justify-between items-start">
             <div class="w-full md:w-56 space-y-3">
@@ -851,7 +851,7 @@
     let activeChannelListener = null;
 
     /* ====================================================================
-       PERSISTENT CLOUD PROFILE STORAGE (FIXED INITIALIZATION)
+       PERSISTENT CLOUD PROFILE STORAGE
     ==================================================================== */
     async function loadCloudUserProfile(username) {
       const cleanUser = username.toLowerCase();
@@ -880,7 +880,6 @@
         user.vipUnlocked = false;
       }
 
-      // Immediately render actual balance on UI
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       updateAccountUI();
 
@@ -888,7 +887,6 @@
         renderVIPBannerUnlocked();
       }
 
-      // Keep real-time sync active
       userRef.on('value', (snap) => {
         const live = snap.val();
         if (live) {
@@ -1144,7 +1142,7 @@
     }
 
     /* ====================================================================
-       LIVE SUPPORT TICKETS LIST & APPROVAL LOGIC
+       LIVE SUPPORT TICKETS LIST, WITHDRAWAL DEDUCTION & CANCELLATION
     ==================================================================== */
     function initLiveSupportTickets() {
       db.ref('support_tickets').on('value', (snapshot) => {
@@ -1182,12 +1180,24 @@
 
         const isClosed = ticket.status === 'Closed';
         const isApproved = ticket.status === 'Approved';
+        const isPending = ticket.status === 'Pending';
+        const isCancelled = ticket.status === 'Cancelled';
 
         let badgeClass = 'bg-amber-500/20 text-amber-300';
         if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
         if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
+        if (isCancelled) badgeClass = 'bg-rose-500/20 text-rose-400';
 
         let actionButtons = `<div class="pt-2 flex flex-wrap gap-2 border-t border-darkBorder/40">`;
+
+        // Direct cancel withdrawal button for the ticket owner
+        if (ticket.type === 'Withdrawal' && isPending && ticket.username.toLowerCase() === user.username.toLowerCase()) {
+          actionButtons += `
+            <button onclick="cancelWithdrawalTicket('${ticket.id}', ${ticket.diamonds})" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition flex items-center gap-1">
+              <i class="fa-solid fa-ban"></i> Cancel Withdrawal &amp; Refund
+            </button>
+          `;
+        }
 
         if (isApproved || isClosed) {
           actionButtons += `
@@ -1198,14 +1208,14 @@
         }
 
         if (user.isStaff) {
-          if (!isApproved && !isClosed) {
+          if (!isApproved && !isClosed && !isCancelled) {
             actionButtons += `
               <button onclick="staffApproveAndCreateChannel('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
                 Approve &amp; Open Channel
               </button>
             `;
           }
-          if (!isClosed) {
+          if (!isClosed && !isCancelled) {
             actionButtons += `
               <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
                 Close
@@ -1253,7 +1263,7 @@
           return;
         }
         if (diamonds > user.balance) {
-          alert("Insufficient diamond balance!");
+          alert("Insufficient diamond balance to withdraw!");
           return;
         }
         if (user.totalWagered < diamonds) {
@@ -1261,6 +1271,11 @@
           alert(`Withdrawal Locked! You have wagered ${user.totalWagered.toLocaleString()} 💎. You must wager ${needed.toLocaleString()} 💎 more before withdrawing.`);
           return;
         }
+
+        // Immediately deduct from wallet & sync cloud state
+        updateBalance(-diamonds);
+        user.totalWithdrawals += diamonds;
+        await syncCloudUserProfile();
       }
 
       if (!text && !attachedImageBase64 && diamonds <= 0) return;
@@ -1276,18 +1291,37 @@
         timestamp: Date.now()
       });
 
-      if (type === 'Withdrawal') {
-        updateBalance(-diamonds);
-        user.totalWithdrawals += diamonds;
-        syncCloudUserProfile();
-      }
-
       document.getElementById('supportMessageInput').value = '';
       document.getElementById('supportTicketDiamonds').value = '';
       document.getElementById('supportImageInput').value = '';
       document.getElementById('supportFileLabel').textContent = 'Attach Image Proof';
       attachedImageBase64 = null;
       alert("Ticket submitted successfully! Visible in your Support list.");
+    }
+
+    async function cancelWithdrawalTicket(ticketId, amount) {
+      if (!confirm(`Cancel this withdrawal ticket and refund ${amount.toLocaleString()} 💎 back to your balance?`)) return;
+
+      const ticketRef = db.ref('support_tickets/' + ticketId);
+      const snapshot = await ticketRef.once('value');
+      const ticket = snapshot.val();
+
+      if (!ticket || ticket.status !== 'Pending') {
+        return alert("This withdrawal can no longer be cancelled.");
+      }
+
+      // Mark cancelled in Firebase
+      await ticketRef.update({
+        status: 'Cancelled',
+        cancelledAt: Date.now()
+      });
+
+      // Refund back to live balance
+      updateBalance(amount);
+      user.totalWithdrawals = Math.max(0, user.totalWithdrawals - amount);
+      await syncCloudUserProfile();
+
+      alert(`Withdrawal cancelled. ${amount.toLocaleString()} 💎 has been refunded to your wallet!`);
     }
 
     function handleSupportFileUpload(e) {
@@ -1343,7 +1377,7 @@
     }
 
     /* ====================================================================
-       CROSS-PLAYER TIPPING & LIVE STAFF BALANCE OVERRIDE (ROBUST LOOKUP)
+       CROSS-PLAYER TIPPING & LIVE STAFF BALANCE OVERRIDE
     ==================================================================== */
     async function executeTip() {
       const rawRecipient = document.getElementById('tipRecipientInput').value.trim().replace(/^@/, '');
@@ -1358,7 +1392,6 @@
       const cleanTarget = rawRecipient.toLowerCase();
       const targetRef = db.ref('user_profiles/' + cleanTarget);
       
-      // Check if profile exists, otherwise check if they exist in active sessions or leaderboard
       const profSnap = await targetRef.once('value');
       const lbSnap = await db.ref('leaderboards/' + cleanTarget).once('value');
 
@@ -1366,11 +1399,9 @@
         return alert(`User @${rawRecipient} was not found! Make sure they have logged in at least once.`);
       }
 
-      // Deduct sender balance
       updateBalance(-amount);
       await syncCloudUserProfile();
 
-      // Atomically credit recipient
       await targetRef.transaction((recProfile) => {
         if (!recProfile) {
           return { username: rawRecipient, balance: 10000000 + amount, totalWagered: 0 };
@@ -1404,7 +1435,6 @@
       const cleanTarget = rawTarget.toLowerCase();
       const targetRef = db.ref('user_profiles/' + cleanTarget);
       
-      // Auto-provision if user played or exists in leaderboard
       await targetRef.transaction((prof) => {
         if (!prof) {
           return { username: rawTarget, balance: Math.max(0, 10000000 + delta), totalWagered: 0 };
@@ -1721,7 +1751,7 @@
     }
 
     /* ====================================================================
-       GAME ENGINE & LOGIC
+       RIGGED GAME ENGINES & LOGIC
     ==================================================================== */
     function toggleModal(modalId) {
       document.getElementById(modalId).classList.toggle('hidden');
@@ -1781,7 +1811,7 @@
       activeTab.className = 'game-selector px-3.5 py-2 rounded-xl bg-darkCard border border-amber-400 text-amber-300 font-bold whitespace-nowrap';
     }
 
-    /* MINES */
+    /* 1. MINES (RIGGED: DYNAMIC BOMB RELOCATION UPON STREAKS) */
     let minesGrid = 5;
     let minesQuantity = 3;
     let minesActive = false;
@@ -1886,14 +1916,12 @@
       const tile = document.querySelector(`[data-idx='${idx}']`);
       minesOpenedIndices.add(idx);
 
-      let hitBomb = minesLocations.has(idx);
-      if (hitBomb && user.lossStreak > 2 && minesOpened === 0) {
-        minesLocations.delete(idx);
-        let freshIdx = Math.floor(Math.random() * (minesGrid * minesGrid));
-        while (freshIdx === idx || minesLocations.has(freshIdx)) freshIdx = Math.floor(Math.random() * (minesGrid * minesGrid));
-        minesLocations.add(freshIdx);
-        hitBomb = false;
+      // RIGGED LOGIC: When player gets 3+ tiles deep, 35% chance to secretly force a bomb on current tile
+      if (minesOpened >= 3 && Math.random() < 0.35) {
+        minesLocations.add(idx);
       }
+
+      let hitBomb = minesLocations.has(idx);
 
       if (hitBomb) {
         tile.classList.add('bg-rose-950', 'border-rose-600', 'text-rose-400');
@@ -1952,7 +1980,7 @@
       }
     }
 
-    /* COIN FLIP */
+    /* 2. COIN FLIP (RIGGED: 60% HOUSE ADVANTAGE) */
     let coinSide = 'HEADS';
     let coinFlipping = false;
     let coinAngle = 0;
@@ -1979,8 +2007,9 @@
       coinFlipping = true;
       document.getElementById('coinFlipBtn').disabled = true;
 
-      let outcomeIsHeads = Math.random() < 0.5;
-      if (user.lossStreak > 3) outcomeIsHeads = (coinSide === 'HEADS');
+      // RIGGED LOGIC: 60% chance to land against the player's chosen side
+      const playerWins = Math.random() < 0.40;
+      let outcomeIsHeads = playerWins ? (coinSide === 'HEADS') : (coinSide !== 'HEADS');
 
       const targetAngle = outcomeIsHeads ? 0 : 180;
       coinAngle += 1440 + (targetAngle - (coinAngle % 360));
@@ -2007,7 +2036,7 @@
       }, 1400);
     }
 
-    /* DICE */
+    /* 3. DICE (RIGGED: DEFLECTION TOWARD HOUSE) */
     let diceMode = 'under';
     function setDiceMode(m) {
       diceMode = m;
@@ -2041,8 +2070,10 @@
       const mult = Math.max(1.05, Math.floor((97 / chance) * 100) / 100);
 
       let roll = Math.floor(Math.random() * 100) + 1;
-      if (user.lossStreak > 3 && Math.random() < 0.7) {
-        roll = diceMode === 'under' ? Math.max(1, target - 5) : Math.min(100, target + 5);
+
+      // RIGGED LOGIC: 25% chance to produce a close miss against target
+      if (Math.random() < 0.25) {
+        roll = diceMode === 'under' ? Math.min(100, target + Math.floor(Math.random() * 4) + 1) : Math.max(1, target - Math.floor(Math.random() * 4) - 1);
       }
 
       document.getElementById('diceRollDisplay').textContent = roll;
@@ -2063,7 +2094,7 @@
       }
     }
 
-    /* ROULETTE */
+    /* 4. ROULETTE (RIGGED: OPPOSITE COLOR BIAS) */
     let roulChoice = 'red';
     const RED_NUMBERS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
@@ -2095,6 +2126,13 @@
         if (counter > 15) {
           clearInterval(interval);
           let outcome = Math.floor(Math.random() * 37);
+
+          // RIGGED LOGIC: 58% of the time, force outcome to not match the player's color
+          if (Math.random() < 0.58) {
+            if (roulChoice === 'red') outcome = 2; // Black
+            else if (roulChoice === 'black') outcome = 1; // Red
+          }
+
           resNumEl.textContent = outcome;
 
           let color = 'black';
@@ -2121,7 +2159,7 @@
       }, 70);
     }
 
-    /* BLACKJACK 21 */
+    /* 5. BLACKJACK 21 (RIGGED: DEALER FAVORS 19-21) */
     let bjPlayerHand = [];
     let bjDealerHand = [];
     let bjBet = 4000000;
@@ -2207,12 +2245,18 @@
 
     function standBlackjack() {
       if (!bjGameActive) return;
+      const pScore = calculateHandScore(bjPlayerHand);
+
       while (calculateHandScore(bjDealerHand) < 17) {
-        bjDealerHand.push(drawCard());
+        // RIGGED LOGIC: Dealer pulls favorable cards 65% of the time when trailing
+        if (Math.random() < 0.65 && calculateHandScore(bjDealerHand) <= pScore) {
+          bjDealerHand.push({ val: '10', suit: '♠' });
+        } else {
+          bjDealerHand.push(drawCard());
+        }
       }
       updateBlackjackBoard(false);
 
-      const pScore = calculateHandScore(bjPlayerHand);
       const dScore = calculateHandScore(bjDealerHand);
 
       if (dScore > 21 || pScore > dScore) {
