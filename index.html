@@ -138,13 +138,18 @@
         </button>
       </div>
 
+      <!-- Staff Dedicated Action (Dynamic) -->
+      <button id="drawerStaffBtn" onclick="toggleModal('staffPortalModal')" class="hidden w-full mt-3 py-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-shield-halved"></i> Staff Approval Desk
+      </button>
+
       <!-- Direct Channels Button -->
-      <button onclick="toggleChannelsListModal()" class="w-full mt-3 py-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center justify-center gap-2">
-        <i class="fa-solid fa-comments"></i> Active Ticket Channels
+      <button onclick="toggleChannelsListModal()" class="w-full mt-2.5 py-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-comments"></i> Active Channels
       </button>
 
       <!-- Navigation Links -->
-      <nav class="space-y-2.5 mt-6 text-xs">
+      <nav class="space-y-2.5 mt-5 text-xs">
         <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
           <i class="fa-solid fa-gamepad text-neonCyan w-5"></i> Casino Games
         </button>
@@ -159,9 +164,8 @@
         </button>
         <button onclick="menuNavigate('support')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
           <span class="flex items-center gap-3.5">
-            <i class="fa-solid fa-headset text-cyan-400 w-5"></i> Support Desk
+            <i class="fa-solid fa-headset text-cyan-400 w-5"></i> Live Support Tickets
           </span>
-          <span id="drawerTicketBadge" class="hidden px-2 py-0.5 rounded-full bg-cyan-500 text-slate-950 font-bold text-[10px]">0</span>
         </button>
       </nav>
     </div>
@@ -242,6 +246,101 @@
     </div>
   </div>
 
+  <!-- ==================== SEPARATE STAFF APPROVAL PORTAL MODAL ==================== -->
+  <div id="staffPortalModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-3xl bg-darkCard border border-amber-500/40 rounded-2xl p-6 shadow-2xl flex flex-col h-[640px] max-h-[92vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
+        <div>
+          <h3 class="font-serif text-lg font-bold text-amber-300 flex items-center gap-2.5">
+            <i class="fa-solid fa-shield-halved text-neonGold"></i> Staff Operations &amp; Approvals
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Authorised Officers: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
+        </div>
+        <button onclick="toggleModal('staffPortalModal')" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- PRIMARY ADMIN BALANCE OVERRIDE CHANNEL (ISOLATED) -->
+      <div id="staffControlPanel" class="hidden my-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs">
+        <div class="font-bold text-amber-300 flex items-center justify-between mb-3">
+          <span><i class="fa-solid fa-vault mr-1.5"></i> PRIMARY ADMIN BALANCE OVERRIDE VAULT</span>
+          <span class="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded font-bold">SUPERUSER ONLY</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <input type="text" id="staffTargetUser" placeholder="@target_username" class="bg-darkBg border border-darkBorder rounded-lg px-3 py-2 text-slate-200">
+          <input type="number" id="staffAmountDelta" placeholder="Credits (+4000000 / -4000000)" class="bg-darkBg border border-darkBorder rounded-lg px-3 py-2 text-slate-200">
+          <button onclick="staffModifyBalance()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded-lg transition">
+            Modify Cloud Balance
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Incoming Tickets Stream (Staff View) -->
+      <div class="flex-1 overflow-hidden flex flex-col mt-2">
+        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
+          <span>Incoming Tickets Queue (Pending Approvals &amp; Receipts)</span>
+          <span class="text-amber-400 font-bold">ALL USERS</span>
+        </div>
+        <div id="staffQueueLogs" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-xl border border-darkBorder scrollbar-thin">
+          <div class="text-slate-500 text-center py-8">No incoming tickets in queue.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== USER LIVE SUPPORT & CASHIER MODAL ==================== -->
+  <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
+        <div>
+          <h3 class="font-serif text-base sm:text-lg font-bold text-cyan-300 flex items-center gap-2.5">
+            <i class="fa-solid fa-headset text-neonCyan"></i> Live Support &amp; Cashier Desk
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Submit receipts or inquiries for live staff verification.</p>
+        </div>
+        <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- User's Personal Ticket Logs -->
+      <div class="my-4 flex-1 overflow-hidden flex flex-col">
+        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
+          <span>My Ticket History</span>
+          <span class="text-cyan-400">PERSONAL DESK</span>
+        </div>
+        <div id="supportChatLogs" class="overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-xl border border-darkBorder max-h-[260px] scrollbar-thin">
+          <div id="noTicketsMessage" class="text-slate-500 text-center py-6">No active tickets found for your account.</div>
+        </div>
+      </div>
+
+      <!-- Create Ticket Controls -->
+      <div class="space-y-3 pt-3 border-t border-darkBorder">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+          <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none">
+            <option value="Deposit">Deposit (Min 4M 💎)</option>
+            <option value="Withdrawal">Withdrawal (Min 4M 💎)</option>
+            <option value="General">Inquiry / Support</option>
+          </select>
+          <input type="number" id="supportTicketDiamonds" placeholder="Amount (Min 4,000,000)" class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-neonCyan">
+          <input type="text" id="supportMessageInput" placeholder="Transaction notes or ID..." class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-neonCyan">
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <label class="cursor-pointer flex items-center gap-2 text-xs text-slate-400 hover:text-cyan-300 px-3.5 py-2.5 bg-darkSurface rounded-xl border border-darkBorder transition">
+            <i class="fa-solid fa-paperclip"></i>
+            <span id="supportFileLabel">Attach Image Proof</span>
+            <input type="file" id="supportImageInput" accept="image/*" class="hidden" onchange="handleSupportFileUpload(event)">
+          </label>
+          <button onclick="sendSupportTicket()" class="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">
+            Submit Ticket
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== LOGIN SCREEN MODAL ==================== -->
   <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
     <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-2xl p-8 shadow-2xl relative">
@@ -303,6 +402,9 @@
           <button onclick="openCashierModal('Withdrawal')" class="px-3.5 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center gap-1.5">
             <i class="fa-solid fa-arrow-down"></i> Withdraw
           </button>
+          <button id="headerStaffBtn" onclick="toggleModal('staffPortalModal')" class="hidden px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved"></i> Staff Portal
+          </button>
           <button onclick="toggleChannelsListModal()" class="px-3.5 py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center gap-1.5">
             <i class="fa-solid fa-comments"></i> Channels
           </button>
@@ -326,7 +428,7 @@
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 flex-1">
     
-    <!-- LEFT & CENTER: GAMES (2 of 3 Columns) -->
+    <!-- LEFT & CENTER: GAMES (2 Columns) -->
     <div class="lg:col-span-2 flex flex-col gap-6">
       
       <!-- VIP 30X EXCLUSIVE REWARD BANNER -->
@@ -611,7 +713,7 @@
 
     </div>
 
-    <!-- RIGHT: GENERAL CHAT (1 of 3 Columns) -->
+    <!-- RIGHT: GENERAL CHAT (1 Column) -->
     <div class="lg:col-span-1 flex flex-col gap-6">
       <div class="bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-xl flex flex-col h-[650px]">
         <div class="flex items-center justify-between pb-3.5 border-b border-darkBorder">
@@ -729,73 +831,6 @@
         <button onclick="executeTip()" class="w-full py-3 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 uppercase transition">
           Confirm Tip Transfer
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== LIVE SUPPORT & CASHIER MODAL ==================== -->
-  <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6 font-mono">
-    <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
-        <div>
-          <h3 class="font-serif text-base sm:text-lg font-bold text-cyan-300 flex items-center gap-2.5">
-            <i class="fa-solid fa-headset text-neonCyan"></i> Live Support &amp; Cashier Desk
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Staff: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
-        </div>
-        <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <!-- Tickets List View -->
-      <div class="my-4 flex-1 overflow-hidden flex flex-col">
-        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
-          <span>Active Tickets &amp; Requests</span>
-          <span id="ticketViewerScope" class="text-cyan-400">My Tickets</span>
-        </div>
-        <div id="supportChatLogs" class="overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-xl border border-darkBorder max-h-[260px] scrollbar-thin">
-          <div id="noTicketsMessage" class="text-slate-500 text-center py-6">No active tickets found.</div>
-        </div>
-      </div>
-
-      <!-- Staff Balance Override -->
-      <div id="staffControlPanel" class="hidden mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs">
-        <div class="font-bold text-amber-300 flex items-center justify-between mb-2.5">
-          <span><i class="fa-solid fa-shield-halved"></i> PRIMARY ADMIN BALANCE OVERRIDE</span>
-          <span class="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded">SUPERUSER</span>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <input type="text" id="staffTargetUser" placeholder="@target_username" class="bg-darkBg border border-darkBorder rounded-lg px-3 py-2 text-slate-200">
-          <input type="number" id="staffAmountDelta" placeholder="Credits (+4000000 / -4000000)" class="bg-darkBg border border-darkBorder rounded-lg px-3 py-2 text-slate-200">
-          <button onclick="staffModifyBalance()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded-lg transition">
-            Apply Delta
-          </button>
-        </div>
-      </div>
-
-      <!-- Create Ticket Controls -->
-      <div class="space-y-3 pt-3 border-t border-darkBorder">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-          <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none">
-            <option value="Deposit">Deposit (Min 4M 💎)</option>
-            <option value="Withdrawal">Withdrawal (Min 4M 💎)</option>
-            <option value="General">Inquiry / Support</option>
-          </select>
-          <input type="number" id="supportTicketDiamonds" placeholder="Amount (Min 4,000,000)" class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-neonCyan">
-          <input type="text" id="supportMessageInput" placeholder="Transaction ID or notes..." class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-neonCyan">
-        </div>
-
-        <div class="flex items-center justify-between gap-3">
-          <label class="cursor-pointer flex items-center gap-2 text-xs text-slate-400 hover:text-cyan-300 px-3.5 py-2.5 bg-darkSurface rounded-xl border border-darkBorder transition">
-            <i class="fa-solid fa-paperclip"></i>
-            <span id="supportFileLabel">Attach Image Proof</span>
-            <input type="file" id="supportImageInput" accept="image/*" class="hidden" onchange="handleSupportFileUpload(event)">
-          </label>
-          <button onclick="sendSupportTicket()" class="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">
-            Submit Ticket
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -1154,27 +1189,24 @@
           });
         }
         renderVisibleTickets();
+        if (user.isStaff) renderStaffQueue();
       });
     }
 
+    // 1. User Personal Desk (Live Support)
     function renderVisibleTickets() {
       const logs = document.getElementById('supportChatLogs');
       if (!logs) return;
       logs.innerHTML = '';
 
-      const visible = liveTicketsList.filter(t => {
-        if (user.isStaff) return true;
-        return t.username && t.username.toLowerCase() === user.username.toLowerCase();
-      });
+      const myTickets = liveTicketsList.filter(t => t.username && t.username.toLowerCase() === user.username.toLowerCase());
 
-      document.getElementById('ticketViewerScope').textContent = user.isStaff ? 'All Incoming Tickets (Staff View)' : 'My Tickets';
-
-      if (visible.length === 0) {
-        logs.innerHTML = '<div class="text-slate-500 text-center py-6">No active tickets for this account. Create one below.</div>';
+      if (myTickets.length === 0) {
+        logs.innerHTML = '<div class="text-slate-500 text-center py-6">No active tickets for your account. Create one below.</div>';
         return;
       }
 
-      visible.forEach(ticket => {
+      myTickets.forEach(ticket => {
         const ticketDiv = document.createElement('div');
         ticketDiv.className = 'p-3.5 rounded-xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5';
 
@@ -1190,7 +1222,7 @@
 
         let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40">`;
 
-        if (ticket.type === 'Withdrawal' && isPending && ticket.username.toLowerCase() === user.username.toLowerCase()) {
+        if (ticket.type === 'Withdrawal' && isPending) {
           actionButtons += `
             <button onclick="cancelWithdrawalTicket('${ticket.id}', ${ticket.diamonds})" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition flex items-center gap-1.5">
               <i class="fa-solid fa-ban"></i> Cancel Withdrawal &amp; Refund
@@ -1206,22 +1238,6 @@
           `;
         }
 
-        if (user.isStaff) {
-          if (!isApproved && !isClosed && !isCancelled) {
-            actionButtons += `
-              <button onclick="staffApproveAndCreateChannel('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
-                Approve &amp; Open Channel
-              </button>
-            `;
-          }
-          if (!isClosed && !isCancelled) {
-            actionButtons += `
-              <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
-                Close
-              </button>
-            `;
-          }
-        }
         actionButtons += `</div>`;
 
         let html = `
@@ -1242,6 +1258,78 @@
       });
 
       logs.scrollTop = logs.scrollHeight;
+    }
+
+    // 2. Separate Dedicated Staff Operations Queue
+    function renderStaffQueue() {
+      const queue = document.getElementById('staffQueueLogs');
+      if (!queue) return;
+      queue.innerHTML = '';
+
+      if (liveTicketsList.length === 0) {
+        queue.innerHTML = '<div class="text-slate-500 text-center py-8">Queue is clear. No tickets recorded.</div>';
+        return;
+      }
+
+      liveTicketsList.forEach(ticket => {
+        const ticketDiv = document.createElement('div');
+        ticketDiv.className = 'p-4 rounded-xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5';
+
+        const isClosed = ticket.status === 'Closed';
+        const isApproved = ticket.status === 'Approved';
+        const isCancelled = ticket.status === 'Cancelled';
+
+        let badgeClass = 'bg-amber-500/20 text-amber-300';
+        if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
+        if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
+        if (isCancelled) badgeClass = 'bg-rose-500/20 text-rose-400';
+
+        let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40">`;
+
+        if (!isApproved && !isClosed && !isCancelled) {
+          actionButtons += `
+            <button onclick="staffApproveAndCreateChannel('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
+              Approve Receipt &amp; Open Channel
+            </button>
+          `;
+        }
+
+        if (isApproved || isClosed) {
+          actionButtons += `
+            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold text-[10px] transition">
+              Open Channel Chat
+            </button>
+          `;
+        }
+
+        if (!isClosed && !isCancelled) {
+          actionButtons += `
+            <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
+              Close Ticket
+            </button>
+          `;
+        }
+
+        actionButtons += `</div>`;
+
+        let html = `
+          <div class="flex justify-between items-center">
+            <span class="text-amber-400 font-bold text-xs">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${ticket.status || 'Pending'}</span>
+          </div>
+          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
+        `;
+
+        if (ticket.image) {
+          html += `<div class="mt-2"><img src="${ticket.image}" class="rounded-lg max-h-48 border border-darkBorder object-contain"></div>`;
+        }
+
+        html += actionButtons;
+        ticketDiv.innerHTML = html;
+        queue.appendChild(ticketDiv);
+      });
+
+      queue.scrollTop = queue.scrollHeight;
     }
 
     async function sendSupportTicket() {
@@ -1448,6 +1536,7 @@
       alert(`Successfully sent tip of ${amount.toLocaleString()} 💎 to @${rawRecipient}!`);
     }
 
+    // STRICT PERMISSION CHECK: Rastant86 CANNOT modify player balances
     async function staffModifyBalance() {
       if (!user.isPrimaryAdmin) {
         return alert("Access Denied: Only primary administrators (@Dalawar_alt & @darkrulerx7) can modify balances.");
@@ -1486,24 +1575,21 @@
       const cleanUser = username.toLowerCase();
       const sessionRef = db.ref('active_sessions/' + cleanUser);
 
-      // 1. Fetch current live session state
       const snapshot = await sessionRef.once('value');
       const sessionData = snapshot.val();
       const now = Date.now();
 
-      // 2. Reject if another device holds an active heartbeat (< 15s ago)
       if (sessionData && sessionData.token && sessionData.token !== myDeviceToken) {
         if (now - (sessionData.lastSeen || 0) < 15000) {
-          return false; // REJECT: Another device is currently active
+          return false;
         }
       }
 
-      // 3. Atomically claim session for this specific device
       const txResult = await sessionRef.transaction((current) => {
         const currentTime = Date.now();
         if (current && current.token && current.token !== myDeviceToken) {
           if (currentTime - (current.lastSeen || 0) < 15000) {
-            return; // Abort transaction
+            return;
           }
         }
         return {
@@ -1516,7 +1602,6 @@
         return false;
       }
 
-      // 4. Detach old listener if any and attach live eviction listener
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
       activeSessionListener = sessionRef.on('value', (snap) => {
         const val = snap.val();
@@ -1525,7 +1610,6 @@
         }
       });
 
-      // 5. Active heartbeat every 3 seconds to keep lock fresh
       if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
       cloudHeartbeatTimer = setInterval(() => {
         if (user.username !== 'guest') {
@@ -1533,7 +1617,6 @@
         }
       }, 3000);
 
-      // 6. Clean up on disconnect / closed tab
       sessionRef.onDisconnect().remove();
 
       return true;
@@ -1580,6 +1663,11 @@
         roleBadge.textContent = user.isPrimaryAdmin ? 'ADMIN STAFF' : 'SUPPORT DESK';
         roleBadge.className = 'text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
         
+        // Show Staff Portal Buttons in Header and Menu
+        document.getElementById('headerStaffBtn').classList.remove('hidden');
+        document.getElementById('drawerStaffBtn').classList.remove('hidden');
+
+        // Show balance override vault ONLY if primary admin
         if (user.isPrimaryAdmin) {
           document.getElementById('staffControlPanel').classList.remove('hidden');
         } else {
@@ -1588,12 +1676,15 @@
       } else {
         roleBadge.textContent = 'VIP MEMBER';
         roleBadge.className = 'text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+        document.getElementById('headerStaffBtn').classList.add('hidden');
+        document.getElementById('drawerStaffBtn').classList.add('hidden');
         document.getElementById('staffControlPanel').classList.add('hidden');
       }
 
       document.getElementById('loginModal').classList.add('hidden');
       initMinesBoard();
       renderVisibleTickets();
+      if (user.isStaff) renderStaffQueue();
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
@@ -1813,6 +1904,7 @@
       if (modalId === 'leaderboardModal') renderLeaderboard(currentLeaderboardTab);
       if (modalId === 'accountModal') updateAccountUI();
       if (modalId === 'supportModal') renderVisibleTickets();
+      if (modalId === 'staffPortalModal' && user.isStaff) renderStaffQueue();
     }
 
     function updateBalance(delta) {
