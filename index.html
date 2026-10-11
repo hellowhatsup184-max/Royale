@@ -27,10 +27,10 @@
           colors: {
             neonCyan: '#00f2fe',
             neonGold: '#f59e0b',
-            darkBg: '#070a12',
-            darkSurface: '#0c1222',
-            darkCard: '#11192e',
-            darkBorder: '#1e293b'
+            darkBg: '#050811',
+            darkSurface: '#0b1120',
+            darkCard: '#111827',
+            darkBorder: '#1f2937'
           }
         }
       }
@@ -43,7 +43,8 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
-      background-color: #070a12;
+      background-color: #050811;
+      line-height: 1.5;
     }
     .gold-gradient-text {
       background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
@@ -56,18 +57,18 @@
       -webkit-text-fill-color: transparent;
     }
     .scrollbar-thin::-webkit-scrollbar {
-      width: 4px;
+      width: 5px;
     }
     .scrollbar-thin::-webkit-scrollbar-thumb {
-      background: #1e293b;
+      background: #1f2937;
       border-radius: 9999px;
     }
     .coin-perspective {
       perspective: 1000px;
     }
     .coin-3d {
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
       position: relative;
       transform-style: preserve-3d;
       transition: transform 1.4s cubic-bezier(0.2, 0.85, 0.35, 1.2);
@@ -81,7 +82,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.6);
+      box-shadow: inset 0 0 16px rgba(0,0,0,0.6), 0 10px 25px rgba(0,0,0,0.6);
     }
     .coin-front {
       background: radial-gradient(circle, #fde047 20%, #ca8a04 80%, #78350f 100%);
@@ -98,139 +99,139 @@
 <body class="min-h-screen text-slate-100 font-sans flex flex-col justify-between">
 
   <!-- ==================== SESSION KICK OVERLAY ==================== -->
-  <div id="sessionKickOverlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 font-mono">
-    <div class="w-full max-w-md bg-darkCard border border-rose-500/50 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
-      <div class="h-14 w-14 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 text-2xl">
+  <div id="sessionKickOverlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-md bg-darkCard border border-rose-500/50 rounded-2xl p-8 text-center space-y-5 shadow-2xl">
+      <div class="h-16 w-16 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 text-3xl">
         <i class="fa-solid fa-lock"></i>
       </div>
       <h3 class="text-base font-bold text-rose-400 uppercase tracking-wider">Account Active Elsewhere</h3>
       <p class="text-xs text-slate-300 leading-relaxed">
         This account logged in from another browser or device. Simultaneous entries are blocked.
       </p>
-      <button onclick="location.reload()" class="w-full py-2.5 rounded-xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
+      <button onclick="location.reload()" class="w-full py-3 rounded-xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Browser
       </button>
     </div>
   </div>
 
   <!-- ==================== ALL-IN-ONE SLIDING MENU DRAWER ==================== -->
-  <div id="menuDrawerBackdrop" onclick="toggleMenuDrawer()" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity"></div>
-  <div id="menuDrawer" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-darkCard border-l border-darkBorder z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between font-mono p-5 shadow-2xl">
+  <div id="menuDrawerBackdrop" onclick="toggleMenuDrawer()" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm transition-opacity"></div>
+  <div id="menuDrawer" class="fixed top-0 right-0 h-full w-84 max-w-[85vw] bg-darkCard border-l border-darkBorder z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between font-mono p-6 shadow-2xl">
     <div>
-      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-crown text-neonGold text-lg"></i>
+      <div class="flex items-center justify-between pb-5 border-b border-darkBorder">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-crown text-neonGold text-xl"></i>
           <h2 class="font-serif font-black gold-gradient-text tracking-wider uppercase text-base">VIP Menu</h2>
         </div>
-        <button onclick="toggleMenuDrawer()" class="text-slate-400 hover:text-white text-lg p-1">
+        <button onclick="toggleMenuDrawer()" class="text-slate-400 hover:text-white text-lg p-2">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <!-- Quick Cashier Buttons in Drawer -->
-      <div class="grid grid-cols-2 gap-2 mt-4">
-        <button onclick="openCashierModal('Deposit')" class="py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/50 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-2">
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button onclick="openCashierModal('Deposit')" class="py-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-plus-circle"></i> Deposit
         </button>
-        <button onclick="openCashierModal('Withdrawal')" class="py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 text-cyan-300 text-xs font-bold transition flex items-center justify-center gap-2">
+        <button onclick="openCashierModal('Withdrawal')" class="py-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-arrow-down"></i> Withdraw
         </button>
       </div>
 
       <!-- Direct Channels Button -->
-      <button onclick="toggleChannelsListModal()" class="w-full mt-2 py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/50 text-indigo-300 text-xs font-bold transition flex items-center justify-center gap-2">
+      <button onclick="toggleChannelsListModal()" class="w-full mt-3 py-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center justify-center gap-2">
         <i class="fa-solid fa-comments"></i> Active Ticket Channels
       </button>
 
       <!-- Navigation Links -->
-      <nav class="space-y-2 mt-3 text-xs">
-        <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
+      <nav class="space-y-2.5 mt-6 text-xs">
+        <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
           <i class="fa-solid fa-gamepad text-neonCyan w-5"></i> Casino Games
         </button>
-        <button onclick="menuNavigate('account')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
+        <button onclick="menuNavigate('account')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
           <i class="fa-solid fa-user-shield text-amber-400 w-5"></i> Account Vault
         </button>
-        <button onclick="menuNavigate('leaderboard')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
+        <button onclick="menuNavigate('leaderboard')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
           <i class="fa-solid fa-trophy text-yellow-400 w-5"></i> High-Roller Ranks
         </button>
-        <button onclick="menuNavigate('tip')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
+        <button onclick="menuNavigate('tip')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
           <i class="fa-solid fa-hand-holding-dollar text-emerald-400 w-5"></i> Tip Another Player
         </button>
-        <button onclick="menuNavigate('support')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
-          <span class="flex items-center gap-3">
+        <button onclick="menuNavigate('support')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
+          <span class="flex items-center gap-3.5">
             <i class="fa-solid fa-headset text-cyan-400 w-5"></i> Support Desk
           </span>
-          <span id="drawerTicketBadge" class="hidden px-1.5 py-0.5 rounded-full bg-cyan-500 text-slate-950 font-bold text-[10px]">0</span>
+          <span id="drawerTicketBadge" class="hidden px-2 py-0.5 rounded-full bg-cyan-500 text-slate-950 font-bold text-[10px]">0</span>
         </button>
       </nav>
     </div>
 
-    <div class="pt-4 border-t border-darkBorder text-xs space-y-3">
-      <div class="flex items-center justify-between text-[11px] text-slate-400">
+    <div class="pt-5 border-t border-darkBorder text-xs space-y-4">
+      <div class="flex items-center justify-between text-xs text-slate-400">
         <span>Logged in as:</span>
         <span id="drawerUserDisplay" class="font-bold text-amber-300">@guest</span>
       </div>
-      <button onclick="handleLogout()" class="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs uppercase transition flex items-center justify-center gap-2">
+      <button onclick="handleLogout()" class="w-full py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs uppercase transition flex items-center justify-center gap-2">
         <i class="fa-solid fa-right-from-bracket"></i> Log Out
       </button>
     </div>
   </div>
 
   <!-- ==================== SEPARATE CHANNELS SELECTOR MODAL ==================== -->
-  <div id="channelsListModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 font-mono">
-    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl flex flex-col h-[480px] max-h-[90vh]">
-      <div class="pb-3 border-b border-darkBorder flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="h-9 w-9 rounded-xl bg-indigo-500/10 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
-            <i class="fa-solid fa-comments text-base"></i>
+  <div id="channelsListModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl flex flex-col h-[520px] max-h-[90vh]">
+      <div class="pb-4 border-b border-darkBorder flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-xl bg-indigo-500/10 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <i class="fa-solid fa-comments text-lg"></i>
           </div>
           <div>
             <div class="text-xs font-bold text-slate-100 uppercase tracking-wide">Direct Support Channels</div>
-            <div class="text-[10px] text-slate-400">Jump directly into approved cashier/support chats</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Jump directly into approved cashier/support chats</div>
           </div>
         </div>
-        <button onclick="toggleChannelsListModal()" class="text-slate-400 hover:text-white p-1">
+        <button onclick="toggleChannelsListModal()" class="text-slate-400 hover:text-white p-2">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
-      <div id="channelsListContent" class="flex-1 overflow-y-auto py-3 space-y-2 text-xs scrollbar-thin">
-        <div class="text-slate-500 text-center py-6 text-[11px]">Loading active channels...</div>
+      <div id="channelsListContent" class="flex-1 overflow-y-auto py-4 space-y-2.5 text-xs scrollbar-thin">
+        <div class="text-slate-500 text-center py-8 text-[11px]">Loading active channels...</div>
       </div>
     </div>
   </div>
 
   <!-- ==================== DEDICATED TICKET CHAT CHANNEL MODAL ==================== -->
-  <div id="ticketChannelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 font-mono">
-    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl flex flex-col h-[520px] max-h-[90vh]">
-      <div class="pb-3 border-b border-darkBorder flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="h-9 w-9 rounded-xl bg-cyan-500/10 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
-            <i class="fa-solid fa-headset text-base"></i>
+  <div id="ticketChannelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl flex flex-col h-[560px] max-h-[90vh]">
+      <div class="pb-4 border-b border-darkBorder flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+            <i class="fa-solid fa-headset text-lg"></i>
           </div>
           <div>
             <div id="channelTitle" class="text-xs font-bold text-slate-100">Support Channel #---</div>
-            <div id="channelSubtitle" class="text-[10px] text-slate-400">Staff &amp; Player Live Line</div>
+            <div id="channelSubtitle" class="text-[10px] text-slate-400 mt-0.5">Staff &amp; Player Live Line</div>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button id="channelCloseBtn" onclick="staffCloseTicketChannel()" class="hidden px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-[10px] font-bold transition">
+          <button id="channelCloseBtn" onclick="staffCloseTicketChannel()" class="hidden px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-[10px] font-bold transition">
             Close Channel
           </button>
-          <button onclick="closeTicketChannelModal()" class="text-slate-400 hover:text-white p-1">
+          <button onclick="closeTicketChannelModal()" class="text-slate-400 hover:text-white p-2">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
       </div>
 
-      <div id="channelChatLogs" class="flex-1 overflow-y-auto py-3 space-y-2 text-xs scrollbar-thin">
-        <div class="text-slate-500 text-center py-6 text-[11px]">Connecting to dedicated ticket channel...</div>
+      <div id="channelChatLogs" class="flex-1 overflow-y-auto py-4 space-y-3 text-xs scrollbar-thin">
+        <div class="text-slate-500 text-center py-8 text-[11px]">Connecting to dedicated ticket channel...</div>
       </div>
 
-      <form id="channelChatForm" onsubmit="handleSendChannelMessage(event)" class="pt-2 border-t border-darkBorder space-y-1.5">
+      <form id="channelChatForm" onsubmit="handleSendChannelMessage(event)" class="pt-3 border-t border-darkBorder space-y-2">
         <div class="flex gap-2">
-          <input type="text" id="channelChatInput" placeholder="Reply to channel..." maxlength="200" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-neonCyan">
-          <button type="submit" id="channelSendBtn" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">
+          <input type="text" id="channelChatInput" placeholder="Reply to channel..." maxlength="200" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-neonCyan">
+          <button type="submit" id="channelSendBtn" class="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
         </div>
@@ -242,39 +243,39 @@
   </div>
 
   <!-- ==================== LOGIN SCREEN MODAL ==================== -->
-  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
-    <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl relative">
-      <div class="text-center mb-6">
+  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
+    <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-2xl p-8 shadow-2xl relative">
+      <div class="text-center mb-7">
         <h2 class="font-serif text-2xl font-black gold-gradient-text uppercase tracking-widest">Aura Royale VIP</h2>
-        <p class="text-xs text-slate-400 font-mono mt-1">HIGH-ROLLER DIAMOND CASINO (MIN 4M 💎)</p>
+        <p class="text-xs text-slate-400 font-mono mt-1.5">HIGH-ROLLER DIAMOND CASINO (MIN 4M 💎)</p>
       </div>
 
-      <form id="loginForm" class="space-y-4">
+      <form id="loginForm" class="space-y-5">
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1">Roblox Username *</label>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Roblox Username *</label>
           <div class="relative">
-            <span class="absolute left-3 top-2.5 text-slate-500 font-mono">@</span>
-            <input type="text" id="robloxInput" required placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-8 pr-4 py-2.5 text-sm text-slate-100 font-mono focus:outline-none focus:border-neonGold transition">
+            <span class="absolute left-3.5 top-3 text-slate-500 font-mono">@</span>
+            <input type="text" id="robloxInput" required placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-9 pr-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-neonGold transition">
           </div>
-          <p class="text-[10px] text-slate-500 mt-1 font-mono">Support Duty: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
+          <p class="text-[10px] text-slate-500 mt-1.5 font-mono">Support Duty: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
         </div>
 
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1">Link Discord (Optional)</label>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Link Discord (Optional)</label>
           <div class="flex gap-2">
-            <input type="text" id="discordInput" placeholder="Discord Username#0000" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-4 py-2.5 text-sm text-slate-100 font-mono focus:outline-none focus:border-neonCyan transition">
-            <a href="https://discord.gg/vGkHmVBEJ" target="_blank" class="px-3 py-2 bg-indigo-600/30 border border-indigo-500/50 hover:bg-indigo-600/50 rounded-xl flex items-center justify-center text-indigo-300 transition text-xs font-mono">
+            <input type="text" id="discordInput" placeholder="Discord Username#0000" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-neonCyan transition">
+            <a href="https://discord.gg/vGkHmVBEJ" target="_blank" class="px-4 py-3 bg-indigo-600/30 border border-indigo-500/50 hover:bg-indigo-600/50 rounded-xl flex items-center justify-center text-indigo-300 transition text-sm font-mono">
               <i class="fa-brands fa-discord text-base"></i>
             </a>
           </div>
         </div>
 
-        <div id="loginErrorAlert" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2">
+        <div id="loginErrorAlert" class="hidden p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2.5">
           <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
           <span id="loginErrorMsg">Account is currently online on another device or browser!</span>
         </div>
 
-        <button type="submit" id="loginSubmitBtn" class="w-full py-3 rounded-xl font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition font-mono">
+        <button type="submit" id="loginSubmitBtn" class="w-full py-3.5 rounded-xl font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition font-mono">
           Enter VIP Arena
         </button>
       </form>
@@ -283,39 +284,39 @@
 
   <!-- ==================== HEADER ==================== -->
   <header class="border-b border-darkBorder bg-darkSurface/90 backdrop-blur sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-700 flex items-center justify-center text-slate-950 font-bold shadow-md shadow-amber-500/20">
-          <i class="fa-solid fa-crown text-base"></i>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3.5">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-700 flex items-center justify-center text-slate-950 font-bold shadow-md shadow-amber-500/20">
+          <i class="fa-solid fa-crown text-lg"></i>
         </div>
         <div>
-          <h1 class="font-serif text-base sm:text-lg font-black gold-gradient-text tracking-wide leading-tight">AURA ROYALE</h1>
-          <span id="roleBadge" class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Guest</span>
+          <h1 class="font-serif text-lg sm:text-xl font-black gold-gradient-text tracking-wide leading-tight">AURA ROYALE</h1>
+          <span id="roleBadge" class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Guest</span>
         </div>
       </div>
 
       <!-- Cashier Buttons, Channels, Balance & Menu Drawer Trigger -->
-      <div class="flex items-center gap-2 font-mono">
-        <div class="hidden sm:flex items-center gap-1.5">
-          <button onclick="openCashierModal('Deposit')" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5">
+      <div class="flex items-center gap-3 font-mono">
+        <div class="hidden sm:flex items-center gap-2">
+          <button onclick="openCashierModal('Deposit')" class="px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5">
             <i class="fa-solid fa-circle-plus"></i> Deposit
           </button>
-          <button onclick="openCashierModal('Withdrawal')" class="px-2.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center gap-1.5">
+          <button onclick="openCashierModal('Withdrawal')" class="px-3.5 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center gap-1.5">
             <i class="fa-solid fa-arrow-down"></i> Withdraw
           </button>
-          <button onclick="toggleChannelsListModal()" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center gap-1.5">
+          <button onclick="toggleChannelsListModal()" class="px-3.5 py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center gap-1.5">
             <i class="fa-solid fa-comments"></i> Channels
           </button>
         </div>
 
-        <div class="bg-darkBg border border-darkBorder px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs sm:text-sm shadow-inner">
+        <div class="bg-darkBg border border-darkBorder px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs sm:text-sm shadow-inner">
           <i class="fa-solid fa-gem text-cyan-400"></i>
           <span id="userBalance" class="text-cyan-400 font-bold">---</span>
         </div>
 
-        <div class="flex items-center gap-1.5 pl-2 border-l border-darkBorder">
-          <span id="currentUserDisplay" class="text-xs text-slate-300 font-semibold max-w-[80px] sm:max-w-none truncate hidden md:inline">@guest</span>
-          <button onclick="toggleMenuDrawer()" title="Open Main Menu" class="px-2.5 py-1.5 rounded-xl bg-darkCard hover:bg-darkBorder border border-darkBorder text-amber-300 transition text-sm flex items-center gap-1.5">
+        <div class="flex items-center gap-2 pl-3 border-l border-darkBorder">
+          <span id="currentUserDisplay" class="text-xs text-slate-300 font-semibold max-w-[90px] sm:max-w-none truncate hidden md:inline">@guest</span>
+          <button onclick="toggleMenuDrawer()" title="Open Main Menu" class="p-2.5 rounded-xl bg-darkCard hover:bg-darkBorder border border-darkBorder text-amber-300 transition text-sm flex items-center justify-center">
             <i class="fa-solid fa-bars text-base"></i>
           </button>
         </div>
@@ -324,64 +325,64 @@
   </header>
 
   <!-- ==================== MAIN CONTENT ==================== -->
-  <main class="max-w-7xl mx-auto p-3 sm:p-4 w-full grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 flex-1">
     
-    <!-- LEFT & CENTER: GAMES (8 Cols) -->
-    <div class="lg:col-span-8 flex flex-col gap-4">
+    <!-- LEFT & CENTER: GAMES (2 of 3 Columns) -->
+    <div class="lg:col-span-2 flex flex-col gap-6">
       
       <!-- VIP 30X EXCLUSIVE REWARD BANNER -->
-      <div id="vipRewardBanner" class="p-3.5 rounded-2xl border border-darkBorder bg-darkCard flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono shadow-lg">
-        <div class="flex items-center gap-3">
-          <div class="h-9 w-9 rounded-xl bg-purple-900/40 border border-purple-500/40 flex items-center justify-center text-purple-400 text-lg">
+      <div id="vipRewardBanner" class="p-4 sm:p-5 rounded-2xl border border-darkBorder bg-darkCard flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono shadow-xl">
+        <div class="flex items-center gap-3.5">
+          <div class="h-10 w-10 rounded-xl bg-purple-900/40 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xl">
             <i class="fa-solid fa-gift"></i>
           </div>
           <div>
-            <div class="font-bold text-slate-200">VIP Reward: Secret Lounge Access</div>
-            <div id="vipRewardStatus" class="text-slate-400 text-[11px]">Reach <b class="text-amber-400">30x profit</b> in Mines to unlock server link.</div>
+            <div class="font-bold text-slate-200 text-sm">VIP Reward: Secret Lounge Access</div>
+            <div id="vipRewardStatus" class="text-slate-400 text-xs mt-0.5">Reach <b class="text-amber-400">30x profit</b> in Mines to unlock server link.</div>
           </div>
         </div>
-        <a id="vipRewardLink" href="#" target="_blank" class="pointer-events-none opacity-40 px-3.5 py-1.5 rounded-xl border border-purple-500/50 bg-purple-600/20 text-purple-300 font-bold transition flex items-center gap-1.5 text-xs whitespace-nowrap">
-          <span>Locked</span> <i class="fa-solid fa-lock text-[10px]"></i>
+        <a id="vipRewardLink" href="#" target="_blank" class="pointer-events-none opacity-40 px-4 py-2.5 rounded-xl border border-purple-500/50 bg-purple-600/20 text-purple-300 font-bold transition flex items-center gap-2 text-xs whitespace-nowrap">
+          <span>Locked</span> <i class="fa-solid fa-lock text-xs"></i>
         </a>
       </div>
 
       <!-- GAME SELECTOR TABS -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin font-mono text-xs">
-        <button onclick="selectGame('mines')" id="tab-mines" class="game-selector px-3.5 py-2 rounded-xl bg-darkCard border border-amber-400 text-amber-300 font-bold whitespace-nowrap">
-          <i class="fa-solid fa-bomb mr-1"></i> Mines (5x5-8x8)
+      <div class="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-thin font-mono text-xs">
+        <button onclick="selectGame('mines')" id="tab-mines" class="game-selector px-4 py-2.5 rounded-xl bg-darkCard border border-amber-400 text-amber-300 font-bold whitespace-nowrap">
+          <i class="fa-solid fa-bomb mr-1.5"></i> Mines (5x5-8x8)
         </button>
-        <button onclick="selectGame('coinflip')" id="tab-coinflip" class="game-selector px-3.5 py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-coins mr-1"></i> PVP Coin Flip
+        <button onclick="selectGame('coinflip')" id="tab-coinflip" class="game-selector px-4 py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
+          <i class="fa-solid fa-coins mr-1.5"></i> PVP Coin Flip
         </button>
-        <button onclick="selectGame('dice')" id="tab-dice" class="game-selector px-3.5 py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-dice mr-1"></i> PVP Dice
+        <button onclick="selectGame('dice')" id="tab-dice" class="game-selector px-4 py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
+          <i class="fa-solid fa-dice mr-1.5"></i> PVP Dice
         </button>
-        <button onclick="selectGame('roulette')" id="tab-roulette" class="game-selector px-3.5 py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-circle-notch mr-1"></i> VIP Roulette
+        <button onclick="selectGame('roulette')" id="tab-roulette" class="game-selector px-4 py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
+          <i class="fa-solid fa-circle-notch mr-1.5"></i> VIP Roulette
         </button>
-        <button onclick="selectGame('blackjack')" id="tab-blackjack" class="game-selector px-3.5 py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-suit-spade mr-1"></i> Blackjack 21
+        <button onclick="selectGame('blackjack')" id="tab-blackjack" class="game-selector px-4 py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400">
+          <i class="fa-solid fa-suit-spade mr-1.5"></i> Blackjack 21
         </button>
       </div>
 
       <!-- GAME VIEWS -->
-      <div class="bg-darkCard border border-darkBorder rounded-2xl p-4 sm:p-5 shadow-2xl relative min-h-[460px]">
+      <div class="bg-darkCard border border-darkBorder rounded-2xl p-5 sm:p-7 shadow-2xl relative min-h-[480px]">
         
-        <!-- 1. MINES (RIGGED + LOWERED SCALING) -->
-        <div id="game-mines-view" class="flex flex-col md:flex-row gap-5">
-          <div class="w-full md:w-60 flex flex-col gap-3 font-mono text-xs">
+        <!-- 1. MINES -->
+        <div id="game-mines-view" class="flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
+          <div class="w-full md:w-64 flex flex-col gap-4 font-mono text-xs">
             <div>
-              <label class="block text-slate-400 mb-1">Grid Dimension</label>
-              <div class="grid grid-cols-4 gap-1">
-                <button onclick="setGridSize(5)" class="grid-size-btn py-1.5 rounded-lg bg-darkSurface border border-amber-400 text-amber-300 font-bold" data-size="5">5x5</button>
-                <button onclick="setGridSize(6)" class="grid-size-btn py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="6">6x6</button>
-                <button onclick="setGridSize(7)" class="grid-size-btn py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="7">7x7</button>
-                <button onclick="setGridSize(8)" class="grid-size-btn py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="8">8x8</button>
+              <label class="block text-slate-400 mb-1.5">Grid Dimension</label>
+              <div class="grid grid-cols-4 gap-1.5">
+                <button onclick="setGridSize(5)" class="grid-size-btn py-2 rounded-lg bg-darkSurface border border-amber-400 text-amber-300 font-bold" data-size="5">5x5</button>
+                <button onclick="setGridSize(6)" class="grid-size-btn py-2 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="6">6x6</button>
+                <button onclick="setGridSize(7)" class="grid-size-btn py-2 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="7">7x7</button>
+                <button onclick="setGridSize(8)" class="grid-size-btn py-2 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="8">8x8</button>
               </div>
             </div>
 
             <div>
-              <div class="flex justify-between mb-1">
+              <div class="flex justify-between mb-1.5">
                 <span class="text-slate-400">Mines Amount</span>
                 <span id="minesValDisplay" class="text-amber-400 font-bold">3</span>
               </div>
@@ -389,17 +390,17 @@
             </div>
 
             <div>
-              <label class="block text-slate-400 mb-1">Bet (Min 4,000,000 💎)</label>
+              <label class="block text-slate-400 mb-1.5">Bet (Min 4,000,000 💎)</label>
               <div class="relative">
-                <input type="number" id="minesBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-3 pr-14 py-2 text-slate-100 focus:outline-none focus:border-neonGold">
-                <div class="absolute right-1 top-1 flex gap-1 text-[10px]">
-                  <button onclick="halveBet('minesBetInput')" class="px-1.5 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">½</button>
-                  <button onclick="doubleBet('minesBetInput')" class="px-1.5 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">2x</button>
+                <input type="number" id="minesBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-3.5 pr-14 py-2.5 text-slate-100 focus:outline-none focus:border-neonGold">
+                <div class="absolute right-1.5 top-1.5 flex gap-1 text-[10px]">
+                  <button onclick="halveBet('minesBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">½</button>
+                  <button onclick="doubleBet('minesBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">2x</button>
                 </div>
               </div>
             </div>
 
-            <div class="p-2.5 bg-darkSurface rounded-xl border border-darkBorder/60 space-y-1.5">
+            <div class="p-3.5 bg-darkSurface rounded-xl border border-darkBorder space-y-2">
               <div class="flex justify-between">
                 <span class="text-slate-400">Next Tile:</span>
                 <span id="minesNextMult" class="text-cyan-400 font-bold">1.01x</span>
@@ -414,60 +415,60 @@
               </div>
             </div>
 
-            <button id="minesActionBtn" onclick="toggleMinesRound()" class="w-full py-3 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
+            <button id="minesActionBtn" onclick="toggleMinesRound()" class="w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
               START GAME
             </button>
           </div>
 
-          <div class="flex-1 flex items-center justify-center bg-darkSurface rounded-2xl p-3 border border-darkBorder/60 min-h-[340px]">
-            <div id="minesBoard" class="grid gap-1.5 w-full max-w-[380px] aspect-square transition-all"></div>
+          <div class="flex-1 w-full flex items-center justify-center bg-darkSurface rounded-2xl p-4 sm:p-6 border border-darkBorder min-h-[360px]">
+            <div id="minesBoard" class="grid gap-2 w-full max-w-[420px] aspect-square transition-all"></div>
           </div>
         </div>
 
-        <!-- 2. PVP COIN FLIP (RIGGED: ~40% WIN RATE) -->
-        <div id="game-coinflip-view" class="hidden flex flex-col md:flex-row gap-6 items-center">
-          <div class="w-full md:w-64 space-y-3 font-mono text-xs">
+        <!-- 2. PVP COIN FLIP -->
+        <div id="game-coinflip-view" class="hidden flex flex-col md:flex-row gap-6 sm:gap-8 items-center">
+          <div class="w-full md:w-64 space-y-4 font-mono text-xs">
             <div>
-              <label class="block text-slate-400 mb-1">Pick Side</label>
-              <div class="grid grid-cols-2 gap-2">
-                <button onclick="selectCoinSide('HEADS')" id="coinPickHeads" class="py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold">HEADS</button>
-                <button onclick="selectCoinSide('TAILS')" id="coinPickTails" class="py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold">TAILS</button>
+              <label class="block text-slate-400 mb-1.5">Pick Side</label>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="selectCoinSide('HEADS')" id="coinPickHeads" class="py-2.5 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold">HEADS</button>
+                <button onclick="selectCoinSide('TAILS')" id="coinPickTails" class="py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold">TAILS</button>
               </div>
             </div>
 
             <div>
-              <label class="block text-slate-400 mb-1">Bet (Min 4M 💎)</label>
+              <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
               <div class="relative">
-                <input type="number" id="coinBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-3 pr-14 py-2 text-slate-100">
-                <div class="absolute right-1 top-1 flex gap-1 text-[10px]">
-                  <button onclick="halveBet('coinBetInput')" class="px-1.5 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">½</button>
-                  <button onclick="doubleBet('coinBetInput')" class="px-1.5 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">2x</button>
+                <input type="number" id="coinBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-3.5 pr-14 py-2.5 text-slate-100">
+                <div class="absolute right-1.5 top-1.5 flex gap-1 text-[10px]">
+                  <button onclick="halveBet('coinBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">½</button>
+                  <button onclick="doubleBet('coinBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded hover:text-amber-400">2x</button>
                 </div>
               </div>
             </div>
 
-            <div class="p-2.5 bg-darkSurface rounded-xl border border-darkBorder/60 space-y-1">
+            <div class="p-3.5 bg-darkSurface rounded-xl border border-darkBorder space-y-1.5">
               <div class="flex justify-between">
                 <span class="text-slate-400">Multiplier:</span>
                 <span class="text-emerald-400 font-bold">1.96x</span>
               </div>
             </div>
 
-            <button id="coinFlipBtn" onclick="playCoinFlip()" class="w-full py-3 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 transition">
+            <button id="coinFlipBtn" onclick="playCoinFlip()" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 transition">
               FLIP COIN (1.96x)
             </button>
           </div>
 
-          <div class="flex-1 flex flex-col items-center justify-center p-6 bg-darkSurface rounded-2xl border border-darkBorder/60 w-full min-h-[300px]">
-            <div class="coin-perspective mb-6">
+          <div class="flex-1 flex flex-col items-center justify-center p-8 bg-darkSurface rounded-2xl border border-darkBorder w-full min-h-[340px]">
+            <div class="coin-perspective mb-7">
               <div id="coin3D" class="coin-3d">
                 <div class="coin-face coin-front font-serif text-slate-950 font-black">
-                  <i class="fa-solid fa-crown text-2xl mb-1 text-amber-950"></i>
-                  <span class="text-[10px] tracking-wider">HEADS</span>
+                  <i class="fa-solid fa-crown text-2xl mb-1.5 text-amber-950"></i>
+                  <span class="text-[11px] tracking-wider">HEADS</span>
                 </div>
                 <div class="coin-face coin-back font-serif text-slate-950 font-black">
-                  <i class="fa-solid fa-gem text-2xl mb-1 text-cyan-950"></i>
-                  <span class="text-[10px] tracking-wider">TAILS</span>
+                  <i class="fa-solid fa-gem text-2xl mb-1.5 text-cyan-950"></i>
+                  <span class="text-[11px] tracking-wider">TAILS</span>
                 </div>
               </div>
             </div>
@@ -475,19 +476,19 @@
           </div>
         </div>
 
-        <!-- 3. PVP DICE (RIGGED) -->
-        <div id="game-dice-view" class="hidden flex flex-col md:flex-row gap-6 items-center">
-          <div class="w-full md:w-64 space-y-3 font-mono text-xs">
+        <!-- 3. PVP DICE -->
+        <div id="game-dice-view" class="hidden flex flex-col md:flex-row gap-6 sm:gap-8 items-center">
+          <div class="w-full md:w-64 space-y-4 font-mono text-xs">
             <div>
-              <label class="block text-slate-400 mb-1">Target Mode</label>
-              <div class="grid grid-cols-2 gap-2">
-                <button onclick="setDiceMode('under')" id="diceModeUnder" class="py-2 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold">ROLL UNDER</button>
-                <button onclick="setDiceMode('over')" id="diceModeOver" class="py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold">ROLL OVER</button>
+              <label class="block text-slate-400 mb-1.5">Target Mode</label>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="setDiceMode('under')" id="diceModeUnder" class="py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold">ROLL UNDER</button>
+                <button onclick="setDiceMode('over')" id="diceModeOver" class="py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold">ROLL OVER</button>
               </div>
             </div>
 
             <div>
-              <div class="flex justify-between mb-1">
+              <div class="flex justify-between mb-1.5">
                 <span class="text-slate-400">Target Value</span>
                 <span id="diceTargetVal" class="text-cyan-400 font-bold">50</span>
               </div>
@@ -495,96 +496,96 @@
             </div>
 
             <div>
-              <label class="block text-slate-400 mb-1">Bet (Min 4M 💎)</label>
-              <input type="number" id="diceBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-slate-100">
+              <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
+              <input type="number" id="diceBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-100">
             </div>
 
-            <div class="p-2.5 bg-darkSurface rounded-xl border border-darkBorder/60 space-y-1">
+            <div class="p-3.5 bg-darkSurface rounded-xl border border-darkBorder space-y-1.5">
               <div class="flex justify-between">
                 <span class="text-slate-400">Multiplier:</span>
                 <span id="diceMultiplier" class="text-emerald-400 font-bold">1.94x</span>
               </div>
             </div>
 
-            <button onclick="playDice()" class="w-full py-3 rounded-xl font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition">
+            <button onclick="playDice()" class="w-full py-3.5 rounded-xl font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition">
               ROLL DICE
             </button>
           </div>
 
-          <div class="flex-1 flex flex-col items-center justify-center p-6 bg-darkSurface rounded-2xl border border-darkBorder/60 w-full min-h-[300px]">
-            <div id="diceRollDisplay" class="font-mono text-6xl font-black text-amber-400 mb-3 tracking-widest drop-shadow-md">--</div>
+          <div class="flex-1 flex flex-col items-center justify-center p-8 bg-darkSurface rounded-2xl border border-darkBorder w-full min-h-[340px]">
+            <div id="diceRollDisplay" class="font-mono text-7xl font-black text-amber-400 mb-4 tracking-widest drop-shadow-md">--</div>
             <div id="diceStatusNotice" class="font-mono text-xs uppercase text-slate-400 font-bold">Set range and roll</div>
           </div>
         </div>
 
-        <!-- 4. VIP ROULETTE (RIGGED) -->
-        <div id="game-roulette-view" class="hidden flex flex-col gap-4">
-          <div class="flex flex-col md:flex-row gap-4 items-center">
-            <div class="w-full md:w-60 space-y-3 font-mono text-xs">
+        <!-- 4. VIP ROULETTE -->
+        <div id="game-roulette-view" class="hidden flex flex-col gap-5">
+          <div class="flex flex-col md:flex-row gap-6 sm:gap-8 items-center">
+            <div class="w-full md:w-64 space-y-4 font-mono text-xs">
               <div>
-                <label class="block text-slate-400 mb-1">Bet Choice</label>
-                <div class="grid grid-cols-3 gap-1.5">
-                  <button onclick="setRouletteBetChoice('red')" id="roulBtnRed" class="py-2 rounded-xl bg-rose-600/30 border border-rose-500 text-rose-300 font-bold">RED (2x)</button>
-                  <button onclick="setRouletteBetChoice('black')" id="roulBtnBlack" class="py-2 rounded-xl bg-slate-800 border border-darkBorder text-slate-300 font-bold">BLK (2x)</button>
-                  <button onclick="setRouletteBetChoice('green')" id="roulBtnGreen" class="py-2 rounded-xl bg-emerald-600/20 border border-darkBorder text-emerald-300 font-bold">0 (14x)</button>
+                <label class="block text-slate-400 mb-1.5">Bet Choice</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button onclick="setRouletteBetChoice('red')" id="roulBtnRed" class="py-2.5 rounded-xl bg-rose-600/30 border border-rose-500 text-rose-300 font-bold">RED (2x)</button>
+                  <button onclick="setRouletteBetChoice('black')" id="roulBtnBlack" class="py-2.5 rounded-xl bg-slate-800 border border-darkBorder text-slate-300 font-bold">BLK (2x)</button>
+                  <button onclick="setRouletteBetChoice('green')" id="roulBtnGreen" class="py-2.5 rounded-xl bg-emerald-600/20 border border-darkBorder text-emerald-300 font-bold">0 (14x)</button>
                 </div>
               </div>
 
               <div>
-                <label class="block text-slate-400 mb-1">Bet (Min 4M 💎)</label>
-                <input type="number" id="rouletteBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-slate-100">
+                <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
+                <input type="number" id="rouletteBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-100">
               </div>
 
-              <button onclick="spinRoulette()" class="w-full py-3 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition">
+              <button onclick="spinRoulette()" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition">
                 SPIN WHEEL
               </button>
             </div>
 
-            <div class="flex-1 flex flex-col items-center justify-center p-4 bg-darkSurface rounded-2xl border border-darkBorder/60 w-full overflow-hidden">
-              <div id="rouletteResultNumber" class="font-serif text-5xl font-black text-slate-200 mb-2">--</div>
+            <div class="flex-1 flex flex-col items-center justify-center p-8 bg-darkSurface rounded-2xl border border-darkBorder w-full min-h-[300px]">
+              <div id="rouletteResultNumber" class="font-serif text-6xl font-black text-slate-200 mb-3">--</div>
               <div id="rouletteStatus" class="font-mono text-xs uppercase text-slate-400 font-bold">Place bet and spin</div>
             </div>
           </div>
         </div>
 
-        <!-- 5. BLACKJACK 21 (RIGGED) -->
-        <div id="game-blackjack-view" class="hidden flex flex-col gap-4 font-mono text-xs">
-          <div class="flex flex-col md:flex-row gap-4 justify-between items-start">
-            <div class="w-full md:w-56 space-y-3">
+        <!-- 5. BLACKJACK 21 -->
+        <div id="game-blackjack-view" class="hidden flex flex-col gap-5 font-mono text-xs">
+          <div class="flex flex-col md:flex-row gap-6 sm:gap-8 justify-between items-start">
+            <div class="w-full md:w-60 space-y-4">
               <div>
-                <label class="block text-slate-400 mb-1">Bet (Min 4M 💎)</label>
-                <input type="number" id="bjBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-slate-100">
+                <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
+                <input type="number" id="bjBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-100">
               </div>
 
               <div id="bjStartControls">
-                <button onclick="startBlackjack()" class="w-full py-2.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition">
+                <button onclick="startBlackjack()" class="w-full py-3 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition">
                   DEAL HAND
                 </button>
               </div>
 
-              <div id="bjActionControls" class="hidden grid grid-cols-2 gap-2">
-                <button onclick="hitBlackjack()" class="py-2.5 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition">HIT</button>
-                <button onclick="standBlackjack()" class="py-2.5 rounded-xl font-bold bg-rose-500 hover:bg-rose-400 text-slate-950 transition">STAND</button>
+              <div id="bjActionControls" class="hidden grid grid-cols-2 gap-2.5">
+                <button onclick="hitBlackjack()" class="py-3 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition">HIT</button>
+                <button onclick="standBlackjack()" class="py-3 rounded-xl font-bold bg-rose-500 hover:bg-rose-400 text-slate-950 transition">STAND</button>
               </div>
             </div>
 
-            <div class="flex-1 w-full bg-darkSurface p-4 rounded-2xl border border-darkBorder/60 flex flex-col gap-4 min-h-[260px] justify-between">
+            <div class="flex-1 w-full bg-darkSurface p-5 sm:p-6 rounded-2xl border border-darkBorder flex flex-col gap-5 min-h-[300px] justify-between">
               <div>
-                <div class="flex justify-between items-center mb-1 text-[11px] text-slate-400">
+                <div class="flex justify-between items-center mb-1.5 text-xs text-slate-400">
                   <span>DEALER (<span id="dealerScore">0</span>)</span>
                 </div>
-                <div id="dealerCards" class="flex gap-2 flex-wrap min-h-[50px] items-center"></div>
+                <div id="dealerCards" class="flex gap-2.5 flex-wrap min-h-[55px] items-center"></div>
               </div>
 
-              <div id="bjOutcomeNotice" class="text-center font-bold text-xs uppercase text-amber-400 py-1">
+              <div id="bjOutcomeNotice" class="text-center font-bold text-xs uppercase text-amber-400 py-1.5">
                 Place bet and hit Deal Hand
               </div>
 
               <div>
-                <div class="flex justify-between items-center mb-1 text-[11px] text-slate-400">
+                <div class="flex justify-between items-center mb-1.5 text-xs text-slate-400">
                   <span>YOUR HAND (<span id="playerScore">0</span>)</span>
                 </div>
-                <div id="playerCards" class="flex gap-2 flex-wrap min-h-[50px] items-center"></div>
+                <div id="playerCards" class="flex gap-2.5 flex-wrap min-h-[55px] items-center"></div>
               </div>
             </div>
           </div>
@@ -592,48 +593,48 @@
 
       </div>
 
-      <!-- LIVE REAL PLAYER FEED (NO BOTS) -->
-      <div class="bg-darkCard border border-darkBorder rounded-2xl p-4 shadow-xl">
-        <div class="flex items-center justify-between pb-2 mb-2 border-b border-darkBorder">
-          <div class="flex items-center gap-2">
-            <span class="relative flex h-2 w-2">
+      <!-- LIVE REAL PLAYER FEED -->
+      <div class="bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-darkBorder">
+          <div class="flex items-center gap-2.5">
+            <span class="relative flex h-2.5 w-2.5">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
             <h3 class="font-mono text-xs uppercase font-bold text-slate-300">Live Player Wins & Losses</h3>
           </div>
           <span class="text-[10px] font-mono text-emerald-400 font-bold">REAL-TIME</span>
         </div>
-        <div id="liveFeedContainer" class="space-y-1.5 max-h-36 overflow-y-auto font-mono text-xs scrollbar-thin">
-          <div id="liveFeedEmpty" class="text-slate-500 text-[11px] py-3 text-center">No real rounds played yet in this session.</div>
+        <div id="liveFeedContainer" class="space-y-2 max-h-40 overflow-y-auto font-mono text-xs scrollbar-thin">
+          <div id="liveFeedEmpty" class="text-slate-500 text-xs py-4 text-center">No real rounds played yet in this session.</div>
         </div>
       </div>
 
     </div>
 
-    <!-- RIGHT: GENERAL CHAT (4 Cols) -->
-    <div class="lg:col-span-4 flex flex-col gap-4">
-      <div class="bg-darkCard border border-darkBorder rounded-2xl p-4 shadow-xl flex flex-col h-[600px]">
-        <div class="flex items-center justify-between pb-3 border-b border-darkBorder">
-          <div class="flex items-center gap-2">
+    <!-- RIGHT: GENERAL CHAT (1 of 3 Columns) -->
+    <div class="lg:col-span-1 flex flex-col gap-6">
+      <div class="bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-xl flex flex-col h-[650px]">
+        <div class="flex items-center justify-between pb-3.5 border-b border-darkBorder">
+          <div class="flex items-center gap-2.5">
             <i class="fa-solid fa-comments text-neonCyan"></i>
-            <h3 class="font-mono text-xs uppercase font-bold tracking-wider text-slate-200">VIP General Lounge</h3>
+            <h3 class="font-mono text-xs uppercase font-bold tracking-wider text-slate-200">VIP Lounge</h3>
           </div>
-          <span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+          <span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1.5">
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Cloud Synced
           </span>
         </div>
 
-        <div id="generalChatBox" class="flex-1 overflow-y-auto space-y-2.5 py-3 font-mono text-xs scrollbar-thin">
-          <div class="p-2 rounded-lg bg-darkSurface/60 border border-darkBorder/40 text-slate-400 text-[11px]">
+        <div id="generalChatBox" class="flex-1 overflow-y-auto space-y-3 py-4 font-mono text-xs scrollbar-thin">
+          <div class="p-3 rounded-xl bg-darkSurface/60 border border-darkBorder/60 text-slate-400 text-xs">
             <span class="text-amber-400 font-bold">[VIP Bot]:</span> Welcome to Aura Royale. All data, tickets, and balances are cloud preserved.
           </div>
         </div>
 
-        <form id="chatForm" onsubmit="handleSendChat(event)" class="mt-2 space-y-1.5">
-          <div class="flex gap-1.5">
-            <input type="text" id="chatInput" placeholder="Message chat..." maxlength="120" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-neonCyan">
-            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-slate-950 font-bold text-xs rounded-xl font-mono transition">
+        <form id="chatForm" onsubmit="handleSendChat(event)" class="mt-2 space-y-2">
+          <div class="flex gap-2">
+            <input type="text" id="chatInput" placeholder="Message chat..." maxlength="120" class="flex-1 bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-neonCyan">
+            <button type="submit" class="px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-slate-950 font-bold text-xs rounded-xl font-mono transition">
               <i class="fa-solid fa-paper-plane"></i>
             </button>
           </div>
@@ -644,58 +645,58 @@
   </main>
 
   <!-- ==================== LEADERBOARD MODAL ==================== -->
-  <div id="leaderboardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl font-mono">
-      <div class="flex justify-between items-center pb-3 border-b border-darkBorder">
-        <h3 class="text-sm font-bold text-amber-300 uppercase flex items-center gap-2">
+  <div id="leaderboardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
+    <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl font-mono">
+      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
+        <h3 class="text-sm font-bold text-amber-300 uppercase flex items-center gap-2.5">
           <i class="fa-solid fa-trophy text-neonGold"></i> High Roller Leaderboards
         </h3>
         <button onclick="toggleModal('leaderboardModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 my-3 text-xs">
-        <button onclick="switchLeaderboard('wagered')" id="lbTabWagered" class="py-1.5 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold">Most Wagered</button>
-        <button onclick="switchLeaderboard('balance')" id="lbTabBalance" class="py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold">Highest Balance</button>
+      <div class="grid grid-cols-2 gap-2.5 my-4 text-xs">
+        <button onclick="switchLeaderboard('wagered')" id="lbTabWagered" class="py-2 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold">Most Wagered</button>
+        <button onclick="switchLeaderboard('balance')" id="lbTabBalance" class="py-2 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold">Highest Balance</button>
       </div>
 
-      <div id="leaderboardList" class="space-y-2 text-xs max-h-64 overflow-y-auto scrollbar-thin">
-        <div class="text-center py-4 text-slate-500">Loading live rankings...</div>
+      <div id="leaderboardList" class="space-y-2.5 text-xs max-h-72 overflow-y-auto scrollbar-thin">
+        <div class="text-center py-6 text-slate-500">Loading live rankings...</div>
       </div>
     </div>
   </div>
 
   <!-- ==================== ACCOUNT VAULT MODAL ==================== -->
-  <div id="accountModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl font-mono">
-      <div class="flex justify-between items-center pb-3 border-b border-darkBorder">
-        <h3 class="text-sm font-bold text-cyan-300 uppercase flex items-center gap-2">
+  <div id="accountModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
+    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl font-mono">
+      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
+        <h3 class="text-sm font-bold text-cyan-300 uppercase flex items-center gap-2.5">
           <i class="fa-solid fa-user-shield text-neonCyan"></i> Player Account Profile
         </h3>
         <button onclick="toggleModal('accountModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div class="my-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-        <div class="p-2.5 bg-darkSurface rounded-xl border border-darkBorder">
+      <div class="my-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+        <div class="p-3 bg-darkSurface rounded-xl border border-darkBorder">
           <div class="text-[10px] text-slate-400 uppercase">Total Wagered</div>
-          <div id="accTotalWagered" class="text-amber-400 font-bold text-sm mt-0.5">0</div>
+          <div id="accTotalWagered" class="text-amber-400 font-bold text-sm mt-1">0</div>
         </div>
-        <div class="p-2.5 bg-darkSurface rounded-xl border border-darkBorder">
+        <div class="p-3 bg-darkSurface rounded-xl border border-darkBorder">
           <div class="text-[10px] text-slate-400 uppercase">Deposits</div>
-          <div id="accTotalDeposits" class="text-emerald-400 font-bold text-sm mt-0.5">10,000,000</div>
+          <div id="accTotalDeposits" class="text-emerald-400 font-bold text-sm mt-1">10,000,000</div>
         </div>
-        <div class="p-2.5 bg-darkSurface rounded-xl border border-darkBorder">
+        <div class="p-3 bg-darkSurface rounded-xl border border-darkBorder">
           <div class="text-[10px] text-slate-400 uppercase">Withdrawals</div>
-          <div id="accTotalWithdrawals" class="text-cyan-400 font-bold text-sm mt-0.5">0</div>
+          <div id="accTotalWithdrawals" class="text-cyan-400 font-bold text-sm mt-1">0</div>
         </div>
-        <div class="p-2.5 bg-darkSurface rounded-xl border border-darkBorder">
+        <div class="p-3 bg-darkSurface rounded-xl border border-darkBorder">
           <div class="text-[10px] text-slate-400 uppercase">Net Profit/Loss</div>
-          <div id="accNetProfit" class="text-slate-200 font-bold text-sm mt-0.5">0</div>
+          <div id="accNetProfit" class="text-slate-200 font-bold text-sm mt-1">0</div>
         </div>
       </div>
 
       <div class="text-xs">
-        <div class="text-slate-400 mb-1 font-bold uppercase text-[11px]">Recent Rounds Played</div>
-        <div id="accRoundLogs" class="space-y-1.5 max-h-40 overflow-y-auto scrollbar-thin text-[11px] p-2 bg-darkSurface rounded-xl border border-darkBorder">
+        <div class="text-slate-400 mb-1.5 font-bold uppercase text-[11px]">Recent Rounds Played</div>
+        <div id="accRoundLogs" class="space-y-2 max-h-48 overflow-y-auto scrollbar-thin text-xs p-3 bg-darkSurface rounded-xl border border-darkBorder">
           <div class="text-slate-500">No rounds completed yet.</div>
         </div>
       </div>
@@ -703,30 +704,30 @@
   </div>
 
   <!-- ==================== TIP PLAYER MODAL ==================== -->
-  <div id="tipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="w-full max-w-sm bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl font-mono">
-      <div class="flex justify-between items-center pb-3 border-b border-darkBorder">
-        <h3 class="text-sm font-bold text-amber-300 uppercase flex items-center gap-2">
+  <div id="tipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
+    <div class="w-full max-w-sm bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl font-mono">
+      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
+        <h3 class="text-sm font-bold text-amber-300 uppercase flex items-center gap-2.5">
           <i class="fa-solid fa-hand-holding-dollar"></i> Tip Another Player
         </h3>
         <button onclick="toggleModal('tipModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div class="space-y-3 mt-4 text-xs">
+      <div class="space-y-4 mt-5 text-xs">
         <div>
-          <label class="block text-slate-400 mb-1">Recipient Roblox Username</label>
+          <label class="block text-slate-400 mb-1.5">Recipient Roblox Username</label>
           <div class="relative">
-            <span class="absolute left-3 top-2.5 text-slate-500 font-mono">@</span>
-            <input type="text" id="tipRecipientInput" placeholder="other_player_name" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-8 pr-3 py-2 text-slate-100 focus:outline-none focus:border-neonGold">
+            <span class="absolute left-3.5 top-2.5 text-slate-500 font-mono">@</span>
+            <input type="text" id="tipRecipientInput" placeholder="other_player_name" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-9 pr-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-neonGold">
           </div>
         </div>
 
         <div>
-          <label class="block text-slate-400 mb-1">Tip Amount (💎)</label>
-          <input type="number" id="tipAmountInput" placeholder="1000000" min="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-neonGold">
+          <label class="block text-slate-400 mb-1.5">Tip Amount (💎)</label>
+          <input type="number" id="tipAmountInput" placeholder="1000000" min="500000" class="w-full bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-neonGold">
         </div>
 
-        <button onclick="executeTip()" class="w-full py-2.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 uppercase transition">
+        <button onclick="executeTip()" class="w-full py-3 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 uppercase transition">
           Confirm Tip Transfer
         </button>
       </div>
@@ -734,65 +735,65 @@
   </div>
 
   <!-- ==================== LIVE SUPPORT & CASHIER MODAL ==================== -->
-  <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 font-mono">
-    <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="flex items-center justify-between pb-3 border-b border-darkBorder">
+  <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-2xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
         <div>
-          <h3 class="font-serif text-base sm:text-lg font-bold text-cyan-300 flex items-center gap-2">
+          <h3 class="font-serif text-base sm:text-lg font-bold text-cyan-300 flex items-center gap-2.5">
             <i class="fa-solid fa-headset text-neonCyan"></i> Live Support &amp; Cashier Desk
           </h3>
-          <p class="text-xs text-slate-400">Staff: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
+          <p class="text-xs text-slate-400 mt-0.5">Staff: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
         </div>
-        <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-1">
+        <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-2">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
       <!-- Tickets List View -->
-      <div class="my-3 flex-1 overflow-hidden flex flex-col">
-        <div class="text-[11px] text-slate-400 font-bold uppercase mb-1.5 flex justify-between">
+      <div class="my-4 flex-1 overflow-hidden flex flex-col">
+        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
           <span>Active Tickets &amp; Requests</span>
           <span id="ticketViewerScope" class="text-cyan-400">My Tickets</span>
         </div>
-        <div id="supportChatLogs" class="overflow-y-auto p-3 space-y-2.5 text-xs bg-darkSurface rounded-xl border border-darkBorder/60 max-h-[250px] scrollbar-thin">
-          <div id="noTicketsMessage" class="text-slate-500 text-center py-4">No active tickets found.</div>
+        <div id="supportChatLogs" class="overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-xl border border-darkBorder max-h-[260px] scrollbar-thin">
+          <div id="noTicketsMessage" class="text-slate-500 text-center py-6">No active tickets found.</div>
         </div>
       </div>
 
       <!-- Staff Balance Override: STRICTLY RESTRICTED TO PRIMARY ADMINS -->
-      <div id="staffControlPanel" class="hidden mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs">
-        <div class="font-bold text-amber-300 flex items-center justify-between mb-2">
+      <div id="staffControlPanel" class="hidden mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs">
+        <div class="font-bold text-amber-300 flex items-center justify-between mb-2.5">
           <span><i class="fa-solid fa-shield-halved"></i> PRIMARY ADMIN BALANCE OVERRIDE</span>
-          <span class="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded">SUPERUSER</span>
+          <span class="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded">SUPERUSER</span>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <input type="text" id="staffTargetUser" placeholder="@target_username" class="bg-darkBg border border-darkBorder rounded-lg px-2.5 py-1.5 text-slate-200">
-          <input type="number" id="staffAmountDelta" placeholder="Credits (+4000000 / -4000000)" class="bg-darkBg border border-darkBorder rounded-lg px-2.5 py-1.5 text-slate-200">
-          <button onclick="staffModifyBalance()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg transition">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <input type="text" id="staffTargetUser" placeholder="@target_username" class="bg-darkBg border border-darkBorder rounded-lg px-3 py-2 text-slate-200">
+          <input type="number" id="staffAmountDelta" placeholder="Credits (+4000000 / -4000000)" class="bg-darkBg border border-darkBorder rounded-lg px-3 py-2 text-slate-200">
+          <button onclick="staffModifyBalance()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded-lg transition">
             Apply Delta
           </button>
         </div>
       </div>
 
       <!-- Create Ticket Controls -->
-      <div class="space-y-2 pt-2 border-t border-darkBorder">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-          <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
+      <div class="space-y-3 pt-3 border-t border-darkBorder">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+          <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none">
             <option value="Deposit">Deposit (Min 4M 💎)</option>
             <option value="Withdrawal">Withdrawal (Min 4M 💎)</option>
             <option value="General">Inquiry / Support</option>
           </select>
-          <input type="number" id="supportTicketDiamonds" placeholder="Amount (Min 4,000,000)" class="bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-neonCyan">
-          <input type="text" id="supportMessageInput" placeholder="Transaction ID or notes..." class="bg-darkSurface border border-darkBorder rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-neonCyan">
+          <input type="number" id="supportTicketDiamonds" placeholder="Amount (Min 4,000,000)" class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-neonCyan">
+          <input type="text" id="supportMessageInput" placeholder="Transaction ID or notes..." class="bg-darkSurface border border-darkBorder rounded-xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-neonCyan">
         </div>
 
-        <div class="flex items-center justify-between gap-2">
-          <label class="cursor-pointer flex items-center gap-2 text-xs text-slate-400 hover:text-cyan-300 px-3 py-2 bg-darkSurface rounded-xl border border-darkBorder transition">
+        <div class="flex items-center justify-between gap-3">
+          <label class="cursor-pointer flex items-center gap-2 text-xs text-slate-400 hover:text-cyan-300 px-3.5 py-2.5 bg-darkSurface rounded-xl border border-darkBorder transition">
             <i class="fa-solid fa-paperclip"></i>
             <span id="supportFileLabel">Attach Image Proof</span>
             <input type="file" id="supportImageInput" accept="image/*" class="hidden" onchange="handleSupportFileUpload(event)">
           </label>
-          <button onclick="sendSupportTicket()" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">
+          <button onclick="sendSupportTicket()" class="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">
             Submit Ticket
           </button>
         </div>
@@ -815,7 +816,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // STAFF CONFIGURATION: Rastant86 is support, but only PRIMARY_ADMINS can alter balances
     const PRIMARY_ADMINS = ['dalawar_alt', 'darkrulerx7'];
     const SUPPORT_STAFF = ['dalawar_alt', 'darkrulerx7', 'rastant86'];
 
@@ -920,8 +920,8 @@
     function renderVIPBannerUnlocked(mult) {
       const linkBtn = document.getElementById('vipRewardLink');
       linkBtn.href = VIP_REWARD_DISCORD;
-      linkBtn.className = 'px-3.5 py-1.5 rounded-xl border border-purple-400 bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center gap-1.5 text-xs whitespace-nowrap shadow-lg shadow-purple-500/30';
-      linkBtn.innerHTML = 'Access Exclusive Lounge <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>';
+      linkBtn.className = 'px-4 py-2.5 rounded-xl border border-purple-400 bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center gap-2 text-xs whitespace-nowrap shadow-lg shadow-purple-500/30';
+      linkBtn.innerHTML = 'Access Exclusive Lounge <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
       document.getElementById('vipRewardStatus').textContent = mult 
         ? `Unlocked: Reached ${mult.toFixed(2)}x Profit in Mines!` 
         : `Unlocked: Exclusive VIP Access Active!`;
@@ -996,7 +996,7 @@
 
       if (relevant.length === 0) {
         container.innerHTML = `
-          <div class="text-slate-500 text-center py-6 text-xs">
+          <div class="text-slate-500 text-center py-8 text-xs">
             No active channels yet.<br>Channels are opened once a ticket is approved by staff.
           </div>
         `;
@@ -1005,7 +1005,7 @@
 
       relevant.forEach(ticket => {
         const item = document.createElement('div');
-        item.className = 'p-3 rounded-xl bg-darkSurface border border-darkBorder flex items-center justify-between hover:border-cyan-500/50 transition cursor-pointer';
+        item.className = 'p-3.5 rounded-xl bg-darkSurface border border-darkBorder flex items-center justify-between hover:border-cyan-500/50 transition cursor-pointer';
         item.onclick = () => {
           toggleChannelsListModal();
           openTicketChannel(ticket.id);
@@ -1015,13 +1015,13 @@
 
         item.innerHTML = `
           <div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2.5">
               <span class="font-bold text-slate-100 text-xs">Channel #${ticket.id.slice(-5)}</span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isClosed ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500/20 text-emerald-300'}">
                 ${isClosed ? 'Closed' : 'Active'}
               </span>
             </div>
-            <div class="text-[10px] text-slate-400 mt-0.5">
+            <div class="text-[10px] text-slate-400 mt-1">
               @${ticket.username} • ${ticket.type} (${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'})
             </div>
           </div>
@@ -1086,7 +1086,7 @@
         <div class="text-[9px] text-slate-400 mb-0.5">
           <span class="${msg.isStaff ? 'text-amber-400 font-bold' : 'text-cyan-400'}">@${msg.sender}</span> • ${msg.time || ''}
         </div>
-        <div class="p-2.5 rounded-xl text-xs max-w-[85%] ${isMe ? 'bg-cyan-600/30 border border-cyan-500/40 text-cyan-100' : 'bg-darkSurface border border-darkBorder text-slate-200'}">
+        <div class="p-3 rounded-xl text-xs max-w-[85%] ${isMe ? 'bg-cyan-600/30 border border-cyan-500/40 text-cyan-100' : 'bg-darkSurface border border-darkBorder text-slate-200'}">
           ${msg.text}
         </div>
       `;
@@ -1171,13 +1171,13 @@
       document.getElementById('ticketViewerScope').textContent = user.isStaff ? 'All Incoming Tickets (Staff View)' : 'My Tickets';
 
       if (visible.length === 0) {
-        logs.innerHTML = '<div class="text-slate-500 text-center py-4">No active tickets for this account. Create one below.</div>';
+        logs.innerHTML = '<div class="text-slate-500 text-center py-6">No active tickets for this account. Create one below.</div>';
         return;
       }
 
       visible.forEach(ticket => {
         const ticketDiv = document.createElement('div');
-        ticketDiv.className = 'p-3 rounded-xl bg-darkCard border border-darkBorder text-slate-200 space-y-2';
+        ticketDiv.className = 'p-3.5 rounded-xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5';
 
         const isClosed = ticket.status === 'Closed';
         const isApproved = ticket.status === 'Approved';
@@ -1189,12 +1189,11 @@
         if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
         if (isCancelled) badgeClass = 'bg-rose-500/20 text-rose-400';
 
-        let actionButtons = `<div class="pt-2 flex flex-wrap gap-2 border-t border-darkBorder/40">`;
+        let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40">`;
 
-        // Cancellation button for user
         if (ticket.type === 'Withdrawal' && isPending && ticket.username.toLowerCase() === user.username.toLowerCase()) {
           actionButtons += `
-            <button onclick="cancelWithdrawalTicket('${ticket.id}', ${ticket.diamonds})" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition flex items-center gap-1">
+            <button onclick="cancelWithdrawalTicket('${ticket.id}', ${ticket.diamonds})" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition flex items-center gap-1.5">
               <i class="fa-solid fa-ban"></i> Cancel Withdrawal &amp; Refund
             </button>
           `;
@@ -1208,7 +1207,6 @@
           `;
         }
 
-        // Approval actions available to all Support Staff (including Rastant86)
         if (user.isStaff) {
           if (!isApproved && !isClosed && !isCancelled) {
             actionButtons += `
@@ -1219,7 +1217,7 @@
           }
           if (!isClosed && !isCancelled) {
             actionButtons += `
-              <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
+              <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
                 Close
               </button>
             `;
@@ -1236,7 +1234,7 @@
         `;
 
         if (ticket.image) {
-          html += `<div class="mt-1"><img src="${ticket.image}" class="rounded-lg max-h-36 border border-darkBorder object-contain"></div>`;
+          html += `<div class="mt-1.5"><img src="${ticket.image}" class="rounded-lg max-h-36 border border-darkBorder object-contain"></div>`;
         }
 
         html += actionButtons;
@@ -1274,12 +1272,11 @@
           return;
         }
 
-        // ATOMIC TRANSACTION: Subtract from Firebase immediately
         const userRef = db.ref('user_profiles/' + user.username.toLowerCase());
         const txResult = await userRef.transaction((profile) => {
           if (!profile) return profile;
           if ((profile.balance || 0) < diamonds) {
-            return; // Abort if balance insufficient
+            return;
           }
           profile.balance = (profile.balance || 0) - diamonds;
           profile.totalWithdrawals = (profile.totalWithdrawals || 0) + diamonds;
@@ -1329,13 +1326,11 @@
         return alert("This withdrawal can no longer be cancelled.");
       }
 
-      // Mark cancelled
       await ticketRef.update({
         status: 'Cancelled',
         cancelledAt: Date.now()
       });
 
-      // ATOMIC TRANSACTION: Refund back into wallet
       const userRef = db.ref('user_profiles/' + user.username.toLowerCase());
       await userRef.transaction((profile) => {
         if (!profile) return profile;
@@ -1454,7 +1449,6 @@
       alert(`Successfully sent tip of ${amount.toLocaleString()} 💎 to @${rawRecipient}!`);
     }
 
-    // STRICT PERMISSION CHECK: Rastant86 CANNOT modify player balances
     async function staffModifyBalance() {
       if (!user.isPrimaryAdmin) {
         return alert("Access Denied: Only primary administrators (@Dalawar_alt & @darkrulerx7) can modify balances.");
@@ -1566,9 +1560,8 @@
 
       if (user.isStaff) {
         roleBadge.textContent = user.isPrimaryAdmin ? 'ADMIN STAFF' : 'SUPPORT DESK';
-        roleBadge.className = 'text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        roleBadge.className = 'text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
         
-        // Show balance override ONLY if primary admin
         if (user.isPrimaryAdmin) {
           document.getElementById('staffControlPanel').classList.remove('hidden');
         } else {
@@ -1576,7 +1569,7 @@
         }
       } else {
         roleBadge.textContent = 'VIP MEMBER';
-        roleBadge.className = 'text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+        roleBadge.className = 'text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
         document.getElementById('staffControlPanel').classList.add('hidden');
       }
 
@@ -1666,11 +1659,11 @@
     function switchLeaderboard(type) {
       currentLeaderboardTab = type;
       if (type === 'wagered') {
-        document.getElementById('lbTabWagered').className = 'py-1.5 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
-        document.getElementById('lbTabBalance').className = 'py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+        document.getElementById('lbTabWagered').className = 'py-2 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabBalance').className = 'py-2 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
       } else {
-        document.getElementById('lbTabBalance').className = 'py-1.5 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
-        document.getElementById('lbTabWagered').className = 'py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+        document.getElementById('lbTabBalance').className = 'py-2 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabWagered').className = 'py-2 rounded-lg bg-darkSurface border border-darkBorder text-slate-400 font-bold';
       }
       renderLeaderboard(type);
     }
@@ -1680,15 +1673,15 @@
       list.innerHTML = '';
       const sorted = [...globalLeaderboardData].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
       if (sorted.length === 0) {
-        list.innerHTML = '<div class="text-center py-4 text-slate-500">No active players ranked yet.</div>';
+        list.innerHTML = '<div class="text-center py-6 text-slate-500">No active players ranked yet.</div>';
         return;
       }
       sorted.forEach((item, index) => {
         const row = document.createElement('div');
-        row.className = 'p-2 rounded-xl bg-darkSurface border border-darkBorder flex justify-between items-center';
+        row.className = 'p-3 rounded-xl bg-darkSurface border border-darkBorder flex justify-between items-center';
         row.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="w-5 text-center font-bold text-amber-400">#${index+1}</span>
+          <div class="flex items-center gap-3">
+            <span class="w-6 text-center font-bold text-amber-400">#${index+1}</span>
             <span class="text-slate-200">@${item.user}</span>
           </div>
           <div class="text-right">
@@ -1713,15 +1706,15 @@
       if (emptyNotice) emptyNotice.remove();
 
       const item = document.createElement('div');
-      item.className = 'p-2 rounded-xl bg-darkSurface border border-darkBorder flex justify-between items-center text-xs';
+      item.className = 'p-2.5 rounded-xl bg-darkSurface border border-darkBorder flex justify-between items-center text-xs';
       item.innerHTML = `
         <div>
           <span class="font-bold text-slate-200">@${player}</span>
-          <span class="text-slate-500 text-[10px]">(${game})</span>
+          <span class="text-slate-500 text-[10px] ml-1">(${game})</span>
         </div>
         <div class="text-right">
           <span class="${won ? 'text-emerald-400' : 'text-rose-400'} font-bold">${won ? '+' + Math.floor(bet * mult).toLocaleString() : '-' + bet.toLocaleString()} 💎</span>
-          <span class="text-[10px] text-slate-500 ml-1 font-bold">${mult.toFixed(2)}x</span>
+          <span class="text-[10px] text-slate-500 ml-1.5 font-bold">${mult.toFixed(2)}x</span>
         </div>
       `;
       feed.prepend(item);
@@ -1752,9 +1745,9 @@
     function renderChatMessage(sender, text, isStaff, time) {
       const box = document.getElementById('generalChatBox');
       const msgDiv = document.createElement('div');
-      msgDiv.className = 'p-2 rounded-xl bg-darkSurface/90 border border-darkBorder/60';
+      msgDiv.className = 'p-3 rounded-xl bg-darkSurface/90 border border-darkBorder/60';
       msgDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-0.5">
+        <div class="flex justify-between items-center mb-1">
           <span class="${isStaff ? 'text-amber-400 font-bold' : 'text-cyan-400 font-semibold'}">@${sender}</span>
           <span class="text-[9px] text-slate-500">${time || 'Just now'}</span>
         </div>
@@ -1847,14 +1840,14 @@
       allGames.forEach(g => {
         document.getElementById(`game-${g}-view`).classList.add('hidden');
         const tab = document.getElementById(`tab-${g}`);
-        tab.className = 'game-selector px-3.5 py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400';
+        tab.className = 'game-selector px-4 py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold whitespace-nowrap hover:text-amber-400';
       });
       document.getElementById(`game-${name}-view`).classList.remove('hidden');
       const activeTab = document.getElementById(`tab-${name}`);
-      activeTab.className = 'game-selector px-3.5 py-2 rounded-xl bg-darkCard border border-amber-400 text-amber-300 font-bold whitespace-nowrap';
+      activeTab.className = 'game-selector px-4 py-2.5 rounded-xl bg-darkCard border border-amber-400 text-amber-300 font-bold whitespace-nowrap';
     }
 
-    /* 1. MINES (RIGGED) */
+    /* 1. MINES */
     let minesGrid = 5;
     let minesQuantity = 3;
     let minesActive = false;
@@ -1869,9 +1862,9 @@
       minesGrid = size;
       document.querySelectorAll('.grid-size-btn').forEach(b => {
         if (parseInt(b.getAttribute('data-size')) === size) {
-          b.className = 'grid-size-btn py-1.5 rounded-lg bg-darkSurface border border-amber-400 text-amber-300 font-bold';
+          b.className = 'grid-size-btn py-2 rounded-lg bg-darkSurface border border-amber-400 text-amber-300 font-bold';
         } else {
-          b.className = 'grid-size-btn py-1.5 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold';
+          b.className = 'grid-size-btn py-2 rounded-lg bg-darkSurface border border-darkBorder text-slate-300 font-bold';
         }
       });
       const maxMines = (size * size) - 1;
@@ -1947,7 +1940,7 @@
 
         const btn = document.getElementById('minesActionBtn');
         btn.textContent = 'CASHOUT (0)';
-        btn.className = 'w-full py-3 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition';
+        btn.className = 'w-full py-3.5 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition';
         document.getElementById('minesCountSlider').disabled = true;
       } else {
         cashoutMines();
@@ -1959,7 +1952,6 @@
       const tile = document.querySelector(`[data-idx='${idx}']`);
       minesOpenedIndices.add(idx);
 
-      // RIGGED LOGIC: 35% chance to force bomb if player is 3+ tiles deep
       if (minesOpened >= 3 && Math.random() < 0.35) {
         minesLocations.add(idx);
       }
@@ -2008,7 +2000,7 @@
       document.getElementById('minesCountSlider').disabled = false;
       const btn = document.getElementById('minesActionBtn');
       btn.textContent = 'START GAME';
-      btn.className = 'w-full py-3 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 transition';
+      btn.className = 'w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 transition';
     }
 
     function revealAllMines() {
@@ -2023,7 +2015,7 @@
       }
     }
 
-    /* 2. COIN FLIP (RIGGED: 60% HOUSE ADVANTAGE) */
+    /* 2. COIN FLIP */
     let coinSide = 'HEADS';
     let coinFlipping = false;
     let coinAngle = 0;
@@ -2032,11 +2024,11 @@
       if (coinFlipping) return;
       coinSide = side;
       document.getElementById('coinPickHeads').className = side === 'HEADS' 
-        ? 'py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold' 
-        : 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+        ? 'py-2.5 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold' 
+        : 'py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
       document.getElementById('coinPickTails').className = side === 'TAILS' 
-        ? 'py-2 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold' 
-        : 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+        ? 'py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold' 
+        : 'py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
     }
 
     function playCoinFlip() {
@@ -2078,16 +2070,16 @@
       }, 1400);
     }
 
-    /* 3. DICE (RIGGED: 25% DEFLECTION ON CLOSE CALLS) */
+    /* 3. DICE */
     let diceMode = 'under';
     function setDiceMode(m) {
       diceMode = m;
       document.getElementById('diceModeUnder').className = m === 'under'
-        ? 'py-2 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold'
-        : 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+        ? 'py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold'
+        : 'py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
       document.getElementById('diceModeOver').className = m === 'over'
-        ? 'py-2 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold'
-        : 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+        ? 'py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-300 font-bold'
+        : 'py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
       updateDiceOdds();
     }
 
@@ -2135,7 +2127,7 @@
       }
     }
 
-    /* 4. ROULETTE (RIGGED: 58% BIAS) */
+    /* 4. ROULETTE */
     let roulChoice = 'red';
     const RED_NUMBERS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
@@ -2169,8 +2161,8 @@
           let outcome = Math.floor(Math.random() * 37);
 
           if (Math.random() < 0.58) {
-            if (roulChoice === 'red') outcome = 2; // Force Black
-            else if (roulChoice === 'black') outcome = 1; // Force Red
+            if (roulChoice === 'red') outcome = 2;
+            else if (roulChoice === 'black') outcome = 1;
           }
 
           resNumEl.textContent = outcome;
@@ -2179,7 +2171,7 @@
           if (outcome === 0) color = 'green';
           else if (RED_NUMBERS.includes(outcome)) color = 'red';
 
-          resNumEl.className = color === 'red' ? 'font-serif text-5xl font-black text-rose-500' : (color === 'green' ? 'font-serif text-5xl font-black text-emerald-400' : 'font-serif text-5xl font-black text-slate-300');
+          resNumEl.className = color === 'red' ? 'font-serif text-6xl font-black text-rose-500 mb-3' : (color === 'green' ? 'font-serif text-6xl font-black text-emerald-400 mb-3' : 'font-serif text-6xl font-black text-slate-300 mb-3');
 
           if (color === roulChoice) {
             const mult = color === 'green' ? 14 : 2;
@@ -2199,7 +2191,7 @@
       }, 70);
     }
 
-    /* 5. BLACKJACK 21 (RIGGED: DEALER BIAS 19-21) */
+    /* 5. BLACKJACK 21 */
     let bjPlayerHand = [];
     let bjDealerHand = [];
     let bjBet = 4000000;
@@ -2229,10 +2221,10 @@
     }
 
     function renderCard(c, hidden = false) {
-      if (hidden) return `<div class="w-9 h-13 bg-slate-800 border border-slate-600 rounded flex items-center justify-center font-bold text-slate-500">?</div>`;
+      if (hidden) return `<div class="w-10 h-14 bg-slate-800 border border-slate-600 rounded flex items-center justify-center font-bold text-slate-500">?</div>`;
       const isRed = ['♥', '♦'].includes(c.suit);
-      return `<div class="w-9 h-13 bg-white text-slate-900 border rounded flex flex-col items-center justify-center font-bold text-xs ${isRed ? 'text-red-600' : 'text-slate-950'} shadow">
-                <span>${c.val}</span><span class="text-[9px]">${c.suit}</span>
+      return `<div class="w-10 h-14 bg-white text-slate-900 border rounded flex flex-col items-center justify-center font-bold text-xs ${isRed ? 'text-red-600' : 'text-slate-950'} shadow">
+                <span>${c.val}</span><span class="text-[10px]">${c.suit}</span>
               </div>`;
     }
 
@@ -2252,7 +2244,7 @@
       document.getElementById('bjStartControls').classList.add('hidden');
       document.getElementById('bjActionControls').classList.remove('hidden');
       document.getElementById('bjOutcomeNotice').textContent = "Hit or Stand?";
-      document.getElementById('bjOutcomeNotice').className = "text-center font-bold text-xs uppercase text-amber-400 py-1";
+      document.getElementById('bjOutcomeNotice').className = "text-center font-bold text-xs uppercase text-amber-400 py-1.5";
 
       updateBlackjackBoard(true);
       if (calculateHandScore(bjPlayerHand) === 21) standBlackjack();
@@ -2317,15 +2309,15 @@
       if (result === true) {
         const payout = bjBet * 2;
         updateBalance(payout);
-        notice.className = "text-center font-bold text-xs uppercase text-emerald-400 py-1";
+        notice.className = "text-center font-bold text-xs uppercase text-emerald-400 py-1.5";
         recordRound('Blackjack', bjBet, 2.0, true);
       } else if (result === 'push') {
         updateBalance(bjBet);
-        notice.className = "text-center font-bold text-xs uppercase text-amber-400 py-1";
+        notice.className = "text-center font-bold text-xs uppercase text-amber-400 py-1.5";
         recordRound('Blackjack', bjBet, 1.0, true);
       } else {
         user.lossStreak++;
-        notice.className = "text-center font-bold text-xs uppercase text-rose-400 py-1";
+        notice.className = "text-center font-bold text-xs uppercase text-rose-400 py-1.5";
         recordRound('Blackjack', bjBet, 0, false);
       }
     }
@@ -2335,14 +2327,14 @@
       document.getElementById('accTotalDeposits').textContent = `${user.totalDeposits.toLocaleString()} 💎`;
       document.getElementById('accTotalWithdrawals').textContent = `${user.totalWithdrawals.toLocaleString()} 💎`;
       document.getElementById('accNetProfit').textContent = `${user.netProfit >= 0 ? '+' + user.netProfit.toLocaleString() : user.netProfit.toLocaleString()} 💎`;
-      document.getElementById('accNetProfit').className = user.netProfit >= 0 ? 'text-emerald-400 font-bold text-sm mt-0.5' : 'text-rose-400 font-bold text-sm mt-0.5';
+      document.getElementById('accNetProfit').className = user.netProfit >= 0 ? 'text-emerald-400 font-bold text-sm mt-1' : 'text-rose-400 font-bold text-sm mt-1';
 
       const logBox = document.getElementById('accRoundLogs');
       if (user.roundsPlayed.length > 0) {
         logBox.innerHTML = '';
         user.roundsPlayed.forEach(r => {
           logBox.innerHTML += `
-            <div class="flex justify-between items-center py-1 border-b border-darkBorder/40">
+            <div class="flex justify-between items-center py-1.5 border-b border-darkBorder/40">
               <span><b>${r.game}</b> (Bet: ${r.bet.toLocaleString()} 💎)</span>
               <span class="${r.payout > 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${r.payout > 0 ? '+' + r.payout.toLocaleString() : '-' + r.bet.toLocaleString()} (${r.mult}x)</span>
             </div>
