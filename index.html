@@ -108,7 +108,7 @@
       </div>
       <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Device Firewall Activated</h3>
       <p class="text-xs text-slate-300 leading-relaxed font-sans">
-        This account is active on another device or browser session. Multiple concurrent logins are blocked by the firewall.
+        This account is currently active on another device or browser session. Multiple concurrent logins are blocked by the firewall.
       </p>
       <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Device
@@ -130,7 +130,6 @@
         </button>
       </div>
 
-      <!-- Quick Cashier Buttons in Drawer -->
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="openCashierModal('Deposit')" class="py-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-circle-plus"></i> Deposit
@@ -148,7 +147,6 @@
         <i class="fa-solid fa-comments"></i> Active Channels
       </button>
 
-      <!-- Navigation Links -->
       <nav class="space-y-2 mt-5 text-xs">
         <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
           <i class="fa-solid fa-gamepad text-sky-400 w-5"></i> Casino Games
@@ -261,11 +259,10 @@
         </button>
       </div>
 
-      <!-- PRIMARY ADMIN BALANCE OVERRIDE (ISOLATED) -->
       <div id="staffControlPanel" class="hidden my-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs">
         <div class="font-bold text-amber-300 flex items-center justify-between mb-3 font-display">
           <span><i class="fa-solid fa-vault mr-1.5"></i> PRIMARY ADMIN BALANCE OVERRIDE VAULT</span>
-          <span class="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">SUPERUSER</span>
+          <span class="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">SUPERUSER ONLY</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <input type="text" id="staffTargetUser" placeholder="@target_username" class="bg-darkBg border border-darkBorder rounded-xl px-3 py-2 text-slate-200">
@@ -276,7 +273,6 @@
         </div>
       </div>
 
-      <!-- Live Incoming Tickets Stream (Staff View) -->
       <div class="flex-1 overflow-hidden flex flex-col mt-2">
         <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
           <span>Incoming Tickets Queue (Pending Approvals &amp; Receipts)</span>
@@ -314,7 +310,6 @@
         </div>
       </div>
 
-      <!-- Create Ticket Controls -->
       <div class="space-y-3 pt-3 border-t border-darkBorder font-sans">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
           <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:outline-none">
@@ -1302,7 +1297,7 @@
 
         if (!isClosed && !isCancelled) {
           actionButtons += `
-            <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
+            <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
               Close Ticket
             </button>
           `;
@@ -1566,62 +1561,69 @@
     }
 
     /* ====================================================================
-       STRICT REALTIME SINGLE-DEVICE FIREWALL
+       STRICT REALTIME SINGLE-DEVICE FIREWALL (SERVER TIMESTAMP)
     ==================================================================== */
     async function verifyAndLockCloudSession(username) {
       const cleanUser = username.toLowerCase();
       const sessionRef = db.ref('active_sessions/' + cleanUser);
 
-      const snapshot = await sessionRef.once('value');
-      const sessionData = snapshot.val();
-      const now = Date.now();
+      // 1. Fetch current server time offset to eliminate client clock discrepancies
+      const offsetSnap = await db.ref('.info/serverTimeOffset').once('value');
+      const offset = offsetSnap.val() || 0;
+      const serverNow = Date.now() + offset;
 
-      // Enforce strict firewall: check lease expiration
-      if (sessionData && sessionData.token && sessionData.token !== myDeviceToken) {
-        if (sessionData.expiresAt && sessionData.expiresAt > now) {
-          return false; // Active on other browser
+      // 2. Fetch active session state
+      const snap = await sessionRef.once('value');
+      const data = snap.val();
+
+      if (data && data.token && data.token !== myDeviceToken) {
+        if (data.expiresAt && data.expiresAt > serverNow) {
+          return false; // Active lock held by other device
         }
       }
 
-      // Claim atomic lease for this device
-      const txResult = await sessionRef.transaction((current) => {
-        const currentTime = Date.now();
+      // 3. Atomically register lock with lease in Firebase
+      const tx = await sessionRef.transaction((current) => {
+        const estServerNow = Date.now() + offset;
         if (current && current.token && current.token !== myDeviceToken) {
-          if (current.expiresAt && current.expiresAt > currentTime) {
-            return; // Abort
+          if (current.expiresAt && current.expiresAt > estServerNow) {
+            return; // Abort: other session is active
           }
         }
         return {
           token: myDeviceToken,
-          expiresAt: currentTime + 10000,
-          updatedAt: currentTime
+          expiresAt: estServerNow + 10000,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP
         };
       });
 
-      if (!txResult.committed) {
+      if (!tx.committed) {
         return false;
       }
 
-      // Live firewall eviction sentry
+      // 4. Attach real-time kick listener
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
-      activeSessionListener = sessionRef.on('value', (snap) => {
-        const val = snap.val();
+      activeSessionListener = sessionRef.on('value', (s) => {
+        const val = s.val();
         if (val && val.token && val.token !== myDeviceToken) {
           triggerRemoteSessionEviction();
         }
       });
 
-      // Renew 10-second lease every 3 seconds
+      // 5. Active 3-second heartbeat to maintain lease
       if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
-      cloudHeartbeatTimer = setInterval(() => {
+      cloudHeartbeatTimer = setInterval(async () => {
         if (user.username !== 'guest') {
+          const offSnap = await db.ref('.info/serverTimeOffset').once('value');
+          const off = offSnap.val() || 0;
           sessionRef.update({
-            expiresAt: Date.now() + 10000,
-            updatedAt: Date.now()
+            expiresAt: Date.now() + off + 10000,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
           });
         }
       }, 3000);
 
+      // Clean up lock on tab close or navigation
       sessionRef.onDisconnect().remove();
       return true;
     }
