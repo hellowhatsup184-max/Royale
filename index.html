@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Gemluck - Diamond Arcade & Social VIP</title>
+  <title>Gemluck - Diamond Arcade & VIP Lounge</title>
   <script src="https://cdn.tailwindcss.com"></script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
     tailwind.config = {
@@ -31,7 +31,7 @@
             neonGold: '#fbbf24',
             darkBg: '#05070f',
             darkSurface: '#0b1120',
-            darkCard: '#0f172a',
+            darkCard: '#10172a',
             darkBorder: '#1e293b'
           }
         }
@@ -58,57 +58,35 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .scrollbar-thin::-webkit-scrollbar {
-      width: 4px;
-    }
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 9999px;
-    }
-    .coin-perspective {
-      perspective: 1000px;
-    }
+    .scrollbar-thin::-webkit-scrollbar { width: 4px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    .coin-perspective { perspective: 1000px; }
     .coin-3d {
-      width: 105px;
-      height: 105px;
-      position: relative;
+      width: 105px; height: 105px; position: relative;
       transform-style: preserve-3d;
       transition: transform 1.4s cubic-bezier(0.2, 0.85, 0.35, 1.2);
     }
     .coin-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: absolute; inset: 0; backface-visibility: hidden; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.6);
     }
-    .coin-front {
-      background: radial-gradient(circle, #fde047 20%, #ca8a04 80%, #78350f 100%);
-      border: 3px solid #facc15;
-    }
-    .coin-back {
-      background: radial-gradient(circle, #38bdf8 20%, #0284c7 80%, #082f49 100%);
-      border: 3px solid #38bdf8;
-      transform: rotateY(180deg);
-    }
+    .coin-front { background: radial-gradient(circle, #fde047 20%, #ca8a04 80%, #78350f 100%); border: 3px solid #facc15; }
+    .coin-back { background: radial-gradient(circle, #38bdf8 20%, #0284c7 80%, #082f49 100%); border: 3px solid #38bdf8; transform: rotateY(180deg); }
   </style>
 </head>
 
 <body class="text-slate-100 font-sans flex flex-col justify-between">
 
-  <!-- ==================== FIREWALL LOCKOUT OVERLAY ==================== -->
+  <!-- ==================== SESSION KICK OVERLAY ==================== -->
   <div id="sessionKickOverlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-6 font-mono">
     <div class="w-full max-w-md bg-darkCard border border-rose-500/50 rounded-3xl p-8 text-center space-y-5 shadow-2xl">
       <div class="h-16 w-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 text-3xl">
         <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Device Session Relinquished</h3>
+      <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Active Elsewhere</h3>
       <p class="text-xs text-slate-300 leading-relaxed font-sans">
-        This account logged in or took over access from another browser window. Simultaneous usage is prevented.
+        This account signed in on another device or tab. Concurrent active sessions are blocked.
       </p>
       <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Device
@@ -116,281 +94,46 @@
     </div>
   </div>
 
-  <!-- ==================== ALL-IN-ONE SLIDING MENU DRAWER ==================== -->
-  <div id="menuDrawerBackdrop" onclick="toggleMenuDrawer()" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm transition-opacity"></div>
-  <div id="menuDrawer" class="fixed top-0 right-0 h-full w-84 max-w-[85vw] bg-darkCard/95 border-l border-darkBorder z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl backdrop-blur-2xl">
-    <div>
-      <div class="flex items-center justify-between pb-5 border-b border-darkBorder">
-        <div class="flex items-center gap-3">
-          <i class="fa-solid fa-crown text-amber-400 text-xl"></i>
-          <h2 class="font-display font-black gold-gradient-text tracking-wider uppercase text-base">Gemluck VIP</h2>
-        </div>
-        <button onclick="toggleMenuDrawer()" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 mt-6">
-        <button onclick="openCashierModal('Deposit')" class="py-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-circle-plus"></i> Deposit
-        </button>
-        <button onclick="openCashierModal('Withdrawal')" class="py-3 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-arrow-down"></i> Withdraw
-        </button>
-      </div>
-
-      <button id="drawerStaffBtn" onclick="toggleModal('staffPortalModal')" class="hidden w-full mt-3 py-3 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center justify-center gap-2">
-        <i class="fa-solid fa-shield-halved"></i> Staff Approval Desk
-      </button>
-
-      <button onclick="toggleChannelsListModal()" class="w-full mt-2.5 py-3 rounded-2xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center justify-center gap-2">
-        <i class="fa-solid fa-comments"></i> Active Channels
-      </button>
-
-      <nav class="space-y-2 mt-5 text-xs">
-        <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
-          <i class="fa-solid fa-gamepad text-sky-400 w-5"></i> Casino Games
-        </button>
-        <button onclick="menuNavigate('account')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
-          <i class="fa-solid fa-user-shield text-amber-400 w-5"></i> Account Vault
-        </button>
-        <button onclick="menuNavigate('leaderboard')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
-          <i class="fa-solid fa-trophy text-yellow-400 w-5"></i> High-Roller Ranks
-        </button>
-        <button onclick="menuNavigate('tip')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
-          <i class="fa-solid fa-hand-holding-dollar text-emerald-400 w-5"></i> Tip Another Player
-        </button>
-        <button onclick="menuNavigate('support')" class="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
-          <span class="flex items-center gap-3.5">
-            <i class="fa-solid fa-headset text-sky-400 w-5"></i> Live Support Tickets
-          </span>
-        </button>
-      </nav>
-    </div>
-
-    <div class="pt-5 border-t border-darkBorder text-xs space-y-4">
-      <div class="flex items-center justify-between text-xs text-slate-400">
-        <span>Active User:</span>
-        <span id="drawerUserDisplay" class="font-bold text-amber-300 font-mono">@guest</span>
-      </div>
-      <button onclick="handleLogout()" class="w-full py-3 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs uppercase transition flex items-center justify-center gap-2">
-        <i class="fa-solid fa-right-from-bracket"></i> Log Out
-      </button>
-    </div>
-  </div>
-
-  <!-- ==================== SEPARATE CHANNELS SELECTOR MODAL ==================== -->
-  <div id="channelsListModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
-    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col h-[520px] max-h-[90vh]">
-      <div class="pb-4 border-b border-darkBorder flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="h-10 w-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
-            <i class="fa-solid fa-comments text-lg"></i>
-          </div>
-          <div>
-            <div class="text-xs font-display font-black text-slate-100 uppercase tracking-wide">Direct Support Channels</div>
-            <div class="text-[10px] text-slate-400 mt-0.5 font-sans">Open any active cashier/support dialogue directly</div>
-          </div>
-        </div>
-        <button onclick="toggleChannelsListModal()" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div id="channelsListContent" class="flex-1 overflow-y-auto py-4 space-y-2.5 text-xs scrollbar-thin">
-        <div class="text-slate-500 text-center py-8 text-[11px]">Loading active channels...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== DEDICATED TICKET CHAT CHANNEL MODAL ==================== -->
-  <div id="ticketChannelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
-    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col h-[560px] max-h-[90vh]">
-      <div class="pb-4 border-b border-darkBorder flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="h-10 w-10 rounded-2xl bg-sky-500/10 border border-sky-500/40 flex items-center justify-center text-sky-400">
-            <i class="fa-solid fa-headset text-lg"></i>
-          </div>
-          <div>
-            <div id="channelTitle" class="text-xs font-display font-bold text-slate-100">Ticket #---</div>
-            <div id="channelSubtitle" class="text-[10px] text-slate-400 mt-0.5">Staff &amp; Player Line</div>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button id="channelCloseBtn" onclick="staffCloseTicketChannel()" class="hidden px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-[10px] font-bold transition">
-            Close Channel
-          </button>
-          <button onclick="closeTicketChannelModal()" class="text-slate-400 hover:text-white p-2">
-            <i class="fa-solid fa-xmark text-lg"></i>
-          </button>
-        </div>
-      </div>
-
-      <div id="channelChatLogs" class="flex-1 overflow-y-auto py-4 space-y-3 text-xs scrollbar-thin">
-        <div class="text-slate-500 text-center py-8 text-[11px]">Connecting to dedicated ticket channel...</div>
-      </div>
-
-      <form id="channelChatForm" onsubmit="handleSendChannelMessage(event)" class="pt-3 border-t border-darkBorder space-y-2">
-        <div class="flex gap-2 items-center">
-          <label class="cursor-pointer p-2.5 rounded-2xl bg-darkSurface border border-darkBorder hover:text-sky-300 text-slate-400 text-sm transition">
-            <i class="fa-solid fa-image"></i>
-            <input type="file" id="channelMsgFile" accept="image/*" class="hidden" onchange="handleChannelImageUpload(event)">
-          </label>
-          <input type="text" id="channelChatInput" placeholder="Message or attach image..." maxlength="200" class="flex-1 bg-darkSurface border border-darkBorder rounded-2xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
-          <button type="submit" id="channelSendBtn" class="px-5 py-2.5 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
-            <i class="fa-solid fa-paper-plane"></i>
-          </button>
-        </div>
-        <div id="channelImagePreviewNote" class="hidden text-[10px] text-sky-400 px-1 font-mono">Image attached ready to send</div>
-        <div id="channelClosedAlert" class="hidden text-center text-[10px] text-rose-400 font-bold py-1">
-          This channel is closed. No new messages can be sent.
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==================== SEPARATE STAFF APPROVAL PORTAL MODAL ==================== -->
-  <div id="staffPortalModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6 font-mono">
-    <div class="w-full max-w-3xl bg-darkCard border border-amber-500/40 rounded-3xl p-6 shadow-2xl flex flex-col h-[640px] max-h-[92vh]">
-      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
-        <div>
-          <h3 class="font-display text-lg font-black text-amber-300 flex items-center gap-2.5">
-            <i class="fa-solid fa-shield-halved text-amber-400"></i> Staff Operations &amp; Approvals
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Officers: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
-        </div>
-        <button onclick="toggleModal('staffPortalModal')" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <!-- PRIMARY ADMIN BALANCE OVERRIDE -->
-      <div id="staffControlPanel" class="hidden my-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs">
-        <div class="font-bold text-amber-300 flex items-center justify-between mb-3 font-display">
-          <span><i class="fa-solid fa-vault mr-1.5"></i> PRIMARY ADMIN BALANCE OVERRIDE VAULT</span>
-          <span class="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">SUPERUSER ONLY</span>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <input type="text" id="staffTargetUser" placeholder="@target_username" class="bg-darkBg border border-darkBorder rounded-xl px-3 py-2 text-slate-200">
-          <input type="number" id="staffAmountDelta" placeholder="Credits (+4000000 / -4000000)" class="bg-darkBg border border-darkBorder rounded-xl px-3 py-2 text-slate-200">
-          <button onclick="staffModifyBalance()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-3 py-2 rounded-xl transition font-sans">
-            Modify Cloud Balance
-          </button>
-        </div>
-      </div>
-
-      <!-- Live Incoming Tickets Stream (Staff View) -->
-      <div class="flex-1 overflow-hidden flex flex-col mt-2">
-        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
-          <span>Incoming Tickets Queue (Pending Approvals &amp; Receipts)</span>
-          <span class="text-amber-400 font-bold">ALL USERS</span>
-        </div>
-        <div id="staffQueueLogs" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-2xl border border-darkBorder scrollbar-thin">
-          <div class="text-slate-500 text-center py-8">No incoming tickets in queue.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== USER LIVE SUPPORT & CASHIER MODAL ==================== -->
-  <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
-    <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
-        <div>
-          <h3 class="font-display text-base sm:text-lg font-black text-sky-300 flex items-center gap-2.5">
-            <i class="fa-solid fa-headset text-sky-400"></i> Cashier Desk &amp; Inquiries
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5 font-sans">Direct chat opens immediately upon ticket submission.</p>
-        </div>
-        <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <!-- Deposit In-Game Mail Banner -->
-      <div class="mt-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-3 font-sans">
-        <i class="fa-solid fa-envelope-open-text text-amber-400 text-xl"></i>
-        <div>
-          <span class="font-bold font-display uppercase tracking-wider block">In-Game Mailbox Deposit:</span>
-          <span>Send diamond deposits to Roblox username <b class="text-white font-mono bg-amber-500/30 px-1.5 py-0.5 rounded">@Gemluck99</b> via mail. Submit transaction ID below!</span>
-        </div>
-      </div>
-
-      <div class="my-3 flex-1 overflow-hidden flex flex-col">
-        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
-          <span>My Ticket History</span>
-          <span class="text-sky-400 font-bold">PERSONAL DESK</span>
-        </div>
-        <div id="supportChatLogs" class="overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-2xl border border-darkBorder max-h-[200px] scrollbar-thin">
-          <div id="noTicketsMessage" class="text-slate-500 text-center py-6">No active tickets found for your account.</div>
-        </div>
-      </div>
-
-      <!-- Create Ticket Controls -->
-      <div class="space-y-3 pt-3 border-t border-darkBorder font-sans">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-          <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:outline-none">
-            <option value="Deposit">Deposit (Min 4M 💎)</option>
-            <option value="Withdrawal">Withdrawal (Min 4M 💎)</option>
-            <option value="General">Inquiry / Support</option>
-          </select>
-          <input type="number" id="supportTicketDiamonds" placeholder="Amount (Min 4,000,000)" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-sky-400">
-          <input type="text" id="supportMessageInput" placeholder="Transaction notes or ID..." class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-sky-400">
-        </div>
-
-        <div class="flex items-center justify-between gap-3 font-mono">
-          <label class="cursor-pointer flex items-center gap-2 text-xs text-slate-400 hover:text-sky-300 px-4 py-2.5 bg-darkSurface rounded-2xl border border-darkBorder transition">
-            <i class="fa-solid fa-paperclip"></i>
-            <span id="supportFileLabel">Attach Proof Photo</span>
-            <input type="file" id="supportImageInput" accept="image/*" class="hidden" onchange="handleSupportFileUpload(event)">
-          </label>
-          <button onclick="sendSupportTicket()" class="px-6 py-2.5 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
-            Submit &amp; Open Chat
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== LOGIN SCREEN MODAL WITH OVERRIDE ==================== -->
+  <!-- ==================== LOGIN & REGISTRATION MODAL ==================== -->
   <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
     <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-3xl p-8 shadow-2xl relative">
-      <div class="text-center mb-7">
+      <div class="text-center mb-6">
         <h2 class="font-display text-2xl font-black gold-gradient-text uppercase tracking-widest">Gemluck VIP</h2>
-        <p class="text-xs text-slate-400 font-mono mt-1.5">HIGH-ROLLER DIAMOND CASINO (MIN 4M 💎)</p>
+        <p class="text-xs text-slate-400 font-mono mt-1">HIGH-ROLLER DIAMOND CASINO (MIN 4M 💎)</p>
       </div>
 
-      <form id="loginForm" class="space-y-5">
+      <!-- Mode Switcher -->
+      <div class="grid grid-cols-2 gap-2 mb-5 p-1 bg-darkSurface rounded-2xl border border-darkBorder text-xs font-bold">
+        <button id="tabLogin" type="button" onclick="switchAuthMode('login')" class="py-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">Log In</button>
+        <button id="tabRegister" type="button" onclick="switchAuthMode('register')" class="py-2.5 rounded-xl text-slate-400 hover:text-white">Register</button>
+      </div>
+
+      <form id="authForm" class="space-y-4">
         <div>
           <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Roblox Username *</label>
           <div class="relative">
             <span class="absolute left-3.5 top-3.5 text-slate-500 font-mono">@</span>
             <input type="text" id="robloxInput" required placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-9 pr-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
           </div>
-          <p class="text-[10px] text-slate-500 mt-1.5 font-mono">Authorized: @Dalawar_alt, @darkrulerx7, @Rastant86</p>
         </div>
 
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Link Discord (Optional)</label>
-          <div class="flex gap-2">
-            <input type="text" id="discordInput" placeholder="Discord Username#0000" class="flex-1 bg-darkSurface border border-darkBorder rounded-2xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-sky-400 transition">
-            <a href="https://discord.gg/vGkHmVBEJ" target="_blank" class="px-4 py-3 bg-indigo-600/30 border border-indigo-500/50 hover:bg-indigo-600/50 rounded-2xl flex items-center justify-center text-indigo-300 transition text-sm font-mono">
-              <i class="fa-brands fa-discord text-base"></i>
-            </a>
-          </div>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Email Address *</label>
+          <input type="email" id="emailInput" required placeholder="youremail@example.com" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-sky-400 transition">
         </div>
 
-        <div id="loginErrorAlert" class="hidden p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs space-y-2">
-          <div class="flex items-start gap-2.5">
-            <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
-            <span id="loginErrorMsg">Account active on another browser/device!</span>
-          </div>
-          <button type="button" onclick="forceTakeoverLogin()" class="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 font-bold rounded-xl text-[11px] transition uppercase">
-            Force Relinquish Other Device &amp; Enter Here
-          </button>
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Password / PIN *</label>
+          <input type="password" id="passwordInput" required placeholder="••••••••" minlength="6" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
+          <p class="text-[10px] text-slate-500 mt-1 font-mono">Must be at least 6 characters</p>
         </div>
 
-        <button type="submit" id="loginSubmitBtn" class="w-full py-3.5 rounded-2xl font-display font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
+        <div id="authErrorAlert" class="hidden p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2.5">
+          <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
+          <span id="authErrorMsg">Error occurred.</span>
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="w-full py-3.5 rounded-2xl font-display font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
           Enter VIP Arena
         </button>
       </form>
@@ -411,47 +154,36 @@
       </div>
 
       <div class="flex items-center gap-3 font-mono">
-        <div class="hidden sm:flex items-center gap-2">
-          <button onclick="openCashierModal('Deposit')" class="px-3.5 py-2 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
-            <i class="fa-solid fa-circle-plus"></i> Deposit
-          </button>
-          <button onclick="openCashierModal('Withdrawal')" class="px-3.5 py-2 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
-            <i class="fa-solid fa-arrow-down"></i> Withdraw
-          </button>
-          <button id="headerStaffBtn" onclick="toggleModal('staffPortalModal')" class="hidden px-3.5 py-2 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
-            <i class="fa-solid fa-shield-halved"></i> Staff Portal
-          </button>
-          <button onclick="toggleChannelsListModal()" class="px-3.5 py-2 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
-            <i class="fa-solid fa-comments"></i> Channels
-          </button>
-        </div>
+        <button onclick="openCashierModal('Deposit')" class="px-3.5 py-2 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
+          <i class="fa-solid fa-circle-plus"></i> Deposit
+        </button>
+        <button onclick="openCashierModal('Withdrawal')" class="px-3.5 py-2 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
+          <i class="fa-solid fa-arrow-down"></i> Withdraw
+        </button>
 
         <div class="bg-darkBg/80 border border-darkBorder px-3.5 py-2 rounded-2xl flex items-center gap-2.5 text-xs sm:text-sm shadow-inner">
           <i class="fa-solid fa-gem text-sky-400"></i>
           <span id="userBalance" class="text-sky-400 font-bold">---</span>
         </div>
 
-        <div class="flex items-center gap-2 pl-3 border-l border-darkBorder">
-          <span id="currentUserDisplay" class="text-xs text-slate-300 font-semibold max-w-[90px] sm:max-w-none truncate hidden md:inline">@guest</span>
-          <button onclick="toggleMenuDrawer()" title="Open Main Menu" class="p-2.5 rounded-2xl bg-darkCard hover:bg-darkBorder border border-darkBorder text-amber-300 transition text-sm flex items-center justify-center">
-            <i class="fa-solid fa-bars text-base"></i>
-          </button>
-        </div>
+        <button onclick="handleLogout()" class="p-2.5 rounded-2xl bg-darkCard hover:bg-darkBorder border border-darkBorder text-rose-400 transition text-sm flex items-center justify-center" title="Log Out">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- ==================== MAIN CONTENT ==================== -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 flex-1">
+  <!-- ==================== MAIN ARENA ==================== -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
     
-    <!-- LEFT & CENTER: GAMES (2 Columns) -->
+    <!-- Games Container -->
     <div class="lg:col-span-2 flex flex-col gap-6">
       
-      <!-- EXCLUSIVE LEAKS & LIVE VIP BANNER -->
+      <!-- VIP Leaks & Live Stream Banner -->
       <div id="vipRewardBanner" class="p-4 sm:p-5 rounded-3xl border border-darkBorder bg-darkCard/90 flex flex-col sm:flex-row items-center justify-between gap-5 shadow-xl backdrop-blur-xl relative overflow-hidden">
         <div class="flex items-center gap-4">
-          <div class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/50 shadow-md shrink-0">
-            <img src="https://img.magnific.com/free-photo/medium-shot-woman-posing-outdoors_23-2149870212.jpg?semt=ais_hybrid&w=740&q=80" alt="VIP Model Host" class="w-full h-full object-cover">
+          <div class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/50 shrink-0">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="VIP Stream Host" class="w-full h-full object-cover">
             <span class="absolute top-1 right-1 h-2.5 w-2.5 bg-rose-500 rounded-full animate-ping"></span>
           </div>
           <div>
@@ -460,283 +192,55 @@
               <span class="text-rose-400 font-bold text-xs flex items-center gap-1 font-mono"><i class="fa-solid fa-circle text-[8px] animate-pulse"></i> LIVE</span>
             </div>
             <div class="font-display font-black text-slate-100 text-sm mt-1">Exclusive Leaks &amp; Live Private Streams</div>
-            <div id="vipRewardStatus" class="text-slate-400 text-xs mt-0.5 font-sans">Reach <b class="text-amber-400">30x profit</b> in Mines to unlock private VIP channel link.</div>
+            <div id="vipRewardStatus" class="text-slate-400 text-xs mt-0.5 font-sans">Reach <b class="text-amber-400">30x profit</b> in Mines to unlock private link.</div>
           </div>
         </div>
-        <a id="vipRewardLink" href="#" target="_blank" class="pointer-events-none opacity-40 px-5 py-3 rounded-2xl border border-purple-500/50 bg-purple-600/20 text-purple-200 font-bold transition flex items-center gap-2 text-xs whitespace-nowrap font-sans shrink-0">
+        <a id="vipRewardLink" href="#" target="_blank" class="pointer-events-none opacity-40 px-5 py-3 rounded-2xl border border-purple-500/50 bg-purple-600/20 text-purple-200 font-bold transition flex items-center gap-2 text-xs font-sans shrink-0">
           <span>Locked</span> <i class="fa-solid fa-lock text-xs"></i>
         </a>
       </div>
 
-      <!-- GAME SELECTOR TABS -->
-      <div class="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-thin font-display font-bold text-xs">
-        <button onclick="selectGame('mines')" id="tab-mines" class="game-selector px-4 py-2.5 rounded-2xl bg-darkCard border border-amber-400 text-amber-300 whitespace-nowrap">
-          <i class="fa-solid fa-bomb mr-1.5"></i> Mines (5x5-8x8)
-        </button>
-        <button onclick="selectGame('coinflip')" id="tab-coinflip" class="game-selector px-4 py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-300 whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-coins mr-1.5"></i> PVP Coin Flip
-        </button>
-        <button onclick="selectGame('dice')" id="tab-dice" class="game-selector px-4 py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-300 whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-dice mr-1.5"></i> PVP Dice
-        </button>
-        <button onclick="selectGame('roulette')" id="tab-roulette" class="game-selector px-4 py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-300 whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-circle-notch mr-1.5"></i> VIP Roulette
-        </button>
-        <button onclick="selectGame('blackjack')" id="tab-blackjack" class="game-selector px-4 py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-300 whitespace-nowrap hover:text-amber-400">
-          <i class="fa-solid fa-suit-spade mr-1.5"></i> Blackjack 21
-        </button>
-      </div>
-
-      <!-- GAME VIEWS -->
-      <div class="bg-darkCard/90 border border-darkBorder rounded-3xl p-5 sm:p-7 shadow-2xl relative min-h-[480px] backdrop-blur-xl">
-        
-        <!-- 1. MINES -->
-        <div id="game-mines-view" class="flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
-          <div class="w-full md:w-64 flex flex-col gap-4 font-mono text-xs">
-            <div>
-              <label class="block text-slate-400 mb-1.5">Grid Dimension</label>
-              <div class="grid grid-cols-4 gap-1.5">
-                <button onclick="setGridSize(5)" class="grid-size-btn py-2 rounded-xl bg-darkSurface border border-amber-400 text-amber-300 font-bold" data-size="5">5x5</button>
-                <button onclick="setGridSize(6)" class="grid-size-btn py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="6">6x6</button>
-                <button onclick="setGridSize(7)" class="grid-size-btn py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="7">7x7</button>
-                <button onclick="setGridSize(8)" class="grid-size-btn py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold" data-size="8">8x8</button>
-              </div>
+      <!-- Mines Game Component -->
+      <div class="bg-darkCard/90 border border-darkBorder rounded-3xl p-5 sm:p-7 shadow-2xl relative backdrop-blur-xl flex flex-col md:flex-row gap-6 items-start">
+        <div class="w-full md:w-64 flex flex-col gap-4 font-mono text-xs">
+          <div>
+            <div class="flex justify-between mb-1.5">
+              <span class="text-slate-400">Mines Amount</span>
+              <span id="minesValDisplay" class="text-amber-400 font-bold">3</span>
             </div>
-
-            <div>
-              <div class="flex justify-between mb-1.5">
-                <span class="text-slate-400">Mines Amount</span>
-                <span id="minesValDisplay" class="text-amber-400 font-bold">3</span>
-              </div>
-              <input type="range" id="minesCountSlider" min="1" max="24" value="3" class="w-full accent-amber-500 cursor-pointer">
-            </div>
-
-            <div>
-              <label class="block text-slate-400 mb-1.5">Bet (Min 4,000,000 💎)</label>
-              <div class="relative">
-                <input type="number" id="minesBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-3.5 pr-14 py-2.5 text-slate-100 focus:outline-none focus:border-amber-400">
-                <div class="absolute right-1.5 top-1.5 flex gap-1 text-[10px]">
-                  <button onclick="halveBet('minesBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded-lg hover:text-amber-400">½</button>
-                  <button onclick="doubleBet('minesBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded-lg hover:text-amber-400">2x</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-3.5 bg-darkSurface rounded-2xl border border-darkBorder space-y-2">
-              <div class="flex justify-between">
-                <span class="text-slate-400">Next Tile:</span>
-                <span id="minesNextMult" class="text-sky-400 font-bold">1.01x</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Current Mult:</span>
-                <span id="minesCurrentMult" class="text-emerald-400 font-bold">1.00x</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Total Profit:</span>
-                <span id="minesCurrentPayout" class="text-sky-400 font-bold">0 💎</span>
-              </div>
-            </div>
-
-            <button id="minesActionBtn" onclick="toggleMinesRound()" class="w-full py-3.5 rounded-2xl font-display font-black bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
-              START GAME
-            </button>
+            <input type="range" id="minesCountSlider" min="1" max="24" value="3" class="w-full accent-amber-500 cursor-pointer">
           </div>
 
-          <div class="flex-1 w-full flex items-center justify-center bg-darkSurface rounded-3xl p-4 sm:p-6 border border-darkBorder min-h-[360px]">
-            <div id="minesBoard" class="grid gap-2 w-full max-w-[420px] aspect-square transition-all"></div>
+          <div>
+            <label class="block text-slate-400 mb-1.5">Bet (Min 4,000,000 💎)</label>
+            <input type="number" id="minesBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-400">
           </div>
+
+          <div class="p-3.5 bg-darkSurface rounded-2xl border border-darkBorder space-y-2">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Current Mult:</span>
+              <span id="minesCurrentMult" class="text-emerald-400 font-bold">1.00x</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Total Profit:</span>
+              <span id="minesCurrentPayout" class="text-sky-400 font-bold">0 💎</span>
+            </div>
+          </div>
+
+          <button id="minesActionBtn" onclick="toggleMinesRound()" class="w-full py-3.5 rounded-2xl font-display font-black bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 shadow-lg transition">
+            START GAME
+          </button>
         </div>
 
-        <!-- 2. PVP COIN FLIP -->
-        <div id="game-coinflip-view" class="hidden flex flex-col md:flex-row gap-6 sm:gap-8 items-center">
-          <div class="w-full md:w-64 space-y-4 font-mono text-xs">
-            <div>
-              <label class="block text-slate-400 mb-1.5">Pick Side</label>
-              <div class="grid grid-cols-2 gap-2.5 font-display font-black">
-                <button onclick="selectCoinSide('HEADS')" id="coinPickHeads" class="py-2.5 rounded-2xl bg-amber-500/20 border border-amber-400 text-amber-300">HEADS</button>
-                <button onclick="selectCoinSide('TAILS')" id="coinPickTails" class="py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400">TAILS</button>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
-              <div class="relative">
-                <input type="number" id="coinBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-3.5 pr-14 py-2.5 text-slate-100">
-                <div class="absolute right-1.5 top-1.5 flex gap-1 text-[10px]">
-                  <button onclick="halveBet('coinBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded-lg hover:text-amber-400">½</button>
-                  <button onclick="doubleBet('coinBetInput')" class="px-2 py-1 bg-darkCard border border-darkBorder rounded-lg hover:text-amber-400">2x</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-3.5 bg-darkSurface rounded-2xl border border-darkBorder space-y-1.5">
-              <div class="flex justify-between">
-                <span class="text-slate-400">Multiplier:</span>
-                <span id="coinMultiplier" class="text-emerald-400 font-bold">1.96x</span>
-              </div>
-            </div>
-
-            <button id="coinFlipBtn" onclick="playCoinFlip()" class="w-full py-3.5 rounded-2xl font-display font-black bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 transition">
-              FLIP COIN (1.96x)
-            </button>
-          </div>
-
-          <div class="flex-1 flex flex-col items-center justify-center p-8 bg-darkSurface rounded-3xl border border-darkBorder w-full min-h-[340px]">
-            <div class="coin-perspective mb-7">
-              <div id="coin3D" class="coin-3d">
-                <div class="coin-face coin-front font-display font-black text-slate-950">
-                  <i class="fa-solid fa-crown text-2xl mb-1 text-amber-950"></i>
-                  <span class="text-[10px] tracking-wider">HEADS</span>
-                </div>
-                <div class="coin-face coin-back font-display font-black text-slate-950">
-                  <i class="fa-solid fa-gem text-2xl mb-1 text-sky-950"></i>
-                  <span class="text-[10px] tracking-wider">TAILS</span>
-                </div>
-              </div>
-            </div>
-            <div id="coinResultNotice" class="font-mono text-xs uppercase text-slate-400 font-bold">Select side &amp; flip</div>
-          </div>
-        </div>
-
-        <!-- 3. PVP DICE -->
-        <div id="game-dice-view" class="hidden flex flex-col md:flex-row gap-6 sm:gap-8 items-center">
-          <div class="w-full md:w-64 space-y-4 font-mono text-xs">
-            <div>
-              <label class="block text-slate-400 mb-1.5">Target Mode</label>
-              <div class="grid grid-cols-2 gap-2.5 font-display font-black">
-                <button onclick="setDiceMode('under')" id="diceModeUnder" class="py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300">ROLL UNDER</button>
-                <button onclick="setDiceMode('over')" id="diceModeOver" class="py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400">ROLL OVER</button>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex justify-between mb-1.5">
-                <span class="text-slate-400">Target Value</span>
-                <span id="diceTargetVal" class="text-sky-400 font-bold">50</span>
-              </div>
-              <input type="range" id="diceSlider" min="5" max="95" value="50" class="w-full accent-sky-500 cursor-pointer" oninput="updateDiceOdds()">
-            </div>
-
-            <div>
-              <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
-              <input type="number" id="diceBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-100">
-            </div>
-
-            <div class="p-3.5 bg-darkSurface rounded-2xl border border-darkBorder space-y-1.5">
-              <div class="flex justify-between">
-                <span class="text-slate-400">Multiplier:</span>
-                <span id="diceMultiplier" class="text-emerald-400 font-bold">1.94x</span>
-              </div>
-            </div>
-
-            <button onclick="playDice()" class="w-full py-3.5 rounded-2xl font-display font-black bg-sky-400 hover:bg-sky-300 text-slate-950 shadow-lg shadow-sky-500/20 transition">
-              ROLL DICE
-            </button>
-          </div>
-
-          <div class="flex-1 flex flex-col items-center justify-center p-8 bg-darkSurface rounded-3xl border border-darkBorder w-full min-h-[340px]">
-            <div id="diceRollDisplay" class="font-display text-7xl font-black text-amber-400 mb-4 tracking-widest drop-shadow-md">--</div>
-            <div id="diceStatusNotice" class="font-mono text-xs uppercase text-slate-400 font-bold">Set range and roll</div>
-          </div>
-        </div>
-
-        <!-- 4. VIP ROULETTE -->
-        <div id="game-roulette-view" class="hidden flex flex-col gap-5">
-          <div class="flex flex-col md:flex-row gap-6 sm:gap-8 items-center">
-            <div class="w-full md:w-64 space-y-4 font-mono text-xs">
-              <div>
-                <label class="block text-slate-400 mb-1.5">Bet Choice</label>
-                <div class="grid grid-cols-3 gap-2 font-display font-black">
-                  <button onclick="setRouletteBetChoice('red')" id="roulBtnRed" class="py-2.5 rounded-2xl bg-rose-600/30 border border-rose-500 text-rose-300">RED (2x)</button>
-                  <button onclick="setRouletteBetChoice('black')" id="roulBtnBlack" class="py-2.5 rounded-2xl bg-slate-800 border border-darkBorder text-slate-300">BLK (2x)</button>
-                  <button onclick="setRouletteBetChoice('green')" id="roulBtnGreen" class="py-2.5 rounded-2xl bg-emerald-600/20 border border-darkBorder text-emerald-300">0 (14x)</button>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
-                <input type="number" id="rouletteBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-100">
-              </div>
-
-              <button onclick="spinRoulette()" class="w-full py-3.5 rounded-2xl font-display font-black bg-amber-500 hover:bg-amber-400 text-slate-950 transition">
-                SPIN WHEEL
-              </button>
-            </div>
-
-            <div class="flex-1 flex flex-col items-center justify-center p-8 bg-darkSurface rounded-3xl border border-darkBorder w-full min-h-[300px]">
-              <div id="rouletteResultNumber" class="font-display text-6xl font-black text-slate-200 mb-3">--</div>
-              <div id="rouletteStatus" class="font-mono text-xs uppercase text-slate-400 font-bold">Place bet and spin</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. BLACKJACK 21 -->
-        <div id="game-blackjack-view" class="hidden flex flex-col gap-5 font-mono text-xs">
-          <div class="flex flex-col md:flex-row gap-6 sm:gap-8 justify-between items-start">
-            <div class="w-full md:w-60 space-y-4">
-              <div>
-                <label class="block text-slate-400 mb-1.5">Bet (Min 4M 💎)</label>
-                <input type="number" id="bjBetInput" value="4000000" min="4000000" step="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-100">
-              </div>
-
-              <div id="bjStartControls">
-                <button onclick="startBlackjack()" class="w-full py-3 rounded-2xl font-display font-black bg-amber-500 hover:bg-amber-400 text-slate-950 transition">
-                  DEAL HAND
-                </button>
-              </div>
-
-              <div id="bjActionControls" class="hidden grid grid-cols-2 gap-2.5 font-display font-black">
-                <button onclick="hitBlackjack()" class="py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition">HIT</button>
-                <button onclick="standBlackjack()" class="py-3 rounded-2xl bg-rose-500 hover:bg-rose-400 text-slate-950 transition">STAND</button>
-              </div>
-            </div>
-
-            <div class="flex-1 w-full bg-darkSurface p-5 sm:p-6 rounded-3xl border border-darkBorder flex flex-col gap-5 min-h-[300px] justify-between">
-              <div>
-                <div class="flex justify-between items-center mb-1.5 text-xs text-slate-400">
-                  <span>DEALER (<span id="dealerScore">0</span>)</span>
-                </div>
-                <div id="dealerCards" class="flex gap-2.5 flex-wrap min-h-[55px] items-center"></div>
-              </div>
-
-              <div id="bjOutcomeNotice" class="text-center font-bold text-xs uppercase text-amber-400 py-1.5 font-sans">
-                Place bet and hit Deal Hand
-              </div>
-
-              <div>
-                <div class="flex justify-between items-center mb-1.5 text-xs text-slate-400">
-                  <span>YOUR HAND (<span id="playerScore">0</span>)</span>
-                </div>
-                <div id="playerCards" class="flex gap-2.5 flex-wrap min-h-[55px] items-center"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- LIVE REAL PLAYER FEED -->
-      <div class="bg-darkCard/90 border border-darkBorder rounded-3xl p-5 shadow-xl backdrop-blur-xl">
-        <div class="flex items-center justify-between pb-3 mb-3 border-b border-darkBorder">
-          <div class="flex items-center gap-2.5">
-            <span class="relative flex h-2.5 w-2.5">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
-            <h3 class="font-display font-bold text-xs uppercase tracking-wider text-slate-300">Live Player Wins &amp; Losses</h3>
-          </div>
-          <span class="text-[10px] font-mono text-emerald-400 font-bold">REAL-TIME</span>
-        </div>
-        <div id="liveFeedContainer" class="space-y-2 max-h-40 overflow-y-auto font-mono text-xs scrollbar-thin">
-          <div id="liveFeedEmpty" class="text-slate-500 text-xs py-4 text-center">No real rounds played yet in this session.</div>
+        <div class="flex-1 w-full flex items-center justify-center bg-darkSurface rounded-3xl p-4 sm:p-6 border border-darkBorder min-h-[340px]">
+          <div id="minesBoard" class="grid gap-2 w-full max-w-[380px] aspect-square transition-all"></div>
         </div>
       </div>
-
     </div>
 
-    <!-- RIGHT: GENERAL CHAT WITH USER AVATARS -->
+    <!-- Live Lounge Chat with User Profile Icons -->
     <div class="lg:col-span-1 flex flex-col gap-6">
-      <div class="bg-darkCard/90 border border-darkBorder rounded-3xl p-5 shadow-xl flex flex-col h-[650px] backdrop-blur-xl">
+      <div class="bg-darkCard/90 border border-darkBorder rounded-3xl p-5 shadow-xl flex flex-col h-[580px] backdrop-blur-xl">
         <div class="flex items-center justify-between pb-3.5 border-b border-darkBorder">
           <div class="flex items-center gap-2.5">
             <i class="fa-solid fa-comments text-sky-400"></i>
@@ -747,121 +251,57 @@
           </span>
         </div>
 
-        <div id="generalChatBox" class="flex-1 overflow-y-auto space-y-3 py-4 font-mono text-xs scrollbar-thin">
-          <div class="p-3 rounded-2xl bg-darkSurface/60 border border-darkBorder/60 text-slate-400 text-xs font-sans flex items-start gap-2.5">
-            <div class="h-7 w-7 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0 text-xs">
-              <i class="fa-solid fa-robot"></i>
-            </div>
-            <div>
-              <span class="text-amber-400 font-bold font-mono">VIP Bot:</span> Welcome to Gemluck VIP Lounge. Chat messages, tickets, and user balances are cloud secured.
-            </div>
-          </div>
-        </div>
+        <div id="generalChatBox" class="flex-1 overflow-y-auto space-y-3 py-4 font-mono text-xs scrollbar-thin"></div>
 
-        <form id="chatForm" onsubmit="handleSendChat(event)" class="mt-2 space-y-2">
-          <div class="flex gap-2 font-mono">
-            <input type="text" id="chatInput" placeholder="Message chat..." maxlength="120" class="flex-1 bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
-            <button type="submit" class="px-4 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
-              <i class="fa-solid fa-paper-plane"></i>
-            </button>
-          </div>
-          <p id="chatWarning" class="text-[10px] text-rose-400 font-mono hidden"></p>
+        <form onsubmit="handleSendChat(event)" class="mt-2 flex gap-2 font-mono">
+          <input type="text" id="chatInput" placeholder="Message chat..." maxlength="120" class="flex-1 bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+          <button type="submit" class="px-4 py-2.5 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
         </form>
       </div>
     </div>
   </main>
 
-  <!-- ==================== LEADERBOARD MODAL ==================== -->
-  <div id="leaderboardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
-    <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl font-mono">
-      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
-        <h3 class="text-sm font-display font-black text-amber-300 uppercase flex items-center gap-2.5">
-          <i class="fa-solid fa-trophy text-amber-400"></i> High Roller Leaderboards
+  <!-- ==================== CASHIER MODAL ==================== -->
+  <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
+        <h3 class="font-display text-base font-black text-sky-300 flex items-center gap-2.5">
+          <i class="fa-solid fa-headset text-sky-400"></i> Gemluck Cashier
         </h3>
-        <button onclick="toggleModal('leaderboardModal')" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2.5 my-4 text-xs font-display font-bold">
-        <button onclick="switchLeaderboard('wagered')" id="lbTabWagered" class="py-2.5 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300">Most Wagered</button>
-        <button onclick="switchLeaderboard('balance')" id="lbTabBalance" class="py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400">Highest Balance</button>
-      </div>
-
-      <div id="leaderboardList" class="space-y-2.5 text-xs max-h-72 overflow-y-auto scrollbar-thin">
-        <div class="text-center py-6 text-slate-500">Loading live rankings...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== ACCOUNT VAULT MODAL ==================== -->
-  <div id="accountModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6 font-mono">
-    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl">
-      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
-        <h3 class="text-sm font-display font-black text-sky-300 uppercase flex items-center gap-2.5">
-          <i class="fa-solid fa-user-shield text-sky-400"></i> Player Account Profile
-        </h3>
-        <button onclick="toggleModal('accountModal')" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="my-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
-          <div class="text-[10px] text-slate-400 uppercase">Total Wagered</div>
-          <div id="accTotalWagered" class="text-amber-400 font-bold text-sm mt-1">0</div>
-        </div>
-        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
-          <div class="text-[10px] text-slate-400 uppercase">Deposits</div>
-          <div id="accTotalDeposits" class="text-emerald-400 font-bold text-sm mt-1">10,000,000</div>
-        </div>
-        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
-          <div class="text-[10px] text-slate-400 uppercase">Withdrawals</div>
-          <div id="accTotalWithdrawals" class="text-sky-400 font-bold text-sm mt-1">0</div>
-        </div>
-        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
-          <div class="text-[10px] text-slate-400 uppercase">Net Profit/Loss</div>
-          <div id="accNetProfit" class="text-slate-200 font-bold text-sm mt-1">0</div>
-        </div>
-      </div>
-
-      <div class="text-xs">
-        <div class="text-slate-400 mb-1.5 font-bold uppercase text-[11px]">Recent Rounds Played</div>
-        <div id="accRoundLogs" class="space-y-2 max-h-48 overflow-y-auto scrollbar-thin text-xs p-3 bg-darkSurface rounded-2xl border border-darkBorder">
-          <div class="text-slate-500">No rounds completed yet.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== TIP PLAYER MODAL ==================== -->
-  <div id="tipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6 font-mono">
-    <div class="w-full max-w-sm bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl">
-      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
-        <h3 class="text-sm font-display font-black text-amber-300 uppercase flex items-center gap-2.5">
-          <i class="fa-solid fa-hand-holding-dollar"></i> Tip Another Player
-        </h3>
-        <button onclick="toggleModal('tipModal')" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="space-y-4 mt-5 text-xs">
+      <!-- In-Game Mailbox Deposit Notice -->
+      <div class="mt-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-3 font-sans">
+        <i class="fa-solid fa-envelope-open-text text-amber-400 text-xl"></i>
         <div>
-          <label class="block text-slate-400 mb-1.5">Recipient Roblox Username</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-2.5 text-slate-500">@</span>
-            <input type="text" id="tipRecipientInput" placeholder="other_player_name" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-9 pr-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-400">
-          </div>
+          <span class="font-bold font-display uppercase tracking-wider block">In-Game Mailbox Deposit:</span>
+          <span>Send in-game mailbox deposit to Roblox username <b class="text-white font-mono bg-amber-500/30 px-1.5 py-0.5 rounded">@Gemluck99</b> to receive diamond credits. Submit ticket below!</span>
         </div>
+      </div>
 
-        <div>
-          <label class="block text-slate-400 mb-1.5">Tip Amount (💎)</label>
-          <input type="number" id="tipAmountInput" placeholder="1000000" min="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-400">
+      <div class="space-y-3 pt-4 font-sans">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+          <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200">
+            <option value="Deposit">Deposit (Min 4M 💎)</option>
+            <option value="Withdrawal">Withdrawal (Min 4M 💎)</option>
+            <option value="General">Inquiry / Support</option>
+          </select>
+          <input type="number" id="supportTicketDiamonds" placeholder="Amount (Min 4,000,000)" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:border-sky-400">
+          <input type="text" id="supportMessageInput" placeholder="Transaction ID or notes..." class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:border-sky-400">
         </div>
-
-        <button onclick="executeTip()" class="w-full py-3 rounded-2xl font-display font-black bg-amber-500 hover:bg-amber-400 text-slate-950 uppercase transition">
-          Confirm Tip Transfer
+        <button onclick="sendSupportTicket()" class="w-full py-3 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition font-mono uppercase">
+          Submit Cashier Ticket
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ==================== CORE SCRIPT & FIREWALL ENGINE ==================== -->
+  <!-- ==================== CORE SCRIPT ==================== -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDdsIHkwzg5llxiVW2Z6H6bE6d-k07jUe8",
@@ -874,14 +314,14 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.database();
 
-    const PRIMARY_ADMINS = ['dalawar_alt', 'darkrulerx7'];
-    const SUPPORT_STAFF = ['dalawar_alt', 'darkrulerx7', 'rastant86'];
     const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
-    const MIN_THRESHOLD = 4000000; // 4,000,000 💎
+    const MIN_THRESHOLD = 4000000;
+    let authMode = 'login';
 
-    // Unique Browser Fingerprint
+    // Unique per-device token
     let myDeviceToken = localStorage.getItem('aura_cloud_device_token');
     if (!myDeviceToken) {
       myDeviceToken = 'hw_' + Math.random().toString(36).substring(2) + Date.now();
@@ -889,86 +329,54 @@
     }
 
     let user = {
+      uid: null,
       username: 'guest',
-      discord: '',
-      isStaff: false,
-      isPrimaryAdmin: false,
       balance: 10000000,
-      totalWagered: 0,
-      totalDeposits: 10000000,
-      totalWithdrawals: 0,
-      netProfit: 0,
-      vipUnlocked: false,
-      lossStreak: 0,
-      roundsPlayed: []
+      totalWagered: 0
     };
 
-    let attachedImageBase64 = null;
-    let channelPendingImageBase64 = null;
-    let cloudHeartbeatTimer = null;
+    let heartbeatTimer = null;
     let activeSessionListener = null;
-    let liveTicketsList = [];
-    let currentActiveChannelId = null;
-    let activeChannelListener = null;
-    let pendingLoginUser = null;
 
-    /* ====================================================================
-       SINGLE-DEVICE FIREWALL ENGINE WITH OVERRIDE HANDSHAKE
-    ==================================================================== */
-    async function verifyAndLockCloudSession(username, forceOverride = false) {
-      const cleanUser = username.toLowerCase();
-      const sessionRef = db.ref('active_sessions/' + cleanUser);
+    function switchAuthMode(mode) {
+      authMode = mode;
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const submitBtn = document.getElementById('authSubmitBtn');
 
-      try {
-        const snap = await sessionRef.once('value');
-        const data = snap.val();
-        const now = Date.now();
-
-        // 1. REFRESH CHECK: Same browser tab refreshing keeps access smoothly
-        if (!forceOverride && data && data.token === myDeviceToken) {
-          await sessionRef.update({
-            lastSeen: now,
-            expiresAt: now + 16000
-          });
-          setupSessionGuards(sessionRef);
-          return true;
-        }
-
-        // 2. CONCURRENT CHECK: Different browser active lease check
-        if (!forceOverride && data && data.token && data.token !== myDeviceToken) {
-          const expiration = data.expiresAt || (data.lastSeen ? data.lastSeen + 16000 : 0);
-          if (now < expiration) {
-            return false; // Active lock held by other browser
-          }
-        }
-
-        // 3. CLAIM LOCK (Normal or Forced Takeover)
-        await sessionRef.set({
-          token: myDeviceToken,
-          lastSeen: now,
-          expiresAt: now + 16000
-        });
-
-        setupSessionGuards(sessionRef);
-        return true;
-      } catch (err) {
-        console.error("Lock error:", err);
-        return false;
+      if (mode === 'login') {
+        tabLogin.className = 'py-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        tabRegister.className = 'py-2.5 rounded-xl text-slate-400 hover:text-white';
+        submitBtn.textContent = 'Enter VIP Arena';
+      } else {
+        tabRegister.className = 'py-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        tabLogin.className = 'py-2.5 rounded-xl text-slate-400 hover:text-white';
+        submitBtn.textContent = 'Create VIP Account';
       }
     }
 
-    function setupSessionGuards(sessionRef) {
+    // Single-device lease firewall
+    async function enforceSingleDevice(uid) {
+      const sessionRef = db.ref('active_sessions/' + uid);
+      const now = Date.now();
+
+      await sessionRef.set({
+        token: myDeviceToken,
+        lastSeen: now,
+        expiresAt: now + 16000
+      });
+
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
       activeSessionListener = sessionRef.on('value', (snap) => {
         const val = snap.val();
         if (val && val.token && val.token !== myDeviceToken) {
-          triggerRemoteSessionEviction();
+          triggerRemoteKick();
         }
       });
 
-      if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
-      cloudHeartbeatTimer = setInterval(() => {
-        if (user.username !== 'guest') {
+      if (heartbeatTimer) clearInterval(heartbeatTimer);
+      heartbeatTimer = setInterval(() => {
+        if (user.uid) {
           sessionRef.update({
             lastSeen: Date.now(),
             expiresAt: Date.now() + 16000
@@ -977,1568 +385,238 @@
       }, 4000);
     }
 
-    function triggerRemoteSessionEviction() {
-      if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
-      user.username = 'guest';
-      minesActive = false;
-      localStorage.removeItem('aura_logged_in_username');
+    function triggerRemoteKick() {
+      if (heartbeatTimer) clearInterval(heartbeatTimer);
+      user.uid = null;
       document.getElementById('sessionKickOverlay').classList.remove('hidden');
       document.body.style.pointerEvents = 'none';
       document.getElementById('sessionKickOverlay').style.pointerEvents = 'auto';
     }
 
-    async function forceTakeoverLogin() {
-      if (!pendingLoginUser) return;
-      const submitBtn = document.getElementById('loginSubmitBtn');
-      submitBtn.textContent = "Overriding Lease...";
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const robloxUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const errBox = document.getElementById('authErrorAlert');
+      const errText = document.getElementById('authErrorMsg');
+      const submitBtn = document.getElementById('authSubmitBtn');
+
       submitBtn.disabled = true;
+      submitBtn.textContent = 'Verifying...';
+      errBox.classList.add('hidden');
 
-      const rawDiscord = document.getElementById('discordInput').value.trim();
-      const granted = await verifyAndLockCloudSession(pendingLoginUser, true);
-
-      if (granted) {
-        document.getElementById('loginErrorAlert').classList.add('hidden');
-        await activateUserSession(pendingLoginUser, rawDiscord);
-      } else {
-        alert("Failed to override lock. Try again.");
-      }
-      submitBtn.textContent = "Enter VIP Arena";
-      submitBtn.disabled = false;
-    }
-
-    async function handleLogout() {
-      if (confirm("Log out from this device? This will release the account for other browsers.")) {
-        if (user.username !== 'guest') {
-          const sessionRef = db.ref('active_sessions/' + user.username.toLowerCase());
-          if (activeSessionListener) sessionRef.off('value', activeSessionListener);
-          await sessionRef.remove();
+      try {
+        let userCred;
+        if (authMode === 'register') {
+          userCred = await auth.createUserWithEmailAndPassword(email, password);
+          await db.ref('user_profiles/' + userCred.user.uid).set({
+            username: robloxUser,
+            email: email,
+            balance: 10000000,
+            totalWagered: 0,
+            createdAt: Date.now()
+          });
+        } else {
+          userCred = await auth.signInWithEmailAndPassword(email, password);
         }
-        localStorage.removeItem('aura_logged_in_username');
-        if (cloudHeartbeatTimer) clearInterval(cloudHeartbeatTimer);
-        location.reload();
-      }
-    }
 
-    /* ====================================================================
-       PERSISTENT CLOUD PROFILE STORAGE
-    ==================================================================== */
-    async function loadCloudUserProfile(username) {
-      const cleanUser = username.toLowerCase();
-      const userRef = db.ref('user_profiles/' + cleanUser);
-      const snapshot = await userRef.once('value');
-      const data = snapshot.val();
+        user.uid = userCred.user.uid;
+        user.username = robloxUser;
 
-      if (data) {
-        user.balance = (typeof data.balance === 'number') ? data.balance : 10000000;
-        user.totalWagered = data.totalWagered || 0;
-        user.totalDeposits = data.totalDeposits || 10000000;
-        user.totalWithdrawals = data.totalWithdrawals || 0;
-        user.netProfit = data.netProfit || 0;
-        user.vipUnlocked = data.vipUnlocked || false;
-      } else {
-        await userRef.set({
-          username: user.username,
-          balance: 10000000,
-          totalWagered: 0,
-          totalDeposits: 10000000,
-          totalWithdrawals: 0,
-          netProfit: 0,
-          vipUnlocked: false
-        });
-        user.balance = 10000000;
-        user.vipUnlocked = false;
+        await enforceSingleDevice(user.uid);
+        document.getElementById('loginModal').classList.add('hidden');
+        await loadUserData(user.uid);
+      } catch (err) {
+        errBox.classList.remove('hidden');
+        errText.textContent = err.message;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = authMode === 'login' ? 'Enter VIP Arena' : 'Create VIP Account';
       }
+    });
+
+    async function loadUserData(uid) {
+      const snap = await db.ref('user_profiles/' + uid).once('value');
+      const data = snap.val() || {};
+      user.balance = data.balance || 10000000;
+      user.username = data.username || user.username;
 
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      updateAccountUI();
-
-      if (user.vipUnlocked) {
-        renderVIPBannerUnlocked();
-      }
-
-      userRef.on('value', (snap) => {
-        const live = snap.val();
-        if (live) {
-          if (typeof live.balance === 'number') {
-            user.balance = live.balance;
-            document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-            updateAccountUI();
-          }
-          if (live.vipUnlocked && !user.vipUnlocked) {
-            user.vipUnlocked = true;
-            renderVIPBannerUnlocked();
-          }
-        }
-      });
+      document.getElementById('roleBadge').textContent = 'VIP MEMBER';
     }
 
-    async function syncCloudUserProfile() {
-      if (user.username === 'guest') return;
-      await db.ref('user_profiles/' + user.username.toLowerCase()).update({
-        balance: user.balance,
-        totalWagered: user.totalWagered,
-        totalDeposits: user.totalDeposits,
-        totalWithdrawals: user.totalWithdrawals,
-        netProfit: user.netProfit,
-        vipUnlocked: user.vipUnlocked
-      });
-      syncUserToCloudLeaderboard();
-    }
-
-    function renderVIPBannerUnlocked(mult) {
-      const linkBtn = document.getElementById('vipRewardLink');
-      linkBtn.href = VIP_REWARD_DISCORD;
-      linkBtn.className = 'px-5 py-3 rounded-2xl border border-purple-400 bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center gap-2 text-xs whitespace-nowrap shadow-lg shadow-purple-500/30 font-sans';
-      linkBtn.innerHTML = 'Join Exclusive VIP Channel <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
-      document.getElementById('vipRewardStatus').textContent = mult 
-        ? `Unlocked: Reached ${mult.toFixed(2)}x Profit in Mines! Private Leaks Available.` 
-        : `Unlocked: Exclusive Private VIP Access Active!`;
-    }
-
-    function unlockVIPDiscordMines(mult) {
-      user.vipUnlocked = true;
-      renderVIPBannerUnlocked(mult);
-      syncCloudUserProfile();
-    }
-
-    /* ====================================================================
-       INITIALIZATION & LOGIN GATEWAY
-    ==================================================================== */
-    async function activateUserSession(rawUser, rawDiscord = '') {
-      user.username = rawUser;
-      user.discord = rawDiscord || user.discord;
-
-      const cleanLower = rawUser.toLowerCase();
-      user.isStaff = SUPPORT_STAFF.includes(cleanLower);
-      user.isPrimaryAdmin = PRIMARY_ADMINS.includes(cleanLower);
-
-      localStorage.setItem('aura_logged_in_username', cleanLower);
-      await loadCloudUserProfile(rawUser);
-
-      document.getElementById('currentUserDisplay').textContent = `@${user.username}`;
-      const roleBadge = document.getElementById('roleBadge');
-
-      if (user.isStaff) {
-        roleBadge.textContent = user.isPrimaryAdmin ? 'ADMIN STAFF' : 'SUPPORT DESK';
-        roleBadge.className = 'text-[9px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40';
-        
-        document.getElementById('headerStaffBtn').classList.remove('hidden');
-        document.getElementById('drawerStaffBtn').classList.remove('hidden');
-
-        if (user.isPrimaryAdmin) {
-          document.getElementById('staffControlPanel').classList.remove('hidden');
-        } else {
-          document.getElementById('staffControlPanel').classList.add('hidden');
-        }
+    auth.onAuthStateChanged(async (firebaseUser) => {
+      if (firebaseUser) {
+        user.uid = firebaseUser.uid;
+        await enforceSingleDevice(user.uid);
+        document.getElementById('loginModal').classList.add('hidden');
+        await loadUserData(user.uid);
       } else {
-        roleBadge.textContent = 'VIP MEMBER';
-        roleBadge.className = 'text-[9px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40';
-        document.getElementById('headerStaffBtn').classList.add('hidden');
-        document.getElementById('drawerStaffBtn').classList.add('hidden');
-        document.getElementById('staffControlPanel').classList.add('hidden');
-      }
-
-      document.getElementById('loginModal').classList.add('hidden');
-      initMinesBoard();
-      renderVisibleTickets();
-      if (user.isStaff) renderStaffQueue();
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      initLiveCloudChat();
-      initLiveSupportTickets();
-      initLeaderboardSync();
-      initRealPlayerLiveFeed();
-
-      const savedUser = localStorage.getItem('aura_logged_in_username');
-      if (savedUser) {
-        const allowed = await verifyAndLockCloudSession(savedUser);
-        if (allowed) {
-          await activateUserSession(savedUser);
-        } else {
-          localStorage.removeItem('aura_logged_in_username');
-          document.getElementById('loginModal').classList.remove('hidden');
-        }
+        document.getElementById('loginModal').classList.remove('hidden');
       }
     });
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const rawUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
-      const rawDiscord = document.getElementById('discordInput').value.trim();
-      const errBox = document.getElementById('loginErrorAlert');
-      const submitBtn = document.getElementById('loginSubmitBtn');
-
-      if (!rawUser) return;
-      pendingLoginUser = rawUser;
-
-      submitBtn.textContent = "Verifying Single Device...";
-      submitBtn.disabled = true;
-
-      const isAllowed = await verifyAndLockCloudSession(rawUser);
-
-      if (!isAllowed) {
-        submitBtn.textContent = "Enter VIP Arena";
-        submitBtn.disabled = false;
-        errBox.classList.remove('hidden');
-        document.getElementById('loginErrorMsg').textContent = 
-          `@${rawUser} is currently logged in on another device/browser!`;
-        return;
+    async function handleLogout() {
+      if (user.uid) {
+        await db.ref('active_sessions/' + user.uid).remove();
       }
-
-      errBox.classList.add('hidden');
-      await activateUserSession(rawUser, rawDiscord);
-    });
-
-    /* ====================================================================
-       ALL-IN-ONE SLIDING MENU DRAWER & CASHIER MODALS
-    ==================================================================== */
-    function toggleMenuDrawer() {
-      const drawer = document.getElementById('menuDrawer');
-      const backdrop = document.getElementById('menuDrawerBackdrop');
-      const isOpen = !drawer.classList.contains('translate-x-full');
-
-      if (isOpen) {
-        drawer.classList.add('translate-x-full');
-        backdrop.classList.add('hidden');
-      } else {
-        drawer.classList.remove('translate-x-full');
-        backdrop.classList.remove('hidden');
-        document.getElementById('drawerUserDisplay').textContent = `@${user.username}`;
-      }
+      if (heartbeatTimer) clearInterval(heartbeatTimer);
+      await auth.signOut();
+      location.reload();
     }
 
-    function menuNavigate(target) {
-      toggleMenuDrawer();
-      if (target === 'games') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (target === 'account') {
-        toggleModal('accountModal');
-      } else if (target === 'leaderboard') {
-        toggleModal('leaderboardModal');
-      } else if (target === 'tip') {
-        toggleModal('tipModal');
-      } else if (target === 'support') {
-        toggleModal('supportModal');
-      }
+    function toggleModal(id) {
+      document.getElementById(id).classList.toggle('hidden');
     }
 
     function openCashierModal(mode) {
-      const modal = document.getElementById('supportModal');
-      modal.classList.remove('hidden');
       document.getElementById('supportTicketType').value = mode;
-      renderVisibleTickets();
-    }
-
-    function toggleChannelsListModal() {
-      const modal = document.getElementById('channelsListModal');
-      modal.classList.toggle('hidden');
-      if (!modal.classList.contains('hidden')) {
-        renderChannelsList();
-      }
-    }
-
-    /* ====================================================================
-       SUPPORT CHANNELS (CHAT ACTIVE IMMEDIATELY UPON CREATION)
-    ==================================================================== */
-    function renderChannelsList() {
-      const container = document.getElementById('channelsListContent');
-      container.innerHTML = '';
-
-      const relevant = liveTicketsList.filter(t => {
-        return user.isStaff || (t.username && t.username.toLowerCase() === user.username.toLowerCase());
-      });
-
-      if (relevant.length === 0) {
-        container.innerHTML = `
-          <div class="text-slate-500 text-center py-8 text-xs font-sans">
-            No active channels yet.<br>Submit a ticket in Cashier Desk to start a dialogue.
-          </div>
-        `;
-        return;
-      }
-
-      relevant.forEach(ticket => {
-        const item = document.createElement('div');
-        item.className = 'p-3.5 rounded-2xl bg-darkSurface border border-darkBorder flex items-center justify-between hover:border-sky-500/50 transition cursor-pointer';
-        item.onclick = () => {
-          toggleChannelsListModal();
-          openTicketChannel(ticket.id);
-        };
-
-        const isClosed = ticket.status === 'Closed';
-        const isApproved = ticket.status === 'Approved';
-
-        item.innerHTML = `
-          <div>
-            <div class="flex items-center gap-2.5">
-              <span class="font-display font-bold text-slate-100 text-xs">Ticket #${ticket.id.slice(-5)}</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isApproved ? 'bg-emerald-500/20 text-emerald-300' : (isClosed ? 'bg-slate-700 text-slate-400' : 'bg-amber-500/20 text-amber-300')}">
-                ${ticket.status || 'Chat Active'}
-              </span>
-            </div>
-            <div class="text-[10px] text-slate-400 mt-1 font-sans">
-              @${ticket.username} • ${ticket.type} (${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'})
-            </div>
-          </div>
-          <button class="px-3 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 text-[10px] font-bold border border-sky-500/30">
-            Chat <i class="fa-solid fa-arrow-right ml-1"></i>
-          </button>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    function openTicketChannel(ticketId) {
-      currentActiveChannelId = ticketId;
-      const ticket = liveTicketsList.find(t => t.id === ticketId);
-      if (!ticket) return;
-
-      document.getElementById('channelTitle').textContent = `Ticket #${ticketId.slice(-5)} [${ticket.type}]`;
-      document.getElementById('channelSubtitle').textContent = `@${ticket.username} • ${ticket.status || 'Active'}`;
-
-      const closeBtn = document.getElementById('channelCloseBtn');
-      if (user.isStaff && ticket.status !== 'Closed') {
-        closeBtn.classList.remove('hidden');
-      } else {
-        closeBtn.classList.add('hidden');
-      }
-
-      const chatInput = document.getElementById('channelChatInput');
-      const sendBtn = document.getElementById('channelSendBtn');
-      const closedAlert = document.getElementById('channelClosedAlert');
-
-      if (ticket.status === 'Closed') {
-        chatInput.disabled = true;
-        sendBtn.disabled = true;
-        closedAlert.classList.remove('hidden');
-      } else {
-        chatInput.disabled = false;
-        sendBtn.disabled = false;
-        closedAlert.classList.add('hidden');
-      }
-
-      document.getElementById('ticketChannelModal').classList.remove('hidden');
-
-      const logs = document.getElementById('channelChatLogs');
-      logs.innerHTML = '';
-
-      const msgsRef = db.ref(`ticket_channels/${ticketId}/messages`);
-      if (activeChannelListener) msgsRef.off('child_added', activeChannelListener);
-
-      activeChannelListener = msgsRef.on('child_added', (snap) => {
-        const msg = snap.val();
-        if (msg) renderChannelMessage(msg);
-      });
-    }
-
-    function renderChannelMessage(msg) {
-      const logs = document.getElementById('channelChatLogs');
-      const isMe = msg.sender.toLowerCase() === user.username.toLowerCase();
-
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
-      
-      let imageHtml = '';
-      if (msg.image) {
-        imageHtml = `<div class="mt-1.5"><img src="${msg.image}" class="rounded-xl max-h-40 border border-darkBorder object-contain"></div>`;
-      }
-
-      msgDiv.innerHTML = `
-        <div class="text-[9px] text-slate-400 mb-0.5">
-          <span class="${msg.isStaff ? 'text-amber-400 font-bold' : 'text-sky-400'}">@${msg.sender}</span> • ${msg.time || ''}
-        </div>
-        <div class="p-3 rounded-2xl text-xs max-w-[85%] ${isMe ? 'bg-sky-600/30 border border-sky-500/40 text-sky-100' : 'bg-darkSurface border border-darkBorder text-slate-200'}">
-          ${msg.text ? `<div>${msg.text}</div>` : ''}
-          ${imageHtml}
-        </div>
-      `;
-      logs.appendChild(msgDiv);
-      logs.scrollTop = logs.scrollHeight;
-    }
-
-    function handleChannelImageUpload(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          channelPendingImageBase64 = evt.target.result;
-          document.getElementById('channelImagePreviewNote').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function handleSendChannelMessage(e) {
-      e.preventDefault();
-      if (!currentActiveChannelId) return;
-
-      const input = document.getElementById('channelChatInput');
-      const text = input.value.trim();
-
-      if (!text && !channelPendingImageBase64) return;
-
-      await db.ref(`ticket_channels/${currentActiveChannelId}/messages`).push({
-        sender: user.username,
-        text: text || '',
-        image: channelPendingImageBase64 || null,
-        isStaff: user.isStaff,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-
-      input.value = '';
-      channelPendingImageBase64 = null;
-      document.getElementById('channelMsgFile').value = '';
-      document.getElementById('channelImagePreviewNote').classList.add('hidden');
-    }
-
-    function closeTicketChannelModal() {
-      if (currentActiveChannelId && activeChannelListener) {
-        db.ref(`ticket_channels/${currentActiveChannelId}/messages`).off('child_added', activeChannelListener);
-      }
-      currentActiveChannelId = null;
-      document.getElementById('ticketChannelModal').classList.add('hidden');
-    }
-
-    async function staffCloseTicketChannel() {
-      if (!user.isStaff || !currentActiveChannelId) return;
-      if (!confirm("Are you sure you want to close this ticket channel?")) return;
-
-      await db.ref('support_tickets/' + currentActiveChannelId).update({
-        status: 'Closed',
-        closedBy: user.username,
-        closedAt: Date.now()
-      });
-
-      await db.ref(`ticket_channels/${currentActiveChannelId}/messages`).push({
-        sender: 'GemluckSupport',
-        text: `Ticket channel concluded and closed by staff @${user.username}.`,
-        isStaff: true,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-
-      openTicketChannel(currentActiveChannelId);
-    }
-
-    /* ====================================================================
-       ATOMIC WITHDRAWAL DEDUCTION & TICKET ENGINE
-    ==================================================================== */
-    function initLiveSupportTickets() {
-      db.ref('support_tickets').on('value', (snapshot) => {
-        const val = snapshot.val();
-        liveTicketsList = [];
-        if (val) {
-          Object.keys(val).forEach(key => {
-            liveTicketsList.push({ id: key, ...val[key] });
-          });
-        }
-        renderVisibleTickets();
-        if (user.isStaff) renderStaffQueue();
-      });
-    }
-
-    function renderVisibleTickets() {
-      const logs = document.getElementById('supportChatLogs');
-      if (!logs) return;
-      logs.innerHTML = '';
-
-      const myTickets = liveTicketsList.filter(t => t.username && t.username.toLowerCase() === user.username.toLowerCase());
-
-      if (myTickets.length === 0) {
-        logs.innerHTML = '<div class="text-slate-500 text-center py-6 font-sans">No active tickets for your account. Create one below.</div>';
-        return;
-      }
-
-      myTickets.forEach(ticket => {
-        const ticketDiv = document.createElement('div');
-        ticketDiv.className = 'p-3.5 rounded-2xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5 font-sans';
-
-        const isClosed = ticket.status === 'Closed';
-        const isApproved = ticket.status === 'Approved';
-        const isPending = !isClosed && !isApproved;
-
-        let badgeClass = 'bg-amber-500/20 text-amber-300';
-        if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
-        if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
-
-        let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40 font-mono">`;
-
-        // Direct button to open chat immediately
-        actionButtons += `
-          <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-[10px] transition flex items-center gap-1.5">
-            <i class="fa-solid fa-comments"></i> Open Chat (${ticket.status || 'Active'})
-          </button>
-        `;
-
-        if (ticket.type === 'Withdrawal' && isPending) {
-          actionButtons += `
-            <button onclick="cancelWithdrawalTicket('${ticket.id}', ${ticket.diamonds})" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition flex items-center gap-1.5">
-              <i class="fa-solid fa-ban"></i> Cancel &amp; Refund
-            </button>
-          `;
-        }
-
-        actionButtons += `</div>`;
-
-        let html = `
-          <div class="flex justify-between items-center font-mono">
-            <span class="text-sky-400 font-bold">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Chat Active'}</span>
-          </div>
-          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
-        `;
-
-        if (ticket.image) {
-          html += `<div class="mt-1.5"><img src="${ticket.image}" class="rounded-xl max-h-36 border border-darkBorder object-contain"></div>`;
-        }
-
-        html += actionButtons;
-        ticketDiv.innerHTML = html;
-        logs.appendChild(ticketDiv);
-      });
-
-      logs.scrollTop = logs.scrollHeight;
-    }
-
-    function renderStaffQueue() {
-      const queue = document.getElementById('staffQueueLogs');
-      if (!queue) return;
-      queue.innerHTML = '';
-
-      if (liveTicketsList.length === 0) {
-        queue.innerHTML = '<div class="text-slate-500 text-center py-8 font-sans">Queue is clear. No tickets recorded.</div>';
-        return;
-      }
-
-      liveTicketsList.forEach(ticket => {
-        const ticketDiv = document.createElement('div');
-        ticketDiv.className = 'p-4 rounded-2xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5 font-sans';
-
-        const isClosed = ticket.status === 'Closed';
-        const isApproved = ticket.status === 'Approved';
-
-        let badgeClass = 'bg-amber-500/20 text-amber-300';
-        if (isApproved) badgeClass = 'bg-emerald-500/20 text-emerald-400';
-        if (isClosed) badgeClass = 'bg-slate-700/50 text-slate-400';
-
-        let actionButtons = `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40 font-mono">`;
-
-        // Staff can open channel chat at any time
-        actionButtons += `
-          <button onclick="openTicketChannel('${ticket.id}')" class="px-3.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-[10px] transition flex items-center gap-1.5">
-            <i class="fa-solid fa-comments"></i> Open Chat
-          </button>
-        `;
-
-        if (!isApproved && !isClosed) {
-          actionButtons += `
-            <button onclick="staffApproveDeposit('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
-              Approve (${ticket.type})
-            </button>
-          `;
-        }
-
-        if (!isClosed) {
-          actionButtons += `
-            <button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
-              Close Ticket
-            </button>
-          `;
-        }
-
-        actionButtons += `</div>`;
-
-        let html = `
-          <div class="flex justify-between items-center font-mono">
-            <span class="text-amber-400 font-bold text-xs">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Chat Active'}</span>
-          </div>
-          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
-        `;
-
-        if (ticket.image) {
-          html += `<div class="mt-2"><img src="${ticket.image}" class="rounded-xl max-h-48 border border-darkBorder object-contain"></div>`;
-        }
-
-        html += actionButtons;
-        ticketDiv.innerHTML = html;
-        queue.appendChild(ticketDiv);
-      });
-
-      queue.scrollTop = queue.scrollHeight;
+      document.getElementById('supportModal').classList.remove('hidden');
     }
 
     async function sendSupportTicket() {
-      if (user.username === 'guest') return alert("Please log in first!");
-
+      if (!user.uid) return alert("Log in first!");
       const type = document.getElementById('supportTicketType').value;
       const diamonds = parseInt(document.getElementById('supportTicketDiamonds').value) || 0;
-      const text = document.getElementById('supportMessageInput').value.trim();
+      const notes = document.getElementById('supportMessageInput').value.trim();
 
-      if (type === 'Deposit' && diamonds < MIN_THRESHOLD) {
-        alert(`Minimum deposit threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-        return;
-      }
-
-      if (type === 'Withdrawal') {
-        if (diamonds < MIN_THRESHOLD) {
-          alert(`Minimum withdrawal threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-          return;
-        }
-        if (diamonds > user.balance) {
-          alert("Insufficient diamond balance to withdraw!");
-          return;
-        }
-        if (user.totalWagered < diamonds) {
-          const needed = diamonds - user.totalWagered;
-          alert(`Withdrawal Locked! You have wagered ${user.totalWagered.toLocaleString()} 💎. You must wager ${needed.toLocaleString()} 💎 more before withdrawing.`);
-          return;
-        }
-
-        const userRef = db.ref('user_profiles/' + user.username.toLowerCase());
-        const txResult = await userRef.transaction((profile) => {
-          if (!profile) return profile;
-          if ((profile.balance || 0) < diamonds) {
-            return;
-          }
-          profile.balance = (profile.balance || 0) - diamonds;
-          profile.totalWithdrawals = (profile.totalWithdrawals || 0) + diamonds;
-          return profile;
-        });
-
-        if (!txResult.committed) {
-          return alert("Withdrawal failed: Could not deduct balance from cloud wallet.");
-        }
-
-        user.balance -= diamonds;
-        user.totalWithdrawals += diamonds;
-        document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-        updateAccountUI();
-        syncUserToCloudLeaderboard();
-      }
-
-      if (!text && !attachedImageBase64 && diamonds <= 0) return;
-
-      const newTicketRef = await db.ref('support_tickets').push({
+      await db.ref('support_tickets').push({
+        uid: user.uid,
         username: user.username,
         type: type,
         diamonds: diamonds,
-        message: text,
-        image: attachedImageBase64 || null,
+        message: notes,
         status: 'Chat Active',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       });
 
-      // Initialize channel chat room immediately
-      await db.ref(`ticket_channels/${newTicketRef.key}/messages`).push({
-        sender: 'GemluckSupport',
-        text: `Welcome @${user.username}. Chat is open. You can send transaction receipts, messages, and photos here directly.`,
-        isStaff: true,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-
-      document.getElementById('supportMessageInput').value = '';
-      document.getElementById('supportTicketDiamonds').value = '';
-      document.getElementById('supportImageInput').value = '';
-      document.getElementById('supportFileLabel').textContent = 'Attach Proof Photo';
-      attachedImageBase64 = null;
-
+      alert("Ticket submitted!");
       toggleModal('supportModal');
-      openTicketChannel(newTicketRef.key);
     }
 
-    async function staffApproveDeposit(ticketId, targetUser, diamonds, type) {
-      if (!user.isStaff) return;
-
-      if (type === 'Deposit' && diamonds > 0) {
-        const cleanTarget = targetUser.toLowerCase();
-        const targetRef = db.ref('user_profiles/' + cleanTarget);
-        
-        await targetRef.transaction((curr) => {
-          if (!curr) return { username: targetUser, balance: 10000000 + diamonds, totalWagered: 0 };
-          curr.balance = (curr.balance || 0) + diamonds;
-          curr.totalDeposits = (curr.totalDeposits || 0) + diamonds;
-          return curr;
-        });
-
-        db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(diamonds));
-      }
-
-      await db.ref('support_tickets/' + ticketId).update({
-        status: 'Approved',
-        approvedBy: user.username
-      });
-
-      await db.ref(`ticket_channels/${ticketId}/messages`).push({
-        sender: 'GemluckSupport',
-        text: `Receipt approved by staff @${user.username}. ${diamonds > 0 ? diamonds.toLocaleString() + ' 💎 credited.' : ''}`,
-        isStaff: true,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-
-      openTicketChannel(ticketId);
-    }
-
-    async function cancelWithdrawalTicket(ticketId, amount) {
-      if (!confirm(`Cancel this withdrawal ticket and refund ${amount.toLocaleString()} 💎 back to your balance?`)) return;
-
-      const ticketRef = db.ref('support_tickets/' + ticketId);
-      const snapshot = await ticketRef.once('value');
-      const ticket = snapshot.val();
-
-      if (!ticket || ticket.status === 'Closed' || ticket.status === 'Approved') {
-        return alert("This withdrawal can no longer be cancelled.");
-      }
-
-      await ticketRef.update({
-        status: 'Closed',
-        cancelledAt: Date.now()
-      });
-
-      const userRef = db.ref('user_profiles/' + user.username.toLowerCase());
-      await userRef.transaction((profile) => {
-        if (!profile) return profile;
-        profile.balance = (profile.balance || 0) + amount;
-        profile.totalWithdrawals = Math.max(0, (profile.totalWithdrawals || 0) - amount);
-        return profile;
-      });
-
-      user.balance += amount;
-      user.totalWithdrawals = Math.max(0, user.totalWithdrawals - amount);
-      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      updateAccountUI();
-      syncUserToCloudLeaderboard();
-
-      alert(`Withdrawal cancelled. ${amount.toLocaleString()} 💎 has been refunded to your wallet!`);
-    }
-
-    function handleSupportFileUpload(e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('supportFileLabel').textContent = file.name.substring(0, 15) + '...';
-        const reader = new FileReader();
-        reader.onload = (evt) => { attachedImageBase64 = evt.target.result; };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function staffCloseTicketDirect(ticketId) {
-      if (!user.isStaff) return;
-      if (!confirm("Close this ticket?")) return;
-      await db.ref('support_tickets/' + ticketId).update({
-        status: 'Closed',
-        closedBy: user.username
-      });
-    }
-
-    /* ====================================================================
-       CROSS-PLAYER TIPPING & PRIMARY ADMIN BALANCE OVERRIDE
-    ==================================================================== */
-    async function executeTip() {
-      const rawRecipient = document.getElementById('tipRecipientInput').value.trim().replace(/^@/, '');
-      const amount = parseInt(document.getElementById('tipAmountInput').value);
-
-      if (!rawRecipient) return alert("Enter recipient username");
-      if (rawRecipient.toLowerCase() === user.username.toLowerCase()) {
-        return alert("You cannot tip yourself!");
-      }
-      if (isNaN(amount) || amount <= 0 || amount > user.balance) return alert("Invalid tip balance!");
-
-      const cleanTarget = rawRecipient.toLowerCase();
-      const targetRef = db.ref('user_profiles/' + cleanTarget);
-      
-      const profSnap = await targetRef.once('value');
-      const lbSnap = await db.ref('leaderboards/' + cleanTarget).once('value');
-
-      if (!profSnap.exists() && !lbSnap.exists()) {
-        return alert(`User @${rawRecipient} was not found! Make sure they have logged in at least once.`);
-      }
-
-      updateBalance(-amount);
-      await syncCloudUserProfile();
-
-      await targetRef.transaction((recProfile) => {
-        if (!recProfile) {
-          return { username: rawRecipient, balance: 10000000 + amount, totalWagered: 0 };
-        }
-        recProfile.balance = (recProfile.balance || 0) + amount;
-        return recProfile;
-      });
-
-      db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(amount));
-
-      toggleModal('tipModal');
-
-      db.ref('chat_messages').push({
-        sender: 'GemluckSystem',
-        text: `@${user.username} tipped ${amount.toLocaleString()} 💎 to @${rawRecipient}!`,
-        isStaff: true,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-
-      alert(`Successfully sent tip of ${amount.toLocaleString()} 💎 to @${rawRecipient}!`);
-    }
-
-    async function staffModifyBalance() {
-      if (!user.isPrimaryAdmin) {
-        return alert("Access Denied: Only primary administrators (@Dalawar_alt & @darkrulerx7) can modify balances.");
-      }
-
-      const rawTarget = document.getElementById('staffTargetUser').value.trim().replace(/^@/, '');
-      const delta = parseInt(document.getElementById('staffAmountDelta').value);
-
-      if (!rawTarget || isNaN(delta)) return alert("Provide username and valid amount delta");
-
-      const cleanTarget = rawTarget.toLowerCase();
-      const targetRef = db.ref('user_profiles/' + cleanTarget);
-      
-      await targetRef.transaction((prof) => {
-        if (!prof) {
-          return { username: rawTarget, balance: Math.max(0, 10000000 + delta), totalWagered: 0 };
-        }
-        prof.balance = Math.max(0, (prof.balance || 0) + delta);
-        return prof;
-      });
-
-      db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(delta));
-
-      if (cleanTarget === user.username.toLowerCase()) {
-        updateBalance(delta);
-      }
-
-      alert(`Successfully adjusted ${delta >= 0 ? '+' + delta.toLocaleString() : delta.toLocaleString()} 💎 for @${rawTarget}`);
-      document.getElementById('staffAmountDelta').value = '';
-    }
-
-    /* ====================================================================
-       LEADERBOARDS & ARCADE FEED
-    ==================================================================== */
-    async function syncUserToCloudLeaderboard() {
-      if (user.username === 'guest') return;
-      await db.ref('leaderboards/' + user.username.toLowerCase()).set({
-        user: user.username,
-        wagered: user.totalWagered,
-        balance: user.balance,
-        lastUpdated: Date.now()
-      });
-    }
-
-    let globalLeaderboardData = [];
-    let currentLeaderboardTab = 'wagered';
-
-    function initLeaderboardSync() {
-      db.ref('leaderboards').on('value', (snapshot) => {
-        const val = snapshot.val();
-        globalLeaderboardData = val ? Object.values(val) : [];
-        renderLeaderboard(currentLeaderboardTab);
-      });
-    }
-
-    function switchLeaderboard(type) {
-      currentLeaderboardTab = type;
-      if (type === 'wagered') {
-        document.getElementById('lbTabWagered').className = 'py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
-        document.getElementById('lbTabBalance').className = 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
-      } else {
-        document.getElementById('lbTabBalance').className = 'py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
-        document.getElementById('lbTabWagered').className = 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
-      }
-      renderLeaderboard(type);
-    }
-
-    function renderLeaderboard(sortKey) {
-      const list = document.getElementById('leaderboardList');
-      list.innerHTML = '';
-      const sorted = [...globalLeaderboardData].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
-      if (sorted.length === 0) {
-        list.innerHTML = '<div class="text-center py-6 text-slate-500 font-sans">No active players ranked yet.</div>';
-        return;
-      }
-      sorted.forEach((item, index) => {
-        const row = document.createElement('div');
-        row.className = 'p-3.5 rounded-2xl bg-darkSurface border border-darkBorder flex justify-between items-center';
-        row.innerHTML = `
-          <div class="flex items-center gap-3">
-            <span class="w-6 text-center font-bold text-amber-400 font-display">#${index+1}</span>
-            <span class="text-slate-200">@${item.user}</span>
-          </div>
-          <div class="text-right">
-            <div class="text-amber-400 font-bold">${(item[sortKey] || 0).toLocaleString()} 💎</div>
-            <div class="text-[9px] text-slate-500 uppercase">${sortKey}</div>
-          </div>
-        `;
-        list.appendChild(row);
-      });
-    }
-
-    function initRealPlayerLiveFeed() {
-      db.ref('live_arcade_rounds').limitToLast(20).on('child_added', (snapshot) => {
-        const round = snapshot.val();
-        if (round) addRealFeedItem(round.user, round.game, round.bet, round.mult, round.won);
-      });
-    }
-
-    function addRealFeedItem(player, game, bet, mult, won) {
-      const feed = document.getElementById('liveFeedContainer');
-      const emptyNotice = document.getElementById('liveFeedEmpty');
-      if (emptyNotice) emptyNotice.remove();
-
-      const item = document.createElement('div');
-      item.className = 'p-2.5 rounded-2xl bg-darkSurface border border-darkBorder flex justify-between items-center text-xs';
-      item.innerHTML = `
-        <div>
-          <span class="font-bold text-slate-200">@${player}</span>
-          <span class="text-slate-500 text-[10px] ml-1">(${game})</span>
-        </div>
-        <div class="text-right">
-          <span class="${won ? 'text-emerald-400' : 'text-rose-400'} font-bold">${won ? '+' + Math.floor(bet * mult).toLocaleString() : '-' + bet.toLocaleString()} 💎</span>
-          <span class="text-[10px] text-slate-500 ml-1.5 font-bold">${mult.toFixed(2)}x</span>
-        </div>
-      `;
-      feed.prepend(item);
-      if (feed.children.length > 20) feed.removeChild(feed.lastChild);
-    }
-
-    async function publishRealRound(game, bet, mult, won) {
-      await db.ref('live_arcade_rounds').push({
-        user: user.username,
-        game: game,
-        bet: bet,
-        mult: mult,
-        won: won,
-        timestamp: Date.now()
-      });
-    }
-
-    /* ====================================================================
-       GLOBAL LIVE CHAT (WITH USER PROFILE ICONS)
-    ==================================================================== */
-    function initLiveCloudChat() {
-      db.ref('chat_messages').limitToLast(40).on('child_added', (snapshot) => {
-        const msg = snapshot.val();
-        if (msg) renderChatMessage(msg.sender, msg.text, msg.isStaff, msg.time);
-      });
-    }
-
-    function renderChatMessage(sender, text, isStaff, time) {
-      const box = document.getElementById('generalChatBox');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'p-3 rounded-2xl bg-darkSurface/90 border border-darkBorder/60 flex items-start gap-2.5';
-      
-      const iconClass = isStaff ? 'fa-solid fa-crown text-amber-400' : 'fa-solid fa-user text-sky-400';
-      const iconBg = isStaff ? 'bg-amber-500/10 border-amber-500/30' : 'bg-sky-500/10 border-sky-500/30';
-
-      msgDiv.innerHTML = `
-        <div class="h-7 w-7 rounded-full ${iconBg} border flex items-center justify-center shrink-0 text-xs mt-0.5">
-          <i class="${iconClass}"></i>
-        </div>
-        <div class="flex-1">
-          <div class="flex justify-between items-center mb-0.5">
-            <span class="${isStaff ? 'text-amber-400 font-bold' : 'text-sky-400 font-semibold'}">@${sender}</span>
-            <span class="text-[9px] text-slate-500">${time || 'Just now'}</span>
-          </div>
-          <div class="text-slate-200 text-xs font-sans">${text}</div>
-        </div>
-      `;
-      box.appendChild(msgDiv);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    async function handleSendChat(e) {
-      e.preventDefault();
-      if (user.username === 'guest') return alert("Please log in first!");
-
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      const warning = document.getElementById('chatWarning');
-
-      if (!text) return;
-
-      const forbiddenPatterns = [/discord\.gg\/ravage/i, /discord\.com\/invite\/ravage/i];
-      if (forbiddenPatterns.some(pattern => pattern.test(text))) {
-        warning.textContent = "Security Notice: Secret VIP Server link cannot be shared in public chat.";
-        warning.classList.remove('hidden');
-        return;
-      }
-      warning.classList.add('hidden');
-
-      await db.ref('chat_messages').push({
-        sender: user.username,
-        text: text,
-        isStaff: user.isStaff,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      });
-
-      input.value = '';
-    }
-
-    /* ====================================================================
-       GAME ENGINES & LOGIC
-    ==================================================================== */
-    function toggleModal(modalId) {
-      document.getElementById(modalId).classList.toggle('hidden');
-      if (modalId === 'leaderboardModal') renderLeaderboard(currentLeaderboardTab);
-      if (modalId === 'accountModal') updateAccountUI();
-      if (modalId === 'supportModal') renderVisibleTickets();
-      if (modalId === 'staffPortalModal' && user.isStaff) renderStaffQueue();
-    }
-
-    function updateBalance(delta) {
-      user.balance += delta;
-      if (delta > 0) user.netProfit += delta;
-      else user.netProfit += delta;
-      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      updateAccountUI();
-      syncCloudUserProfile();
-    }
-
-    function recordWager(amount) {
-      user.totalWagered += amount;
-      updateAccountUI();
-      syncCloudUserProfile();
-    }
-
-    function recordRound(game, bet, mult, won) {
-      user.roundsPlayed.unshift({
-        game,
-        bet,
-        mult,
-        payout: won ? Math.floor(bet * mult) : 0,
-        time: new Date().toLocaleTimeString()
-      });
-      if (user.roundsPlayed.length > 20) user.roundsPlayed.pop();
-      publishRealRound(game, bet, mult, won);
-    }
-
-    function halveBet(id) {
-      const el = document.getElementById(id);
-      const val = Math.floor(parseInt(el.value) / 2);
-      el.value = Math.max(MIN_THRESHOLD, val);
-    }
-
-    function doubleBet(id) {
-      const el = document.getElementById(id);
-      const val = Math.floor(parseInt(el.value) * 2);
-      el.value = Math.max(MIN_THRESHOLD, val);
-    }
-
-    const allGames = ['mines', 'coinflip', 'dice', 'roulette', 'blackjack'];
-    function selectGame(name) {
-      allGames.forEach(g => {
-        document.getElementById(`game-${g}-view`).classList.add('hidden');
-        const tab = document.getElementById(`tab-${g}`);
-        tab.className = 'game-selector px-4 py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-300 whitespace-nowrap hover:text-amber-400';
-      });
-      document.getElementById(`game-${name}-view`).classList.remove('hidden');
-      const activeTab = document.getElementById(`tab-${name}`);
-      activeTab.className = 'game-selector px-4 py-2.5 rounded-2xl bg-darkCard border border-amber-400 text-amber-300 whitespace-nowrap';
-    }
-
-    /* 1. MINES */
-    let minesGrid = 5;
+    // Mines Engine
     let minesQuantity = 3;
     let minesActive = false;
     let minesBet = 4000000;
     let minesOpened = 0;
     let minesLocations = new Set();
-    let minesOpenedIndices = new Set();
-    let minesCurrentMultVal = 1.0;
-
-    function setGridSize(size) {
-      if (minesActive) return;
-      minesGrid = size;
-      document.querySelectorAll('.grid-size-btn').forEach(b => {
-        if (parseInt(b.getAttribute('data-size')) === size) {
-          b.className = 'grid-size-btn py-2 rounded-xl bg-darkSurface border border-amber-400 text-amber-300 font-bold';
-        } else {
-          b.className = 'grid-size-btn py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-300 font-bold';
-        }
-      });
-      const maxMines = (size * size) - 1;
-      const slider = document.getElementById('minesCountSlider');
-      slider.max = maxMines;
-      if (parseInt(slider.value) >= maxMines) slider.value = Math.min(3, maxMines);
-      minesQuantity = parseInt(slider.value);
-      document.getElementById('minesValDisplay').textContent = minesQuantity;
-      initMinesBoard();
-      updateMinesOdds();
-    }
 
     document.getElementById('minesCountSlider').addEventListener('input', (e) => {
-      if (minesActive) return;
       minesQuantity = parseInt(e.target.value);
       document.getElementById('minesValDisplay').textContent = minesQuantity;
-      updateMinesOdds();
     });
-
-    function getMinesFairMultiplier(opened, total, mines) {
-      let p = 1.0;
-      for (let i = 0; i < opened; i++) {
-        p *= (total - mines - i) / (total - i);
-      }
-      return Math.max(1.01, Math.floor((0.84 / p) * 100) / 100);
-    }
-
-    function updateMinesOdds() {
-      const total = minesGrid * minesGrid;
-      const next = getMinesFairMultiplier(minesOpened + 1, total, minesQuantity);
-      document.getElementById('minesNextMult').textContent = `${next.toFixed(2)}x`;
-      document.getElementById('minesCurrentMult').textContent = `${minesCurrentMultVal.toFixed(2)}x`;
-      const payout = Math.floor(minesBet * minesCurrentMultVal);
-      document.getElementById('minesCurrentPayout').textContent = `${payout.toLocaleString()} 💎`;
-    }
 
     function initMinesBoard() {
       const board = document.getElementById('minesBoard');
       board.innerHTML = '';
-      board.style.gridTemplateColumns = `repeat(${minesGrid}, minmax(0, 1fr))`;
-      const total = minesGrid * minesGrid;
-      for (let i = 0; i < total; i++) {
-        const tile = document.createElement('button');
-        tile.className = 'w-full aspect-square bg-darkBg border border-darkBorder hover:border-amber-400/50 rounded-2xl flex items-center justify-center font-bold text-sm transition transform active:scale-95 disabled:cursor-not-allowed';
-        tile.setAttribute('data-idx', i);
-        tile.onclick = () => stepMinesTile(i);
-        board.appendChild(tile);
+      board.style.gridTemplateColumns = `repeat(5, minmax(0, 1fr))`;
+      for (let i = 0; i < 25; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'w-full aspect-square bg-darkBg border border-darkBorder rounded-2xl flex items-center justify-center font-bold text-sm transition active:scale-95';
+        btn.onclick = () => stepMines(i, btn);
+        board.appendChild(btn);
       }
     }
 
     function toggleMinesRound() {
+      const bet = parseInt(document.getElementById('minesBetInput').value) || 4000000;
       if (!minesActive) {
-        const bet = parseInt(document.getElementById('minesBetInput').value);
-        if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-        if (bet > user.balance) return alert("Insufficient diamond balance!");
-
-        updateBalance(-bet);
-        recordWager(bet);
+        if (bet > user.balance) return alert("Insufficient balance!");
+        user.balance -= bet;
+        document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+        if (user.uid) {
+          db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+        }
         minesBet = bet;
         minesActive = true;
         minesOpened = 0;
-        minesCurrentMultVal = 1.0;
-        minesOpenedIndices.clear();
         minesLocations.clear();
-
-        const total = minesGrid * minesGrid;
         while (minesLocations.size < minesQuantity) {
-          minesLocations.add(Math.floor(Math.random() * total));
+          minesLocations.add(Math.floor(Math.random() * 25));
         }
-
         initMinesBoard();
-        updateMinesOdds();
-
-        const btn = document.getElementById('minesActionBtn');
-        btn.textContent = 'CASHOUT (0)';
-        btn.className = 'w-full py-3.5 rounded-2xl font-display font-black bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition';
-        document.getElementById('minesCountSlider').disabled = true;
+        document.getElementById('minesActionBtn').textContent = 'CASHOUT';
       } else {
         cashoutMines();
       }
     }
 
-    function stepMinesTile(idx) {
-      if (!minesActive || minesOpenedIndices.has(idx)) return;
-      const tile = document.querySelector(`[data-idx='${idx}']`);
-      minesOpenedIndices.add(idx);
+    function stepMines(idx, btn) {
+      if (!minesActive || btn.disabled) return;
+      btn.disabled = true;
 
+      // 35% bias towards loss after 3 tiles
       if (minesOpened >= 3 && Math.random() < 0.35) {
         minesLocations.add(idx);
       }
 
-      let hitBomb = minesLocations.has(idx);
-
-      if (hitBomb) {
-        tile.classList.add('bg-rose-950', 'border-rose-600', 'text-rose-400');
-        tile.innerHTML = '<i class="fa-solid fa-bomb animate-bounce"></i>';
-        revealAllMines();
+      if (minesLocations.has(idx)) {
+        btn.classList.add('bg-rose-900', 'text-rose-400');
+        btn.innerHTML = '<i class="fa-solid fa-bomb"></i>';
         minesActive = false;
-        user.lossStreak++;
-        resetMinesBtn();
-        recordRound('Mines', minesBet, 0, false);
+        document.getElementById('minesActionBtn').textContent = 'START GAME';
       } else {
         minesOpened++;
-        const total = minesGrid * minesGrid;
-        minesCurrentMultVal = getMinesFairMultiplier(minesOpened, total, minesQuantity);
-        tile.classList.add('bg-emerald-950/60', 'border-emerald-500', 'text-emerald-400');
-        tile.innerHTML = '<i class="fa-solid fa-gem"></i>';
-
-        const payout = Math.floor(minesBet * minesCurrentMultVal);
-        document.getElementById('minesActionBtn').textContent = `CASHOUT (${payout.toLocaleString()} 💎)`;
-        updateMinesOdds();
-
-        if (minesOpened === total - minesQuantity) cashoutMines();
+        btn.classList.add('bg-emerald-900/60', 'text-emerald-400');
+        btn.innerHTML = '<i class="fa-solid fa-gem"></i>';
+        const mult = 1 + (minesOpened * 0.28);
+        document.getElementById('minesCurrentMult').textContent = mult.toFixed(2) + 'x';
+        document.getElementById('minesCurrentPayout').textContent = Math.floor(minesBet * mult).toLocaleString() + ' 💎';
       }
     }
 
     function cashoutMines() {
-      if (!minesActive) return;
-      const payout = Math.floor(minesBet * minesCurrentMultVal);
-      updateBalance(payout);
-      user.lossStreak = 0;
-      revealAllMines();
+      const mult = 1 + (minesOpened * 0.28);
+      const won = Math.floor(minesBet * mult);
+      user.balance += won;
+      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+      if (user.uid) {
+        db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+      }
       minesActive = false;
-      resetMinesBtn();
+      document.getElementById('minesActionBtn').textContent = 'START GAME';
 
-      if (minesCurrentMultVal >= 30.0) {
-        unlockVIPDiscordMines(minesCurrentMultVal);
-      }
-      recordRound('Mines', minesBet, minesCurrentMultVal, true);
-    }
-
-    function resetMinesBtn() {
-      document.getElementById('minesCountSlider').disabled = false;
-      const btn = document.getElementById('minesActionBtn');
-      btn.textContent = 'START GAME';
-      btn.className = 'w-full py-3.5 rounded-2xl font-display font-black bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 transition';
-    }
-
-    function revealAllMines() {
-      const total = minesGrid * minesGrid;
-      for (let i = 0; i < total; i++) {
-        const t = document.querySelector(`[data-idx='${i}']`);
-        t.disabled = true;
-        if (minesLocations.has(i) && !t.classList.contains('bg-rose-950')) {
-          t.classList.add('bg-slate-900', 'border-rose-900/60', 'text-rose-500/70');
-          t.innerHTML = '<i class="fa-solid fa-bomb text-xs"></i>';
-        }
+      if (mult >= 30.0) {
+        const linkBtn = document.getElementById('vipRewardLink');
+        linkBtn.href = VIP_REWARD_DISCORD;
+        linkBtn.className = 'px-5 py-3 rounded-2xl border border-purple-400 bg-purple-600 hover:bg-purple-500 text-white font-bold transition flex items-center gap-2 text-xs font-sans shrink-0';
+        linkBtn.innerHTML = 'Join VIP Stream <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
+        document.getElementById('vipRewardStatus').textContent = 'Unlocked: 30x Profit Hit!';
       }
     }
 
-    /* 2. COIN FLIP */
-    let coinSide = 'HEADS';
-    let coinFlipping = false;
-    let coinAngle = 0;
-
-    function selectCoinSide(side) {
-      if (coinFlipping) return;
-      coinSide = side;
-      document.getElementById('coinPickHeads').className = side === 'HEADS' 
-        ? 'py-2.5 rounded-2xl bg-amber-500/20 border border-amber-400 text-amber-300' 
-        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
-      document.getElementById('coinPickTails').className = side === 'TAILS' 
-        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300' 
-        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
-    }
-
-    function playCoinFlip() {
-      if (coinFlipping) return;
-      const bet = parseInt(document.getElementById('coinBetInput').value);
-      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-      if (bet > user.balance) return alert("Insufficient balance!");
-
-      updateBalance(-bet);
-      recordWager(bet);
-      coinFlipping = true;
-      document.getElementById('coinFlipBtn').disabled = true;
-
-      const playerWins = Math.random() < 0.40;
-      let outcomeIsHeads = playerWins ? (coinSide === 'HEADS') : (coinSide !== 'HEADS');
-
-      const targetAngle = outcomeIsHeads ? 0 : 180;
-      coinAngle += 1440 + (targetAngle - (coinAngle % 360));
-      document.getElementById('coin3D').style.transform = `rotateY(${coinAngle}deg)`;
-      document.getElementById('coinResultNotice').textContent = "Coin In The Air...";
-
-      setTimeout(() => {
-        coinFlipping = false;
-        document.getElementById('coinFlipBtn').disabled = false;
-        const won = (outcomeIsHeads && coinSide === 'HEADS') || (!outcomeIsHeads && coinSide === 'TAILS');
-        if (won) {
-          const payout = Math.floor(bet * 1.96);
-          updateBalance(payout);
-          user.lossStreak = 0;
-          document.getElementById('coinResultNotice').textContent = `Won! +${payout.toLocaleString()} 💎`;
-          document.getElementById('coinResultNotice').className = 'font-mono text-xs uppercase text-amber-400 font-bold';
-          recordRound('Coin Flip', bet, 1.96, true);
-        } else {
-          user.lossStreak++;
-          document.getElementById('coinResultNotice').textContent = `Lost! Landed ${outcomeIsHeads ? 'Heads' : 'Tails'}`;
-          document.getElementById('coinResultNotice').className = 'font-mono text-xs uppercase text-rose-400 font-bold';
-          recordRound('Coin Flip', bet, 0, false);
-        }
-      }, 1400);
-    }
-
-    /* 3. DICE */
-    let diceMode = 'under';
-    function setDiceMode(m) {
-      diceMode = m;
-      document.getElementById('diceModeUnder').className = m === 'under'
-        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300' 
-        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
-      document.getElementById('diceModeOver').className = m === 'over'
-        ? 'py-2.5 rounded-2xl bg-sky-500/20 border border-sky-400 text-sky-300' 
-        : 'py-2.5 rounded-2xl bg-darkSurface border border-darkBorder text-slate-400';
-      updateDiceOdds();
-    }
-
-    function updateDiceOdds() {
-      const target = parseInt(document.getElementById('diceSlider').value);
-      document.getElementById('diceTargetVal').textContent = target;
-      const chance = diceMode === 'under' ? target : (100 - target);
-      const mult = Math.max(1.05, Math.floor((97 / chance) * 100) / 100);
-      document.getElementById('diceMultiplier').textContent = `${mult.toFixed(2)}x`;
-    }
-
-    function playDice() {
-      const bet = parseInt(document.getElementById('diceBetInput').value);
-      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-      if (bet > user.balance) return alert("Insufficient balance!");
-
-      updateBalance(-bet);
-      recordWager(bet);
-
-      const target = parseInt(document.getElementById('diceSlider').value);
-      const chance = diceMode === 'under' ? target : (100 - target);
-      const mult = Math.max(1.05, Math.floor((97 / chance) * 100) / 100);
-
-      let roll = Math.floor(Math.random() * 100) + 1;
-
-      if (Math.random() < 0.25) {
-        roll = diceMode === 'under' ? Math.min(100, target + Math.floor(Math.random() * 4) + 1) : Math.max(1, target - Math.floor(Math.random() * 4) - 1);
-      }
-
-      document.getElementById('diceRollDisplay').textContent = roll;
-      const won = (diceMode === 'under' && roll < target) || (diceMode === 'over' && roll > target);
-
-      if (won) {
-        const payout = Math.floor(bet * mult);
-        updateBalance(payout);
-        user.lossStreak = 0;
-        document.getElementById('diceStatusNotice').textContent = `Winner! Rolled ${roll} (+${payout.toLocaleString()} 💎)`;
-        document.getElementById('diceStatusNotice').className = 'font-mono text-xs uppercase text-emerald-400 font-bold';
-        recordRound('Dice', bet, mult, true);
-      } else {
-        user.lossStreak++;
-        document.getElementById('diceStatusNotice').textContent = `Rolled ${roll} - Target Missed!`;
-        document.getElementById('diceStatusNotice').className = 'font-mono text-xs uppercase text-rose-400 font-bold';
-        recordRound('Dice', bet, 0, false);
-      }
-    }
-
-    /* 4. ROULETTE */
-    let roulChoice = 'red';
-    const RED_NUMBERS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-
-    function setRouletteBetChoice(c) {
-      roulChoice = c;
-      ['red', 'black', 'green'].forEach(k => {
-        document.getElementById(`roulBtn${k.charAt(0).toUpperCase() + k.slice(1)}`).classList.remove('border-amber-400');
+    async function handleSendChat(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text || !user.uid) return;
+      await db.ref('chat_messages').push({
+        sender: user.username,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
-      document.getElementById(`roulBtn${c.charAt(0).toUpperCase() + c.slice(1)}`).classList.add('border-amber-400');
+      input.value = '';
     }
 
-    function spinRoulette() {
-      const bet = parseInt(document.getElementById('rouletteBetInput').value);
-      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-      if (bet > user.balance) return alert("Insufficient balance!");
-
-      updateBalance(-bet);
-      recordWager(bet);
-
-      const resNumEl = document.getElementById('rouletteResultNumber');
-      const statEl = document.getElementById('rouletteStatus');
-      statEl.textContent = "Spinning Wheel...";
-
-      let counter = 0;
-      const interval = setInterval(() => {
-        const rand = Math.floor(Math.random() * 37);
-        resNumEl.textContent = rand;
-        counter++;
-        if (counter > 15) {
-          clearInterval(interval);
-          let outcome = Math.floor(Math.random() * 37);
-
-          if (Math.random() < 0.58) {
-            if (roulChoice === 'red') outcome = 2;
-            else if (roulChoice === 'black') outcome = 1;
-          }
-
-          resNumEl.textContent = outcome;
-
-          let color = 'black';
-          if (outcome === 0) color = 'green';
-          else if (RED_NUMBERS.includes(outcome)) color = 'red';
-
-          resNumEl.className = color === 'red' ? 'font-display text-6xl font-black text-rose-500 mb-3' : (color === 'green' ? 'font-display text-6xl font-black text-emerald-400 mb-3' : 'font-display text-6xl font-black text-slate-300 mb-3');
-
-          if (color === roulChoice) {
-            const mult = color === 'green' ? 14 : 2;
-            const payout = bet * mult;
-            updateBalance(payout);
-            user.lossStreak = 0;
-            statEl.textContent = `Landed ${outcome} (${color.toUpperCase()})! Won ${payout.toLocaleString()} 💎`;
-            statEl.className = 'font-mono text-xs uppercase text-amber-400 font-bold';
-            recordRound('Roulette', bet, mult, true);
-          } else {
-            user.lossStreak++;
-            statEl.textContent = `Landed ${outcome} (${color.toUpperCase()}) - House Wins`;
-            statEl.className = 'font-mono text-xs uppercase text-rose-400 font-bold';
-            recordRound('Roulette', bet, 0, false);
-          }
-        }
-      }, 70);
-    }
-
-    /* 5. BLACKJACK 21 */
-    let bjPlayerHand = [];
-    let bjDealerHand = [];
-    let bjBet = 4000000;
-    let bjGameActive = false;
-
-    function drawCard() {
-      const suits = ['♠', '♥', '♦', '♣'];
-      const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-      const val = values[Math.floor(Math.random() * values.length)];
-      const suit = suits[Math.floor(Math.random() * suits.length)];
-      return { val, suit };
-    }
-
-    function calculateHandScore(hand) {
-      let score = 0;
-      let aces = 0;
-      hand.forEach(c => {
-        if (['J','Q','K'].includes(c.val)) score += 10;
-        else if (c.val === 'A') { score += 11; aces++; }
-        else score += parseInt(c.val);
-      });
-      while (score > 21 && aces > 0) {
-        score -= 10;
-        aces--;
-      }
-      return score;
-    }
-
-    function renderCard(c, hidden = false) {
-      if (hidden) return `<div class="w-10 h-14 bg-slate-800 border border-slate-600 rounded-xl flex items-center justify-center font-bold text-slate-500 font-mono">?</div>`;
-      const isRed = ['♥', '♦'].includes(c.suit);
-      return `<div class="w-10 h-14 bg-white text-slate-900 border rounded-xl flex flex-col items-center justify-center font-bold text-xs font-mono ${isRed ? 'text-red-600' : 'text-slate-950'} shadow">
-                <span>${c.val}</span><span class="text-[10px]">${c.suit}</span>
-              </div>`;
-    }
-
-    function startBlackjack() {
-      const bet = parseInt(document.getElementById('bjBetInput').value);
-      if (isNaN(bet) || bet < MIN_THRESHOLD) return alert(`Minimum bet is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
-      if (bet > user.balance) return alert("Insufficient balance!");
-
-      updateBalance(-bet);
-      recordWager(bet);
-      bjBet = bet;
-      bjGameActive = true;
-
-      bjPlayerHand = [drawCard(), drawCard()];
-      bjDealerHand = [drawCard(), drawCard()];
-
-      document.getElementById('bjStartControls').classList.add('hidden');
-      document.getElementById('bjActionControls').classList.remove('hidden');
-      document.getElementById('bjOutcomeNotice').textContent = "Hit or Stand?";
-      document.getElementById('bjOutcomeNotice').className = "text-center font-bold text-xs uppercase text-amber-400 py-1.5 font-sans";
-
-      updateBlackjackBoard(true);
-      if (calculateHandScore(bjPlayerHand) === 21) standBlackjack();
-    }
-
-    function updateBlackjackBoard(hideDealerHole) {
-      const dEl = document.getElementById('dealerCards');
-      const pEl = document.getElementById('playerCards');
-      dEl.innerHTML = '';
-      pEl.innerHTML = '';
-
-      bjDealerHand.forEach((c, i) => {
-        dEl.innerHTML += renderCard(c, hideDealerHole && i === 1);
-      });
-      bjPlayerHand.forEach(c => { pEl.innerHTML += renderCard(c); });
-
-      document.getElementById('playerScore').textContent = calculateHandScore(bjPlayerHand);
-      document.getElementById('dealerScore').textContent = hideDealerHole ? calculateHandScore([bjDealerHand[0]]) : calculateHandScore(bjDealerHand);
-    }
-
-    function hitBlackjack() {
-      if (!bjGameActive) return;
-      bjPlayerHand.push(drawCard());
-      updateBlackjackBoard(true);
-
-      if (calculateHandScore(bjPlayerHand) > 21) {
-        endBlackjack(false, "Bust! Over 21.");
-      }
-    }
-
-    function standBlackjack() {
-      if (!bjGameActive) return;
-      const pScore = calculateHandScore(bjPlayerHand);
-
-      while (calculateHandScore(bjDealerHand) < 17) {
-        if (Math.random() < 0.65 && calculateHandScore(bjDealerHand) <= pScore) {
-          bjDealerHand.push({ val: '10', suit: '♠' });
-        } else {
-          bjDealerHand.push(drawCard());
-        }
-      }
-      updateBlackjackBoard(false);
-
-      const dScore = calculateHandScore(bjDealerHand);
-
-      if (dScore > 21 || pScore > dScore) {
-        endBlackjack(true, `Won against Dealer (${pScore} vs ${dScore})!`);
-      } else if (pScore === dScore) {
-        endBlackjack('push', "Push! Bets refunded.");
-      } else {
-        endBlackjack(false, `Dealer wins (${dScore} vs ${pScore})`);
-      }
-    }
-
-    function endBlackjack(result, msg) {
-      bjGameActive = false;
-      document.getElementById('bjStartControls').classList.remove('hidden');
-      document.getElementById('bjActionControls').classList.add('hidden');
-      const notice = document.getElementById('bjOutcomeNotice');
-      notice.textContent = msg;
-
-      if (result === true) {
-        const payout = bjBet * 2;
-        updateBalance(payout);
-        notice.className = "text-center font-bold text-xs uppercase text-emerald-400 py-1.5 font-sans";
-        recordRound('Blackjack', bjBet, 2.0, true);
-      } else if (result === 'push') {
-        updateBalance(bjBet);
-        notice.className = "text-center font-bold text-xs uppercase text-amber-400 py-1.5 font-sans";
-        recordRound('Blackjack', bjBet, 1.0, true);
-      } else {
-        user.lossStreak++;
-        notice.className = "text-center font-bold text-xs uppercase text-rose-400 py-1.5 font-sans";
-        recordRound('Blackjack', bjBet, 0, false);
-      }
-    }
-
-    function updateAccountUI() {
-      document.getElementById('accTotalWagered').textContent = `${user.totalWagered.toLocaleString()} 💎`;
-      document.getElementById('accTotalDeposits').textContent = `${user.totalDeposits.toLocaleString()} 💎`;
-      document.getElementById('accTotalWithdrawals').textContent = `${user.totalWithdrawals.toLocaleString()} 💎`;
-      document.getElementById('accNetProfit').textContent = `${user.netProfit >= 0 ? '+' + user.netProfit.toLocaleString() : user.netProfit.toLocaleString()} 💎`;
-      document.getElementById('accNetProfit').className = user.netProfit >= 0 ? 'text-emerald-400 font-bold text-sm mt-1' : 'text-rose-400 font-bold text-sm mt-1';
-
-      const logBox = document.getElementById('accRoundLogs');
-      if (user.roundsPlayed.length > 0) {
-        logBox.innerHTML = '';
-        user.roundsPlayed.forEach(r => {
-          logBox.innerHTML += `
-            <div class="flex justify-between items-center py-1.5 border-b border-darkBorder/40">
-              <span><b>${r.game}</b> (Bet: ${r.bet.toLocaleString()} 💎)</span>
-              <span class="${r.payout > 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${r.payout > 0 ? '+' + r.payout.toLocaleString() : '-' + r.bet.toLocaleString()} (${r.mult}x)</span>
-            </div>
-          `;
-        });
-      }
-    }
+    db.ref('chat_messages').limitToLast(20).on('child_added', (snap) => {
+      const msg = snap.val();
+      const box = document.getElementById('generalChatBox');
+      const div = document.createElement('div');
+      div.className = 'p-3 rounded-2xl bg-darkSurface/60 border border-darkBorder flex items-start gap-2.5';
+      div.innerHTML = `
+        <div class="h-6 w-6 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 text-[10px] shrink-0 mt-0.5">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        <div>
+          <span class="text-sky-400 font-bold">@${msg.sender}</span>: ${msg.text}
+        </div>
+      `;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    });
 
     initMinesBoard();
-    updateDiceOdds();
   </script>
 </body>
 </html>
