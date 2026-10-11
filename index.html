@@ -137,6 +137,11 @@
         </button>
       </div>
 
+      <!-- Direct Channels Button -->
+      <button onclick="toggleChannelsListModal()" class="w-full mt-2 py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/50 text-indigo-300 text-xs font-bold transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-comments"></i> Active Ticket Channels
+      </button>
+
       <!-- Navigation Links -->
       <nav class="space-y-2 mt-3 text-xs">
         <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
@@ -153,7 +158,7 @@
         </button>
         <button onclick="menuNavigate('support')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-darkSurface hover:bg-slate-800 border border-darkBorder text-slate-200 transition">
           <span class="flex items-center gap-3">
-            <i class="fa-solid fa-headset text-cyan-400 w-5"></i> Support Desk &amp; Channels
+            <i class="fa-solid fa-headset text-cyan-400 w-5"></i> Support Desk
           </span>
           <span id="drawerTicketBadge" class="hidden px-1.5 py-0.5 rounded-full bg-cyan-500 text-slate-950 font-bold text-[10px]">0</span>
         </button>
@@ -171,14 +176,38 @@
     </div>
   </div>
 
-  <!-- ==================== DEDICATED TICKET CHANNEL MODAL ==================== -->
+  <!-- ==================== SEPARATE CHANNELS SELECTOR MODAL ==================== -->
+  <div id="channelsListModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 font-mono">
+    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl flex flex-col h-[480px] max-h-[90vh]">
+      <div class="pb-3 border-b border-darkBorder flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="h-9 w-9 rounded-xl bg-indigo-500/10 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <i class="fa-solid fa-comments text-base"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-100 uppercase tracking-wide">Direct Support Channels</div>
+            <div class="text-[10px] text-slate-400">Jump directly into approved cashier/support chats</div>
+          </div>
+        </div>
+        <button onclick="toggleChannelsListModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="channelsListContent" class="flex-1 overflow-y-auto py-3 space-y-2 text-xs scrollbar-thin">
+        <div class="text-slate-500 text-center py-6 text-[11px]">Loading active channels...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DEDICATED TICKET CHAT CHANNEL MODAL ==================== -->
   <div id="ticketChannelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 font-mono">
     <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-2xl p-5 shadow-2xl flex flex-col h-[520px] max-h-[90vh]">
       <!-- Channel Header -->
       <div class="pb-3 border-b border-darkBorder flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="h-9 w-9 rounded-xl bg-cyan-500/10 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
-            <i class="fa-solid fa-comments text-base"></i>
+            <i class="fa-solid fa-headset text-base"></i>
           </div>
           <div>
             <div id="channelTitle" class="text-xs font-bold text-slate-100">Support Channel #---</div>
@@ -230,7 +259,7 @@
             <span class="absolute left-3 top-2.5 text-slate-500 font-mono">@</span>
             <input type="text" id="robloxInput" required placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-xl pl-8 pr-4 py-2.5 text-sm text-slate-100 font-mono focus:outline-none focus:border-neonGold transition">
           </div>
-          <p class="text-[10px] text-slate-500 mt-1">Live Cashier Personnel: @Dalawar_alt &amp; @darkrulerx7</p>
+          <p class="text-[10px] text-slate-500 mt-1 font-mono">Designated Cashier Staff: @Dalawar_alt &amp; @darkrulerx7</p>
         </div>
 
         <div>
@@ -268,7 +297,7 @@
         </div>
       </div>
 
-      <!-- Cashier Buttons, Balance & Menu Drawer Trigger -->
+      <!-- Cashier Buttons, Channels, Balance & Menu Drawer Trigger -->
       <div class="flex items-center gap-2 font-mono">
         <div class="hidden sm:flex items-center gap-1.5">
           <button onclick="openCashierModal('Deposit')" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5">
@@ -277,11 +306,14 @@
           <button onclick="openCashierModal('Withdrawal')" class="px-2.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition flex items-center gap-1.5">
             <i class="fa-solid fa-arrow-down"></i> Withdraw
           </button>
+          <button onclick="toggleChannelsListModal()" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-comments"></i> Channels
+          </button>
         </div>
 
         <div class="bg-darkBg border border-darkBorder px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs sm:text-sm shadow-inner">
           <i class="fa-solid fa-gem text-cyan-400"></i>
-          <span id="userBalance" class="text-cyan-400 font-bold">10,000,000</span>
+          <span id="userBalance" class="text-cyan-400 font-bold">---</span>
         </div>
 
         <div class="flex items-center gap-1.5 pl-2 border-l border-darkBorder">
@@ -819,7 +851,7 @@
     let activeChannelListener = null;
 
     /* ====================================================================
-       PERSISTENT CLOUD PROFILE STORAGE (WITH VIP UNLOCK PERSISTENCE)
+       PERSISTENT CLOUD PROFILE STORAGE (FIXED INITIALIZATION)
     ==================================================================== */
     async function loadCloudUserProfile(username) {
       const cleanUser = username.toLowerCase();
@@ -828,7 +860,7 @@
       const data = snapshot.val();
 
       if (data) {
-        user.balance = data.balance !== undefined ? data.balance : 10000000;
+        user.balance = (typeof data.balance === 'number') ? data.balance : 10000000;
         user.totalWagered = data.totalWagered || 0;
         user.totalDeposits = data.totalDeposits || 10000000;
         user.totalWithdrawals = data.totalWithdrawals || 0;
@@ -848,14 +880,19 @@
         user.vipUnlocked = false;
       }
 
+      // Immediately render actual balance on UI
+      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+      updateAccountUI();
+
       if (user.vipUnlocked) {
         renderVIPBannerUnlocked();
       }
 
+      // Keep real-time sync active
       userRef.on('value', (snap) => {
         const live = snap.val();
         if (live) {
-          if (live.balance !== undefined) {
+          if (typeof live.balance === 'number') {
             user.balance = live.balance;
             document.getElementById('userBalance').textContent = user.balance.toLocaleString();
             updateAccountUI();
@@ -937,9 +974,66 @@
       renderVisibleTickets();
     }
 
+    function toggleChannelsListModal() {
+      const modal = document.getElementById('channelsListModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        renderChannelsList();
+      }
+    }
+
     /* ====================================================================
-       DEDICATED TICKET CHANNEL
+       DEDICATED SUPPORT CHANNELS
     ==================================================================== */
+    function renderChannelsList() {
+      const container = document.getElementById('channelsListContent');
+      container.innerHTML = '';
+
+      const relevant = liveTicketsList.filter(t => {
+        const matchesUser = user.isStaff || (t.username && t.username.toLowerCase() === user.username.toLowerCase());
+        const hasChannel = t.status === 'Approved' || t.status === 'Closed';
+        return matchesUser && hasChannel;
+      });
+
+      if (relevant.length === 0) {
+        container.innerHTML = `
+          <div class="text-slate-500 text-center py-6 text-xs">
+            No active channels yet.<br>Channels are opened once a ticket is approved by staff.
+          </div>
+        `;
+        return;
+      }
+
+      relevant.forEach(ticket => {
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-xl bg-darkSurface border border-darkBorder flex items-center justify-between hover:border-cyan-500/50 transition cursor-pointer';
+        item.onclick = () => {
+          toggleChannelsListModal();
+          openTicketChannel(ticket.id);
+        };
+
+        const isClosed = ticket.status === 'Closed';
+
+        item.innerHTML = `
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-100 text-xs">Channel #${ticket.id.slice(-5)}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isClosed ? 'bg-slate-700 text-slate-400' : 'bg-emerald-500/20 text-emerald-300'}">
+                ${isClosed ? 'Closed' : 'Active'}
+              </span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">
+              @${ticket.username} • ${ticket.type} (${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'})
+            </div>
+          </div>
+          <button class="px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30">
+            Open <i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
     function openTicketChannel(ticketId) {
       currentActiveChannelId = ticketId;
       const ticket = liveTicketsList.find(t => t.id === ticketId);
@@ -1097,8 +1191,8 @@
 
         if (isApproved || isClosed) {
           actionButtons += `
-            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-bold text-[10px] transition flex items-center gap-1.5">
-              <i class="fa-solid fa-comments"></i> Enter Channel
+            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold text-[10px] transition flex items-center gap-1.5">
+              <i class="fa-solid fa-comments"></i> Enter Dedicated Channel
             </button>
           `;
         }
@@ -1171,7 +1265,7 @@
 
       if (!text && !attachedImageBase64 && diamonds <= 0) return;
 
-      const newRef = await db.ref('support_tickets').push({
+      await db.ref('support_tickets').push({
         username: user.username,
         type: type,
         diamonds: diamonds,
@@ -1210,7 +1304,9 @@
       if (!user.isStaff) return;
 
       if (type === 'Deposit' && diamonds > 0) {
-        const targetRef = db.ref('user_profiles/' + targetUser.toLowerCase());
+        const cleanTarget = targetUser.toLowerCase();
+        const targetRef = db.ref('user_profiles/' + cleanTarget);
+        
         await targetRef.transaction((curr) => {
           if (!curr) return { username: targetUser, balance: 10000000 + diamonds, totalWagered: 0 };
           curr.balance = (curr.balance || 0) + diamonds;
@@ -1218,7 +1314,7 @@
           return curr;
         });
 
-        db.ref('leaderboards/' + targetUser.toLowerCase() + '/balance').set(firebase.database.ServerValue.increment(diamonds));
+        db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(diamonds));
       }
 
       await db.ref('support_tickets/' + ticketId).update({
@@ -1247,77 +1343,83 @@
     }
 
     /* ====================================================================
-       CROSS-PLAYER TIPPING & LIVE STAFF BALANCE OVERRIDE
+       CROSS-PLAYER TIPPING & LIVE STAFF BALANCE OVERRIDE (ROBUST LOOKUP)
     ==================================================================== */
     async function executeTip() {
-      const recipient = document.getElementById('tipRecipientInput').value.trim().replace(/^@/, '');
+      const rawRecipient = document.getElementById('tipRecipientInput').value.trim().replace(/^@/, '');
       const amount = parseInt(document.getElementById('tipAmountInput').value);
 
-      if (!recipient) return alert("Enter recipient username");
-      if (recipient.toLowerCase() === user.username.toLowerCase()) {
+      if (!rawRecipient) return alert("Enter recipient username");
+      if (rawRecipient.toLowerCase() === user.username.toLowerCase()) {
         return alert("You cannot tip yourself!");
       }
       if (isNaN(amount) || amount <= 0 || amount > user.balance) return alert("Invalid tip balance!");
 
-      const recipientRef = db.ref('user_profiles/' + recipient.toLowerCase());
-      const recSnap = await recipientRef.once('value');
-      if (!recSnap.exists()) {
-        return alert(`Player @${recipient} has not registered on the platform yet!`);
+      const cleanTarget = rawRecipient.toLowerCase();
+      const targetRef = db.ref('user_profiles/' + cleanTarget);
+      
+      // Check if profile exists, otherwise check if they exist in active sessions or leaderboard
+      const profSnap = await targetRef.once('value');
+      const lbSnap = await db.ref('leaderboards/' + cleanTarget).once('value');
+
+      if (!profSnap.exists() && !lbSnap.exists()) {
+        return alert(`User @${rawRecipient} was not found! Make sure they have logged in at least once.`);
       }
 
+      // Deduct sender balance
       updateBalance(-amount);
       await syncCloudUserProfile();
 
-      await recipientRef.transaction((recProfile) => {
-        if (recProfile) {
-          recProfile.balance = (recProfile.balance || 0) + amount;
+      // Atomically credit recipient
+      await targetRef.transaction((recProfile) => {
+        if (!recProfile) {
+          return { username: rawRecipient, balance: 10000000 + amount, totalWagered: 0 };
         }
+        recProfile.balance = (recProfile.balance || 0) + amount;
         return recProfile;
       });
 
-      db.ref('leaderboards/' + recipient.toLowerCase() + '/balance').set(firebase.database.ServerValue.increment(amount));
+      db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(amount));
 
       toggleModal('tipModal');
 
       db.ref('chat_messages').push({
         sender: 'AuraSystem',
-        text: `@${user.username} tipped ${amount.toLocaleString()} 💎 to @${recipient}!`,
+        text: `@${user.username} tipped ${amount.toLocaleString()} 💎 to @${rawRecipient}!`,
         isStaff: true,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       });
 
-      alert(`Successfully sent tip of ${amount.toLocaleString()} 💎 to @${recipient}!`);
+      alert(`Successfully sent tip of ${amount.toLocaleString()} 💎 to @${rawRecipient}!`);
     }
 
     async function staffModifyBalance() {
       if (!user.isStaff) return;
-      const target = document.getElementById('staffTargetUser').value.trim().replace(/^@/, '');
+      const rawTarget = document.getElementById('staffTargetUser').value.trim().replace(/^@/, '');
       const delta = parseInt(document.getElementById('staffAmountDelta').value);
 
-      if (!target || isNaN(delta)) return alert("Provide username and valid amount delta");
+      if (!rawTarget || isNaN(delta)) return alert("Provide username and valid amount delta");
 
-      const targetRef = db.ref('user_profiles/' + target.toLowerCase());
-      const snap = await targetRef.once('value');
-
-      if (!snap.exists()) {
-        return alert(`User @${target} does not exist in the database!`);
-      }
-
+      const cleanTarget = rawTarget.toLowerCase();
+      const targetRef = db.ref('user_profiles/' + cleanTarget);
+      
+      // Auto-provision if user played or exists in leaderboard
       await targetRef.transaction((prof) => {
-        if (prof) {
-          prof.balance = Math.max(0, (prof.balance || 0) + delta);
+        if (!prof) {
+          return { username: rawTarget, balance: Math.max(0, 10000000 + delta), totalWagered: 0 };
         }
+        prof.balance = Math.max(0, (prof.balance || 0) + delta);
         return prof;
       });
 
-      db.ref('leaderboards/' + target.toLowerCase() + '/balance').set(firebase.database.ServerValue.increment(delta));
+      db.ref('leaderboards/' + cleanTarget + '/balance').set(firebase.database.ServerValue.increment(delta));
 
-      if (target.toLowerCase() === user.username.toLowerCase()) {
+      if (cleanTarget === user.username.toLowerCase()) {
         updateBalance(delta);
       }
 
-      alert(`Successfully adjusted ${delta >= 0 ? '+' + delta.toLocaleString() : delta.toLocaleString()} 💎 for @${target}`);
+      alert(`Successfully adjusted ${delta >= 0 ? '+' + delta.toLocaleString() : delta.toLocaleString()} 💎 for @${rawTarget}`);
       document.getElementById('staffAmountDelta').value = '';
     }
 
@@ -1406,7 +1508,6 @@
       }
 
       document.getElementById('loginModal').classList.add('hidden');
-      updateAccountUI();
       initMinesBoard();
       renderVisibleTickets();
     }
