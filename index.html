@@ -52,6 +52,11 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    .cyan-gradient-text {
+      background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .scrollbar-thin::-webkit-scrollbar { width: 4px; }
     .scrollbar-thin::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
     .coin-perspective { perspective: 1000px; }
@@ -80,10 +85,73 @@
       </div>
       <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Active Elsewhere</h3>
       <p class="text-xs text-slate-300 leading-relaxed font-sans">
-        This account has been accessed on another device or tab.
+        This account has been accessed on another device or tab. Concurrent sessions are blocked.
       </p>
       <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Device
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDING MENU DRAWER ==================== -->
+  <div id="menuDrawerBackdrop" onclick="toggleMenuDrawer()" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm transition-opacity"></div>
+  <div id="menuDrawer" class="fixed top-0 right-0 h-full w-84 max-w-[85vw] bg-darkCard/95 border-l border-darkBorder z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl backdrop-blur-2xl">
+    <div>
+      <div class="flex items-center justify-between pb-5 border-b border-darkBorder">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-crown text-amber-400 text-xl"></i>
+          <h2 class="font-display font-black gold-gradient-text tracking-wider uppercase text-base">Gemluck Menu</h2>
+        </div>
+        <button onclick="toggleMenuDrawer()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button onclick="openCashierModal('Deposit')" class="py-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-plus"></i> Deposit
+        </button>
+        <button onclick="openCashierModal('Withdrawal')" class="py-3 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-arrow-down"></i> Withdraw
+        </button>
+      </div>
+
+      <button id="drawerStaffBtn" onclick="toggleModal('staffPortalModal')" class="hidden w-full mt-3 py-3 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-shield-halved"></i> Staff Approval Desk
+      </button>
+
+      <button onclick="toggleChannelsListModal()" class="w-full mt-2.5 py-3 rounded-2xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-comments"></i> Support Channels
+      </button>
+
+      <nav class="space-y-2 mt-5 text-xs">
+        <button onclick="menuNavigate('games')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
+          <i class="fa-solid fa-gamepad text-sky-400 w-5"></i> Casino Games
+        </button>
+        <button onclick="menuNavigate('account')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
+          <i class="fa-solid fa-user-shield text-amber-400 w-5"></i> Account Vault
+        </button>
+        <button onclick="menuNavigate('leaderboard')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
+          <i class="fa-solid fa-trophy text-yellow-400 w-5"></i> High-Roller Ranks
+        </button>
+        <button onclick="menuNavigate('tip')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
+          <i class="fa-solid fa-hand-holding-dollar text-emerald-400 w-5"></i> Tip Another Player
+        </button>
+        <button onclick="menuNavigate('support')" class="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-darkSurface/60 hover:bg-slate-800 border border-darkBorder/60 text-slate-200 transition">
+          <span class="flex items-center gap-3.5">
+            <i class="fa-solid fa-headset text-sky-400 w-5"></i> Live Support Tickets
+          </span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="pt-5 border-t border-darkBorder text-xs space-y-4">
+      <div class="flex items-center justify-between text-xs text-slate-400">
+        <span>Active User:</span>
+        <span id="drawerUserDisplay" class="font-bold text-amber-300 font-mono">@guest</span>
+      </div>
+      <button onclick="handleLogout()" class="w-full py-3 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs uppercase transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-right-from-bracket"></i> Log Out
       </button>
     </div>
   </div>
@@ -96,7 +164,6 @@
         <p class="text-xs text-slate-400 font-mono mt-1">DIAMOND ARCADE &amp; VIP LOUNGE (MIN 4M 💎)</p>
       </div>
 
-      <!-- Mode Switcher -->
       <div class="grid grid-cols-2 gap-2 mb-5 p-1 bg-darkSurface rounded-2xl border border-darkBorder text-xs font-bold">
         <button id="tabLogin" type="button" onclick="switchAuthMode('login')" class="py-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">Log In</button>
         <button id="tabRegister" type="button" onclick="switchAuthMode('register')" class="py-2.5 rounded-xl text-slate-400 hover:text-white">Register</button>
@@ -155,6 +222,9 @@
           <button onclick="openCashierModal('Withdrawal')" class="px-3.5 py-2 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
             <i class="fa-solid fa-arrow-down"></i> Withdraw
           </button>
+          <button id="headerStaffBtn" onclick="toggleModal('staffPortalModal')" class="hidden px-3.5 py-2 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
+            <i class="fa-solid fa-shield-halved"></i> Staff Portal
+          </button>
           <button onclick="toggleChannelsListModal()" class="px-3.5 py-2 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
             <i class="fa-solid fa-comments"></i> Channels
           </button>
@@ -165,9 +235,12 @@
           <span id="userBalance" class="text-sky-400 font-bold">---</span>
         </div>
 
-        <button onclick="handleLogout()" class="p-2.5 rounded-2xl bg-darkCard hover:bg-darkBorder border border-darkBorder text-rose-400 transition text-sm flex items-center justify-center" title="Log Out">
-          <i class="fa-solid fa-right-from-bracket"></i>
-        </button>
+        <div class="flex items-center gap-2 pl-3 border-l border-darkBorder">
+          <span id="currentUserDisplay" class="text-xs text-slate-300 font-semibold max-w-[90px] sm:max-w-none truncate hidden md:inline">@guest</span>
+          <button onclick="toggleMenuDrawer()" title="Open Main Menu" class="p-2.5 rounded-2xl bg-darkCard hover:bg-darkBorder border border-darkBorder text-amber-300 transition text-sm flex items-center justify-center">
+            <i class="fa-solid fa-bars text-base"></i>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -178,11 +251,11 @@
     <!-- Games Area -->
     <div class="lg:col-span-2 flex flex-col gap-6">
       
-      <!-- VIP Leaks & Live Stream Banner -->
+      <!-- VIP Leaks & Live Stream Banner (Hot Girl Bikini Model) -->
       <div id="vipRewardBanner" class="p-4 sm:p-5 rounded-3xl border border-darkBorder bg-darkCard/90 flex flex-col sm:flex-row items-center justify-between gap-5 shadow-xl backdrop-blur-xl relative overflow-hidden">
         <div class="flex items-center gap-4">
-          <div class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/50 shrink-0">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="VIP Stream Host" class="w-full h-full object-cover">
+          <div class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-purple-500/50 shrink-0 shadow-md">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80" alt="VIP Stream Host Bikini" class="w-full h-full object-cover">
             <span class="absolute top-1 right-1 h-2.5 w-2.5 bg-rose-500 rounded-full animate-ping"></span>
           </div>
           <div>
@@ -439,6 +512,30 @@
     </div>
   </main>
 
+  <!-- ==================== SEPARATE CHANNELS LIST MODAL ==================== -->
+  <div id="channelsListModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col h-[520px] max-h-[90vh]">
+      <div class="pb-4 border-b border-darkBorder flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <i class="fa-solid fa-comments text-lg"></i>
+          </div>
+          <div>
+            <div class="text-xs font-display font-black text-slate-100 uppercase tracking-wide">Direct Support Channels</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 font-sans">Open any active cashier/support dialogue directly</div>
+          </div>
+        </div>
+        <button onclick="toggleChannelsListModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="channelsListContent" class="flex-1 overflow-y-auto py-4 space-y-2.5 text-xs scrollbar-thin">
+        <div class="text-slate-500 text-center py-8 text-[11px]">Loading active channels...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== DEDICATED TICKET CHAT CHANNEL MODAL ==================== -->
   <div id="ticketChannelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
     <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col h-[560px] max-h-[90vh]">
@@ -452,9 +549,14 @@
             <div id="channelSubtitle" class="text-[10px] text-slate-400 mt-0.5">Staff &amp; Player Live Line</div>
           </div>
         </div>
-        <button onclick="closeTicketChannelModal()" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <div class="flex items-center gap-2">
+          <button id="channelCloseBtn" onclick="staffCloseTicketChannel()" class="hidden px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-[10px] font-bold transition">
+            Close Channel
+          </button>
+          <button onclick="closeTicketChannelModal()" class="text-slate-400 hover:text-white p-2">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
       </div>
 
       <div id="channelChatLogs" class="flex-1 overflow-y-auto py-4 space-y-3 text-xs scrollbar-thin"></div>
@@ -471,7 +573,52 @@
           </button>
         </div>
         <div id="channelImagePreviewNote" class="hidden text-[10px] text-sky-400 px-1 font-mono">Image attached ready to send</div>
+        <div id="channelClosedAlert" class="hidden text-center text-[10px] text-rose-400 font-bold py-1">
+          This channel is closed. No new messages can be sent.
+        </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ==================== STAFF APPROVAL PORTAL MODAL ==================== -->
+  <div id="staffPortalModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-3xl bg-darkCard border border-amber-500/40 rounded-3xl p-6 shadow-2xl flex flex-col h-[640px] max-h-[92vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
+        <div>
+          <h3 class="font-display text-lg font-black text-amber-300 flex items-center gap-2.5">
+            <i class="fa-solid fa-shield-halved text-amber-400"></i> Staff Operations &amp; Approvals
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Superuser Console: @dalawar_alt</p>
+        </div>
+        <button onclick="toggleModal('staffPortalModal')" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- SUPERUSER BALANCE OVERRIDE (dalawar_alt only) -->
+      <div id="staffControlPanel" class="hidden my-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs">
+        <div class="font-bold text-amber-300 flex items-center justify-between mb-3 font-display">
+          <span><i class="fa-solid fa-vault mr-1.5"></i> SUPERUSER BALANCE OVERRIDE VAULT</span>
+          <span class="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">PRIMARY ADMIN</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <input type="text" id="staffTargetUser" placeholder="@target_username" class="bg-darkBg border border-darkBorder rounded-xl px-3 py-2 text-slate-200">
+          <input type="number" id="staffAmountDelta" placeholder="Credits (+4000000 / -4000000)" class="bg-darkBg border border-darkBorder rounded-xl px-3 py-2 text-slate-200">
+          <button onclick="staffModifyBalance()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-3 py-2 rounded-xl transition font-sans">
+            Modify Balance
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-hidden flex flex-col mt-2">
+        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
+          <span>Incoming Tickets Queue (Pending Approvals &amp; Receipts)</span>
+          <span class="text-amber-400 font-bold">ALL TICKETS</span>
+        </div>
+        <div id="staffQueueLogs" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-2xl border border-darkBorder scrollbar-thin">
+          <div class="text-slate-500 text-center py-8">No incoming tickets in queue.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -480,7 +627,7 @@
     <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
       <div class="flex items-center justify-between pb-4 border-b border-darkBorder">
         <h3 class="font-display text-base font-black text-sky-300 flex items-center gap-2.5">
-          <i class="fa-solid fa-headset text-sky-400"></i> Gemluck Cashier
+          <i class="fa-solid fa-headset text-sky-400"></i> Cashier Desk &amp; Inquiries
         </h3>
         <button onclick="toggleModal('supportModal')" class="text-slate-400 hover:text-white p-2">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -492,11 +639,21 @@
         <i class="fa-solid fa-envelope-open-text text-amber-400 text-xl"></i>
         <div>
           <span class="font-bold font-display uppercase tracking-wider block">In-Game Mailbox Deposit:</span>
-          <span>Send in-game mailbox deposit to username <b class="text-white font-mono bg-amber-500/30 px-1.5 py-0.5 rounded">@Gemluck99</b> to receive diamond credits. Submit ticket below!</span>
+          <span>Send in-game mailbox deposit to username <b class="text-white font-mono bg-amber-500/30 px-1.5 py-0.5 rounded">@Gemluck99</b> on mail. Submit ticket below to start chatting directly!</span>
         </div>
       </div>
 
-      <div class="space-y-3 pt-4 font-sans">
+      <div class="my-3 flex-1 overflow-hidden flex flex-col">
+        <div class="text-[11px] text-slate-400 font-bold uppercase mb-2 flex justify-between">
+          <span>My Ticket History</span>
+          <span class="text-sky-400 font-bold">PERSONAL DESK</span>
+        </div>
+        <div id="supportChatLogs" class="overflow-y-auto p-4 space-y-3 text-xs bg-darkSurface rounded-2xl border border-darkBorder max-h-[180px] scrollbar-thin">
+          <div class="text-slate-500 text-center py-6">No active tickets found for your account.</div>
+        </div>
+      </div>
+
+      <div class="space-y-3 pt-3 border-t border-darkBorder font-sans">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
           <select id="supportTicketType" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200">
             <option value="Deposit">Deposit (Min 4M 💎)</option>
@@ -504,10 +661,100 @@
             <option value="General">Inquiry / Support</option>
           </select>
           <input type="number" id="supportTicketDiamonds" placeholder="Amount (Min 4,000,000)" class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:border-sky-400">
-          <input type="text" id="supportMessageInput" placeholder="Transaction ID or notes..." class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:border-sky-400">
+          <input type="text" id="supportMessageInput" placeholder="Transaction notes or ID..." class="bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-200 focus:border-sky-400">
         </div>
-        <button onclick="sendSupportTicket()" class="w-full py-3 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition font-mono uppercase">
-          Submit &amp; Open Chat Channel
+        <div class="flex items-center justify-between gap-3 font-mono">
+          <label class="cursor-pointer flex items-center gap-2 text-xs text-slate-400 hover:text-sky-300 px-4 py-2.5 bg-darkSurface rounded-2xl border border-darkBorder transition">
+            <i class="fa-solid fa-paperclip"></i>
+            <span id="supportFileLabel">Attach Proof Photo</span>
+            <input type="file" id="supportImageInput" accept="image/*" class="hidden" onchange="handleSupportFileUpload(event)">
+          </label>
+          <button onclick="sendSupportTicket()" class="px-6 py-2.5 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
+            Submit &amp; Open Chat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LEADERBOARD MODAL ==================== -->
+  <div id="leaderboardModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl">
+      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
+        <h3 class="text-sm font-display font-black text-amber-300 uppercase flex items-center gap-2.5">
+          <i class="fa-solid fa-trophy text-amber-400"></i> High Roller Leaderboards
+        </h3>
+        <button onclick="toggleModal('leaderboardModal')" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5 my-4 text-xs font-display font-bold">
+        <button onclick="switchLeaderboard('wagered')" id="lbTabWagered" class="py-2.5 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300">Most Wagered</button>
+        <button onclick="switchLeaderboard('balance')" id="lbTabBalance" class="py-2.5 rounded-xl bg-darkSurface border border-darkBorder text-slate-400">Highest Balance</button>
+      </div>
+
+      <div id="leaderboardList" class="space-y-2.5 text-xs max-h-72 overflow-y-auto scrollbar-thin">
+        <div class="text-center py-6 text-slate-500">Loading live rankings...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ACCOUNT VAULT MODAL ==================== -->
+  <div id="accountModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl">
+      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
+        <h3 class="text-sm font-display font-black text-sky-300 uppercase flex items-center gap-2.5">
+          <i class="fa-solid fa-user-shield text-sky-400"></i> Player Account Profile
+        </h3>
+        <button onclick="toggleModal('accountModal')" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="my-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
+          <div class="text-[10px] text-slate-400 uppercase">Total Wagered</div>
+          <div id="accTotalWagered" class="text-amber-400 font-bold text-sm mt-1">0</div>
+        </div>
+        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
+          <div class="text-[10px] text-slate-400 uppercase">Deposits</div>
+          <div id="accTotalDeposits" class="text-emerald-400 font-bold text-sm mt-1">10,000,000</div>
+        </div>
+        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
+          <div class="text-[10px] text-slate-400 uppercase">Withdrawals</div>
+          <div id="accTotalWithdrawals" class="text-sky-400 font-bold text-sm mt-1">0</div>
+        </div>
+        <div class="p-3 bg-darkSurface rounded-2xl border border-darkBorder">
+          <div class="text-[10px] text-slate-400 uppercase">Net Profit/Loss</div>
+          <div id="accNetProfit" class="text-slate-200 font-bold text-sm mt-1">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TIP PLAYER MODAL ==================== -->
+  <div id="tipModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-sm bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl">
+      <div class="flex justify-between items-center pb-4 border-b border-darkBorder">
+        <h3 class="text-sm font-display font-black text-amber-300 uppercase flex items-center gap-2.5">
+          <i class="fa-solid fa-hand-holding-dollar"></i> Tip Another Player
+        </h3>
+        <button onclick="toggleModal('tipModal')" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-4 mt-5 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1.5">Recipient Username</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-2.5 text-slate-500">@</span>
+            <input type="text" id="tipRecipientInput" placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-9 pr-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1.5">Tip Amount (💎)</label>
+          <input type="number" id="tipAmountInput" placeholder="1000000" min="500000" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-400">
+        </div>
+
+        <button onclick="executeTip()" class="w-full py-3 rounded-2xl font-display font-black bg-amber-500 hover:bg-amber-400 text-slate-950 uppercase transition">
+          Confirm Tip Transfer
         </button>
       </div>
     </div>
@@ -528,15 +775,16 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // SUPERUSERS AND ADMINS LIST EMPTIED (Assign manually later)
-    const PRIMARY_ADMINS = [];
-    const SUPPORT_STAFF = [];
+    // SUPERUSER / ADMIN SETUP: ONLY dalawar_alt
+    const PRIMARY_ADMINS = ['dalawar_alt'];
+    const SUPPORT_STAFF = ['dalawar_alt'];
 
     const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
+    const MIN_THRESHOLD = 4000000;
     let authMode = 'login';
     let pendingUsername = '';
 
-    // SHA-256 for secure password hashing directly inside database
+    // Fast SHA-256 for secure client password hashing
     async function hashPassword(str) {
       const buffer = new TextEncoder().encode(str + "_gemluck_salt_2026");
       const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
@@ -551,15 +799,23 @@
 
     let user = {
       username: 'guest',
+      isStaff: false,
+      isPrimaryAdmin: false,
       balance: 10000000,
-      totalWagered: 0
+      totalWagered: 0,
+      totalDeposits: 10000000,
+      totalWithdrawals: 0,
+      netProfit: 0,
+      vipUnlocked: false
     };
 
     let heartbeatTimer = null;
     let activeSessionListener = null;
     let currentActiveChannelId = null;
     let channelPendingImageBase64 = null;
+    let attachedTicketImageBase64 = null;
     let activeChannelListener = null;
+    let liveTicketsList = [];
 
     function switchAuthMode(mode) {
       authMode = mode;
@@ -597,7 +853,7 @@
         await sessionRef.set({
           token: myDeviceToken,
           lastSeen: now,
-          expiresAt: now + 12000
+          expiresAt: now + 14000
         });
 
         if (activeSessionListener) sessionRef.off('value', activeSessionListener);
@@ -613,7 +869,7 @@
           if (user.username !== 'guest') {
             sessionRef.update({
               lastSeen: Date.now(),
-              expiresAt: Date.now() + 12000
+              expiresAt: Date.now() + 14000
             });
           }
         }, 3000);
@@ -674,6 +930,10 @@
             hash: passHash,
             balance: 10000000,
             totalWagered: 0,
+            totalDeposits: 10000000,
+            totalWithdrawals: 0,
+            netProfit: 0,
+            vipUnlocked: false,
             createdAt: Date.now()
           });
         } else {
@@ -689,7 +949,7 @@
         if (!lockGranted) {
           errBox.classList.remove('hidden');
           forceBtn.classList.remove('hidden');
-          errText.textContent = `@${rawUser} is logged in on another device!`;
+          errText.textContent = `@${rawUser} is currently logged in on another device!`;
           submitBtn.disabled = false;
           submitBtn.textContent = authMode === 'login' ? 'Enter VIP Arena' : 'Create VIP Account';
           return;
@@ -712,14 +972,51 @@
       const snap = await db.ref('user_vault/' + cleanUser).once('value');
       const data = snap.val() || {};
       user.balance = typeof data.balance === 'number' ? data.balance : 10000000;
+      user.totalWagered = data.totalWagered || 0;
+      user.totalDeposits = data.totalDeposits || 10000000;
+      user.totalWithdrawals = data.totalWithdrawals || 0;
+      user.netProfit = data.netProfit || 0;
+      user.vipUnlocked = data.vipUnlocked || false;
       user.username = data.username || cleanUser;
 
+      const lower = cleanUser.toLowerCase();
+      user.isStaff = SUPPORT_STAFF.includes(lower);
+      user.isPrimaryAdmin = PRIMARY_ADMINS.includes(lower);
+
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      document.getElementById('roleBadge').textContent = 'VIP MEMBER';
+      document.getElementById('currentUserDisplay').textContent = `@${user.username}`;
+      const roleBadge = document.getElementById('roleBadge');
+
+      if (user.isStaff) {
+        roleBadge.textContent = user.isPrimaryAdmin ? 'SUPERUSER' : 'SUPPORT';
+        roleBadge.className = 'text-[9px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        document.getElementById('headerStaffBtn').classList.remove('hidden');
+        document.getElementById('drawerStaffBtn').classList.remove('hidden');
+
+        if (user.isPrimaryAdmin) {
+          document.getElementById('staffControlPanel').classList.remove('hidden');
+        } else {
+          document.getElementById('staffControlPanel').classList.add('hidden');
+        }
+      } else {
+        roleBadge.textContent = 'VIP MEMBER';
+        roleBadge.className = 'text-[9px] uppercase font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+        document.getElementById('headerStaffBtn').classList.add('hidden');
+        document.getElementById('drawerStaffBtn').classList.add('hidden');
+        document.getElementById('staffControlPanel').classList.add('hidden');
+      }
+
+      updateAccountUI();
+      renderVisibleTickets();
+      if (user.isStaff) renderStaffQueue();
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
       initMinesBoard();
+      initLiveSupportTickets();
+      initLeaderboardSync();
+      initLiveCloudChat();
+
       const savedUser = localStorage.getItem('gemluck_logged_user');
       if (savedUser) {
         const allowed = await enforceSingleDevice(savedUser);
@@ -744,25 +1041,237 @@
 
     function toggleModal(id) {
       document.getElementById(id).classList.toggle('hidden');
+      if (id === 'leaderboardModal') renderLeaderboard(currentLeaderboardTab);
+      if (id === 'accountModal') updateAccountUI();
+      if (id === 'supportModal') renderVisibleTickets();
+      if (id === 'staffPortalModal' && user.isStaff) renderStaffQueue();
+    }
+
+    function toggleMenuDrawer() {
+      const drawer = document.getElementById('menuDrawer');
+      const backdrop = document.getElementById('menuDrawerBackdrop');
+      const isOpen = !drawer.classList.contains('translate-x-full');
+
+      if (isOpen) {
+        drawer.classList.add('translate-x-full');
+        backdrop.classList.add('hidden');
+      } else {
+        drawer.classList.remove('translate-x-full');
+        backdrop.classList.remove('hidden');
+        document.getElementById('drawerUserDisplay').textContent = `@${user.username}`;
+      }
+    }
+
+    function menuNavigate(target) {
+      toggleMenuDrawer();
+      if (target === 'games') window.scrollTo({ top: 0, behavior: 'smooth' });
+      else if (target === 'account') toggleModal('accountModal');
+      else if (target === 'leaderboard') toggleModal('leaderboardModal');
+      else if (target === 'tip') toggleModal('tipModal');
+      else if (target === 'support') toggleModal('supportModal');
     }
 
     function openCashierModal(mode) {
       document.getElementById('supportTicketType').value = mode;
       document.getElementById('supportModal').classList.remove('hidden');
+      renderVisibleTickets();
     }
 
-    /* Support Channels & Tickets Engine */
+    function toggleChannelsListModal() {
+      const modal = document.getElementById('channelsListModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) renderChannelsList();
+    }
+
+    /* ====================================================================
+       TICKETS & DIRECT CHAT CHANNELS
+    ==================================================================== */
+    function initLiveSupportTickets() {
+      db.ref('support_tickets').on('value', (snap) => {
+        const val = snap.val();
+        liveTicketsList = [];
+        if (val) {
+          Object.keys(val).forEach(k => liveTicketsList.push({ id: k, ...val[k] }));
+        }
+        renderVisibleTickets();
+        if (user.isStaff) renderStaffQueue();
+      });
+    }
+
+    function renderChannelsList() {
+      const container = document.getElementById('channelsListContent');
+      container.innerHTML = '';
+
+      const relevant = liveTicketsList.filter(t => {
+        return user.isStaff || (t.username && t.username.toLowerCase() === user.username.toLowerCase());
+      });
+
+      if (relevant.length === 0) {
+        container.innerHTML = `<div class="text-slate-500 text-center py-8 text-xs font-sans">No active channels yet.<br>Submit a ticket to start chatting.</div>`;
+        return;
+      }
+
+      relevant.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'p-3.5 rounded-2xl bg-darkSurface border border-darkBorder flex items-center justify-between hover:border-sky-500/50 transition cursor-pointer';
+        item.onclick = () => {
+          toggleChannelsListModal();
+          openTicketChannel(t.id);
+        };
+
+        const isClosed = t.status === 'Closed';
+        const isApproved = t.status === 'Approved';
+
+        item.innerHTML = `
+          <div>
+            <div class="flex items-center gap-2.5">
+              <span class="font-display font-bold text-slate-100 text-xs">Ticket #${t.id.slice(-5)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isApproved ? 'bg-emerald-500/20 text-emerald-300' : (isClosed ? 'bg-slate-700 text-slate-400' : 'bg-amber-500/20 text-amber-300')}">
+                ${t.status || 'Chat Active'}
+              </span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-1 font-sans">
+              @${t.username} • ${t.type} (${t.diamonds ? t.diamonds.toLocaleString() + ' 💎' : 'Inquiry'})
+            </div>
+          </div>
+          <button class="px-3 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 text-[10px] font-bold border border-sky-500/30">
+            Open Chat <i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderVisibleTickets() {
+      const logs = document.getElementById('supportChatLogs');
+      if (!logs) return;
+      logs.innerHTML = '';
+
+      const myTickets = liveTicketsList.filter(t => t.username && t.username.toLowerCase() === user.username.toLowerCase());
+
+      if (myTickets.length === 0) {
+        logs.innerHTML = '<div class="text-slate-500 text-center py-6 font-sans">No active tickets for your account. Create one below.</div>';
+        return;
+      }
+
+      myTickets.forEach(ticket => {
+        const div = document.createElement('div');
+        div.className = 'p-3.5 rounded-2xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5 font-sans';
+
+        const isClosed = ticket.status === 'Closed';
+        const isApproved = ticket.status === 'Approved';
+
+        let badgeClass = isApproved ? 'bg-emerald-500/20 text-emerald-400' : (isClosed ? 'bg-slate-700 text-slate-400' : 'bg-amber-500/20 text-amber-300');
+
+        let html = `
+          <div class="flex justify-between items-center font-mono">
+            <span class="text-sky-400 font-bold">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Chat Active'}</span>
+          </div>
+          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
+        `;
+
+        if (ticket.image) {
+          html += `<div class="mt-1.5"><img src="${ticket.image}" class="rounded-xl max-h-36 border border-darkBorder object-contain"></div>`;
+        }
+
+        html += `
+          <div class="pt-2 border-t border-darkBorder/40">
+            <button onclick="openTicketChannel('${ticket.id}')" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-[10px] transition flex items-center gap-1.5">
+              <i class="fa-solid fa-comments"></i> Enter Live Chat
+            </button>
+          </div>
+        `;
+
+        div.innerHTML = html;
+        logs.appendChild(div);
+      });
+    }
+
+    function renderStaffQueue() {
+      const queue = document.getElementById('staffQueueLogs');
+      if (!queue) return;
+      queue.innerHTML = '';
+
+      if (liveTicketsList.length === 0) {
+        queue.innerHTML = '<div class="text-slate-500 text-center py-8 font-sans">No incoming tickets in queue.</div>';
+        return;
+      }
+
+      liveTicketsList.forEach(ticket => {
+        const div = document.createElement('div');
+        div.className = 'p-4 rounded-2xl bg-darkCard border border-darkBorder text-slate-200 space-y-2.5 font-sans';
+
+        const isClosed = ticket.status === 'Closed';
+        const isApproved = ticket.status === 'Approved';
+
+        let badgeClass = isApproved ? 'bg-emerald-500/20 text-emerald-400' : (isClosed ? 'bg-slate-700 text-slate-400' : 'bg-amber-500/20 text-amber-300');
+
+        let html = `
+          <div class="flex justify-between items-center font-mono">
+            <span class="text-amber-400 font-bold text-xs">@${ticket.username} [${ticket.type} - ${ticket.diamonds ? ticket.diamonds.toLocaleString() + ' 💎' : 'Inquiry'}]</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${ticket.status || 'Chat Active'}</span>
+          </div>
+          <div class="text-slate-300 text-xs">${ticket.message || 'No additional notes.'}</div>
+        `;
+
+        if (ticket.image) {
+          html += `<div class="mt-2"><img src="${ticket.image}" class="rounded-xl max-h-48 border border-darkBorder object-contain"></div>`;
+        }
+
+        html += `<div class="pt-2.5 flex flex-wrap gap-2 border-t border-darkBorder/40 font-mono">
+          <button onclick="openTicketChannel('${ticket.id}')" class="px-3.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-[10px] transition flex items-center gap-1.5">
+            <i class="fa-solid fa-comments"></i> Open Chat
+          </button>`;
+
+        if (!isApproved && !isClosed) {
+          html += `<button onclick="staffApproveDeposit('${ticket.id}', '${ticket.username}', ${ticket.diamonds || 0}, '${ticket.type}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition">
+            Approve Receipt
+          </button>`;
+        }
+
+        if (!isClosed) {
+          html += `<button onclick="staffCloseTicketDirect('${ticket.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-bold text-[10px] transition">
+            Close
+          </button>`;
+        }
+
+        html += `</div>`;
+        div.innerHTML = html;
+        queue.appendChild(div);
+      });
+    }
+
     async function sendSupportTicket() {
       if (user.username === 'guest') return alert("Please log in first!");
+
       const type = document.getElementById('supportTicketType').value;
       const diamonds = parseInt(document.getElementById('supportTicketDiamonds').value) || 0;
       const notes = document.getElementById('supportMessageInput').value.trim();
+
+      if (type === 'Deposit' && diamonds < MIN_THRESHOLD) {
+        return alert(`Minimum deposit threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+      }
+
+      if (type === 'Withdrawal') {
+        if (diamonds < MIN_THRESHOLD) return alert(`Minimum withdrawal threshold is ${MIN_THRESHOLD.toLocaleString()} 💎 (4M)!`);
+        if (diamonds > user.balance) return alert("Insufficient diamond balance to withdraw!");
+
+        user.balance -= diamonds;
+        user.totalWithdrawals += diamonds;
+        document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+        db.ref('user_vault/' + user.username.toLowerCase()).update({
+          balance: user.balance,
+          totalWithdrawals: user.totalWithdrawals
+        });
+      }
 
       const newRef = await db.ref('support_tickets').push({
         username: user.username,
         type: type,
         diamonds: diamonds,
         message: notes,
+        image: attachedTicketImageBase64 || null,
         status: 'Chat Active',
         timestamp: Date.now()
       });
@@ -775,8 +1284,23 @@
         timestamp: Date.now()
       });
 
+      document.getElementById('supportMessageInput').value = '';
+      document.getElementById('supportTicketDiamonds').value = '';
+      document.getElementById('supportFileLabel').textContent = 'Attach Proof Photo';
+      attachedTicketImageBase64 = null;
+
       toggleModal('supportModal');
       openTicketChannel(newRef.key);
+    }
+
+    function handleSupportFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('supportFileLabel').textContent = file.name.substring(0, 15) + '...';
+        const reader = new FileReader();
+        reader.onload = (evt) => { attachedTicketImageBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
     }
 
     function openTicketChannel(ticketId) {
@@ -840,7 +1364,7 @@
         sender: user.username,
         text: text || '',
         image: channelPendingImageBase64 || null,
-        isStaff: false,
+        isStaff: user.isStaff,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       });
@@ -857,6 +1381,157 @@
       }
       currentActiveChannelId = null;
       document.getElementById('ticketChannelModal').classList.add('hidden');
+    }
+
+    async function staffApproveDeposit(ticketId, targetUser, diamonds, type) {
+      if (!user.isStaff) return;
+
+      if (type === 'Deposit' && diamonds > 0) {
+        const clean = targetUser.toLowerCase();
+        const ref = db.ref('user_vault/' + clean);
+        await ref.transaction((curr) => {
+          if (!curr) return curr;
+          curr.balance = (curr.balance || 0) + diamonds;
+          curr.totalDeposits = (curr.totalDeposits || 0) + diamonds;
+          return curr;
+        });
+      }
+
+      await db.ref('support_tickets/' + ticketId).update({
+        status: 'Approved',
+        approvedBy: user.username
+      });
+
+      await db.ref(`ticket_channels/${ticketId}/messages`).push({
+        sender: 'GemluckSupport',
+        text: `Ticket approved by staff @${user.username}. ${diamonds > 0 ? diamonds.toLocaleString() + ' 💎 credited.' : ''}`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      openTicketChannel(ticketId);
+    }
+
+    async function staffCloseTicketDirect(ticketId) {
+      if (!user.isStaff) return;
+      if (!confirm("Close ticket?")) return;
+      await db.ref('support_tickets/' + ticketId).update({ status: 'Closed' });
+    }
+
+    /* ====================================================================
+       SUPERUSER BALANCE OVERRIDE (dalawar_alt ONLY)
+    ==================================================================== */
+    async function staffModifyBalance() {
+      if (!user.isPrimaryAdmin) return alert("Unauthorized: Only superuser @dalawar_alt can modify balance.");
+      const target = document.getElementById('staffTargetUser').value.trim().replace(/^@/, '');
+      const delta = parseInt(document.getElementById('staffAmountDelta').value);
+
+      if (!target || isNaN(delta)) return alert("Enter target username and valid amount delta.");
+
+      const clean = target.toLowerCase();
+      const ref = db.ref('user_vault/' + clean);
+      await ref.transaction((prof) => {
+        if (!prof) return prof;
+        prof.balance = Math.max(0, (prof.balance || 0) + delta);
+        return prof;
+      });
+
+      if (clean === user.username.toLowerCase()) {
+        user.balance = Math.max(0, user.balance + delta);
+        document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+      }
+
+      alert(`Adjusted balance for @${target} by ${delta.toLocaleString()} 💎`);
+      document.getElementById('staffAmountDelta').value = '';
+    }
+
+    /* ====================================================================
+       TIPPING & PROFILE STORAGE
+    ==================================================================== */
+    async function executeTip() {
+      const recipient = document.getElementById('tipRecipientInput').value.trim().replace(/^@/, '');
+      const amount = parseInt(document.getElementById('tipAmountInput').value);
+
+      if (!recipient) return alert("Enter recipient username");
+      if (recipient.toLowerCase() === user.username.toLowerCase()) return alert("You cannot tip yourself!");
+      if (isNaN(amount) || amount <= 0 || amount > user.balance) return alert("Invalid tip balance!");
+
+      const clean = recipient.toLowerCase();
+      const targetRef = db.ref('user_vault/' + clean);
+      const snap = await targetRef.once('value');
+
+      if (!snap.exists()) return alert(`User @${recipient} not found!`);
+
+      user.balance -= amount;
+      document.getElementById('userBalance').textContent = user.balance.toLocaleString();
+      await db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
+
+      await targetRef.transaction((p) => {
+        if (!p) return p;
+        p.balance = (p.balance || 0) + amount;
+        return p;
+      });
+
+      toggleModal('tipModal');
+
+      await db.ref('chat_messages').push({
+        sender: 'GemluckSystem',
+        text: `@${user.username} tipped ${amount.toLocaleString()} 💎 to @${recipient}!`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+
+      alert(`Successfully tipped ${amount.toLocaleString()} 💎 to @${recipient}!`);
+    }
+
+    function updateAccountUI() {
+      document.getElementById('accTotalWagered').textContent = `${(user.totalWagered || 0).toLocaleString()} 💎`;
+      document.getElementById('accTotalDeposits').textContent = `${(user.totalDeposits || 10000000).toLocaleString()} 💎`;
+      document.getElementById('accTotalWithdrawals').textContent = `${(user.totalWithdrawals || 0).toLocaleString()} 💎`;
+      document.getElementById('accNetProfit').textContent = `${(user.netProfit || 0) >= 0 ? '+' + (user.netProfit || 0).toLocaleString() : (user.netProfit || 0).toLocaleString()} 💎`;
+    }
+
+    let currentLeaderboardTab = 'wagered';
+    function switchLeaderboard(type) {
+      currentLeaderboardTab = type;
+      if (type === 'wagered') {
+        document.getElementById('lbTabWagered').className = 'py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabBalance').className = 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+      } else {
+        document.getElementById('lbTabBalance').className = 'py-2 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 font-bold';
+        document.getElementById('lbTabWagered').className = 'py-2 rounded-xl bg-darkSurface border border-darkBorder text-slate-400 font-bold';
+      }
+      renderLeaderboard(type);
+    }
+
+    let globalLeaderboard = [];
+    function initLeaderboardSync() {
+      db.ref('user_vault').on('value', (s) => {
+        const val = s.val() || {};
+        globalLeaderboard = Object.values(val);
+        renderLeaderboard(currentLeaderboardTab);
+      });
+    }
+
+    function renderLeaderboard(key) {
+      const list = document.getElementById('leaderboardList');
+      if (!list) return;
+      list.innerHTML = '';
+
+      const sorted = [...globalLeaderboard].sort((a, b) => (b[key] || 0) - (a[key] || 0));
+      sorted.slice(0, 10).forEach((item, i) => {
+        const row = document.createElement('div');
+        row.className = 'p-3 rounded-2xl bg-darkSurface border border-darkBorder flex justify-between items-center text-xs';
+        row.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <span class="font-bold text-amber-400 font-display">#${i + 1}</span>
+            <span class="text-slate-200">@${item.username || 'User'}</span>
+          </div>
+          <div class="text-amber-400 font-bold">${(item[key] || 0).toLocaleString()} 💎</div>
+        `;
+        list.appendChild(row);
+      });
     }
 
     /* ====================================================================
@@ -908,11 +1583,15 @@
     function toggleMinesRound() {
       const bet = parseInt(document.getElementById('minesBetInput').value) || 4000000;
       if (!minesActive) {
-        if (bet > user.balance) return alert("Insufficient balance!");
+        if (bet > user.balance) return alert("Insufficient diamond balance!");
         user.balance -= bet;
+        user.totalWagered = (user.totalWagered || 0) + bet;
         document.getElementById('userBalance').textContent = user.balance.toLocaleString();
         if (user.username !== 'guest') {
-          db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+          db.ref('user_vault/' + user.username.toLowerCase()).update({
+            balance: user.balance,
+            totalWagered: user.totalWagered
+          });
         }
         minesBet = bet;
         minesActive = true;
@@ -958,7 +1637,7 @@
       user.balance += won;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       if (user.username !== 'guest') {
-        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
       }
       minesActive = false;
       document.getElementById('minesActionBtn').textContent = 'START GAME';
@@ -996,7 +1675,7 @@
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       if (user.username !== 'guest') {
-        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
       }
 
       coinFlipping = true;
@@ -1016,7 +1695,7 @@
           user.balance += payout;
           document.getElementById('userBalance').textContent = user.balance.toLocaleString();
           if (user.username !== 'guest') {
-            db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+            db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
           }
           document.getElementById('coinResultNotice').textContent = `Won! +${payout.toLocaleString()} 💎`;
           document.getElementById('coinResultNotice').className = 'font-mono text-xs uppercase text-amber-400 font-bold';
@@ -1051,7 +1730,7 @@
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       if (user.username !== 'guest') {
-        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
       }
 
       const target = parseInt(document.getElementById('diceSlider').value);
@@ -1066,7 +1745,7 @@
         user.balance += payout;
         document.getElementById('userBalance').textContent = user.balance.toLocaleString();
         if (user.username !== 'guest') {
-          db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+          db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
         }
         document.getElementById('diceStatusNotice').textContent = `Winner! Rolled ${roll}`;
         document.getElementById('diceStatusNotice').className = 'font-mono text-xs uppercase text-emerald-400 font-bold';
@@ -1095,7 +1774,7 @@
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       if (user.username !== 'guest') {
-        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
       }
 
       let outcome = Math.floor(Math.random() * 37);
@@ -1111,7 +1790,7 @@
         user.balance += payout;
         document.getElementById('userBalance').textContent = user.balance.toLocaleString();
         if (user.username !== 'guest') {
-          db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+          db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
         }
         document.getElementById('rouletteStatus').textContent = `Landed ${outcome}! Won ${payout.toLocaleString()} 💎`;
         document.getElementById('rouletteStatus').className = 'font-mono text-xs uppercase text-amber-400 font-bold';
@@ -1157,7 +1836,7 @@
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       if (user.username !== 'guest') {
-        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
       }
 
       bjBet = bet;
@@ -1211,7 +1890,7 @@
       }
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       if (user.username !== 'guest') {
-        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        db.ref('user_vault/' + user.username.toLowerCase()).update({ balance: user.balance });
       }
     }
 
@@ -1225,22 +1904,15 @@
       document.getElementById(`tab-${name}`).className = 'game-selector px-4 py-2.5 rounded-2xl bg-darkCard border border-amber-400 text-amber-300 whitespace-nowrap';
     }
 
-    /* General Lounge Chat */
-    async function handleSendChat(e) {
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text || user.username === 'guest') return;
-      await db.ref('chat_messages').push({
-        sender: user.username,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    /* General Lounge Chat with Player Icons */
+    function initLiveCloudChat() {
+      db.ref('chat_messages').limitToLast(25).on('child_added', (snap) => {
+        const msg = snap.val();
+        if (msg) renderChatMessage(msg);
       });
-      input.value = '';
     }
 
-    db.ref('chat_messages').limitToLast(20).on('child_added', (snap) => {
-      const msg = snap.val();
+    function renderChatMessage(msg) {
       const box = document.getElementById('generalChatBox');
       const div = document.createElement('div');
       div.className = 'p-3 rounded-2xl bg-darkSurface/60 border border-darkBorder flex items-start gap-2.5';
@@ -1254,7 +1926,20 @@
       `;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
-    });
+    }
+
+    async function handleSendChat(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text || user.username === 'guest') return;
+      await db.ref('chat_messages').push({
+        sender: user.username,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      input.value = '';
+    }
   </script>
 </body>
 </html>
