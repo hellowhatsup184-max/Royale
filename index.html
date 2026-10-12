@@ -7,13 +7,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
@@ -50,11 +49,6 @@
     }
     .gold-gradient-text {
       background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .cyan-gradient-text {
-      background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 50%, #0284c7 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -118,19 +112,19 @@
         </div>
 
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Email Address *</label>
-          <input type="email" id="emailInput" required placeholder="youremail@example.com" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-sky-400 transition">
+          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Secret Password / PIN *</label>
+          <input type="password" id="passwordInput" required placeholder="••••••••" minlength="4" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
+          <p class="text-[10px] text-slate-500 mt-1 font-mono">Minimum 4 characters</p>
         </div>
 
-        <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Password / PIN *</label>
-          <input type="password" id="passwordInput" required placeholder="••••••••" minlength="6" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
-          <p class="text-[10px] text-slate-500 mt-1 font-mono">Must be at least 6 characters</p>
-        </div>
-
-        <div id="authErrorAlert" class="hidden p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex items-start gap-2.5">
-          <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
-          <span id="authErrorMsg">Error occurred.</span>
+        <div id="authErrorAlert" class="hidden p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 font-mono text-xs flex flex-col gap-2">
+          <div class="flex items-start gap-2.5">
+            <i class="fa-solid fa-triangle-exclamation text-rose-400 mt-0.5"></i>
+            <span id="authErrorMsg">Error occurred.</span>
+          </div>
+          <button type="button" id="forceOverrideBtn" onclick="forceTakeoverLogin()" class="hidden w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 font-bold rounded-xl text-[11px] transition uppercase">
+            Force Relinquish Other Device &amp; Enter Here
+          </button>
         </div>
 
         <button type="submit" id="authSubmitBtn" class="w-full py-3.5 rounded-2xl font-display font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
@@ -160,9 +154,6 @@
           </button>
           <button onclick="openCashierModal('Withdrawal')" class="px-3.5 py-2 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
             <i class="fa-solid fa-arrow-down"></i> Withdraw
-          </button>
-          <button id="headerStaffBtn" onclick="toggleModal('staffPortalModal')" class="hidden px-3.5 py-2 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
-            <i class="fa-solid fa-shield-halved"></i> Staff Portal
           </button>
           <button onclick="toggleChannelsListModal()" class="px-3.5 py-2 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold transition flex items-center gap-1.5 font-sans">
             <i class="fa-solid fa-comments"></i> Channels
@@ -448,6 +439,42 @@
     </div>
   </main>
 
+  <!-- ==================== DEDICATED TICKET CHAT CHANNEL MODAL ==================== -->
+  <div id="ticketChannelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
+    <div class="w-full max-w-lg bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col h-[560px] max-h-[90vh]">
+      <div class="pb-4 border-b border-darkBorder flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-2xl bg-sky-500/10 border border-sky-500/40 flex items-center justify-center text-sky-400">
+            <i class="fa-solid fa-headset text-lg"></i>
+          </div>
+          <div>
+            <div id="channelTitle" class="text-xs font-display font-bold text-slate-100">Ticket #---</div>
+            <div id="channelSubtitle" class="text-[10px] text-slate-400 mt-0.5">Staff &amp; Player Live Line</div>
+          </div>
+        </div>
+        <button onclick="closeTicketChannelModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="channelChatLogs" class="flex-1 overflow-y-auto py-4 space-y-3 text-xs scrollbar-thin"></div>
+
+      <form onsubmit="handleSendChannelMessage(event)" class="pt-3 border-t border-darkBorder space-y-2">
+        <div class="flex gap-2 items-center">
+          <label class="cursor-pointer p-2.5 rounded-2xl bg-darkSurface border border-darkBorder hover:text-sky-300 text-slate-400 text-sm transition">
+            <i class="fa-solid fa-image"></i>
+            <input type="file" id="channelMsgFile" accept="image/*" class="hidden" onchange="handleChannelImageUpload(event)">
+          </label>
+          <input type="text" id="channelChatInput" placeholder="Message or attach image..." maxlength="200" class="flex-1 bg-darkSurface border border-darkBorder rounded-2xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+          <button type="submit" class="px-5 py-2.5 bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-xs rounded-2xl transition">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+        <div id="channelImagePreviewNote" class="hidden text-[10px] text-sky-400 px-1 font-mono">Image attached ready to send</div>
+      </form>
+    </div>
+  </div>
+
   <!-- ==================== CASHIER MODAL ==================== -->
   <div id="supportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 font-mono">
     <div class="w-full max-w-2xl bg-darkCard border border-darkBorder rounded-3xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
@@ -499,23 +526,26 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.database();
 
-    const PRIMARY_ADMINS = ['dalawar_alt', 'darkrulerx7'];
-    const SUPPORT_STAFF = ['dalawar_alt', 'darkrulerx7', 'rastant86'];
     const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
-    const MIN_THRESHOLD = 4000000;
     let authMode = 'login';
+    let pendingUsername = '';
 
-    let myDeviceToken = localStorage.getItem('aura_cloud_device_token');
+    // Fast SHA-256 for secure in-database client password verification
+    async function hashPassword(str) {
+      const buffer = new TextEncoder().encode(str + "_gemluck_salt");
+      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    let myDeviceToken = localStorage.getItem('gemluck_device_token');
     if (!myDeviceToken) {
       myDeviceToken = 'hw_' + Math.random().toString(36).substring(2) + Date.now();
-      localStorage.setItem('aura_cloud_device_token', myDeviceToken);
+      localStorage.setItem('gemluck_device_token', myDeviceToken);
     }
 
     let user = {
-      uid: null,
       username: 'guest',
       balance: 10000000,
       totalWagered: 0
@@ -523,12 +553,16 @@
 
     let heartbeatTimer = null;
     let activeSessionListener = null;
+    let currentActiveChannelId = null;
+    let channelPendingImageBase64 = null;
+    let activeChannelListener = null;
 
     function switchAuthMode(mode) {
       authMode = mode;
       const tabLogin = document.getElementById('tabLogin');
       const tabRegister = document.getElementById('tabRegister');
       const submitBtn = document.getElementById('authSubmitBtn');
+      document.getElementById('authErrorAlert').classList.add('hidden');
 
       if (mode === 'login') {
         tabLogin.className = 'py-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30';
@@ -541,19 +575,27 @@
       }
     }
 
-    async function enforceSingleDevice(uid) {
-      const sessionRef = db.ref('active_sessions/' + uid);
+    async function enforceSingleDevice(cleanUser, forceOverride = false) {
+      const sessionRef = db.ref('active_sessions/' + cleanUser);
+      const snap = await sessionRef.once('value');
+      const data = snap.val();
       const now = Date.now();
+
+      if (!forceOverride && data && data.token && data.token !== myDeviceToken) {
+        if (data.expiresAt && now < data.expiresAt) {
+          return false; // Active lock held by other device
+        }
+      }
 
       await sessionRef.set({
         token: myDeviceToken,
         lastSeen: now,
-        expiresAt: now + 16000
+        expiresAt: now + 12000
       });
 
       if (activeSessionListener) sessionRef.off('value', activeSessionListener);
-      activeSessionListener = sessionRef.on('value', (snap) => {
-        const val = snap.val();
+      activeSessionListener = sessionRef.on('value', (s) => {
+        const val = s.val();
         if (val && val.token && val.token !== myDeviceToken) {
           triggerRemoteKick();
         }
@@ -561,57 +603,91 @@
 
       if (heartbeatTimer) clearInterval(heartbeatTimer);
       heartbeatTimer = setInterval(() => {
-        if (user.uid) {
+        if (user.username !== 'guest') {
           sessionRef.update({
             lastSeen: Date.now(),
-            expiresAt: Date.now() + 16000
+            expiresAt: Date.now() + 12000
           });
         }
-      }, 4000);
+      }, 3000);
+
+      return true;
     }
 
     function triggerRemoteKick() {
       if (heartbeatTimer) clearInterval(heartbeatTimer);
-      user.uid = null;
+      user.username = 'guest';
+      localStorage.removeItem('gemluck_logged_user');
       document.getElementById('sessionKickOverlay').classList.remove('hidden');
       document.body.style.pointerEvents = 'none';
       document.getElementById('sessionKickOverlay').style.pointerEvents = 'auto';
     }
 
+    async function forceTakeoverLogin() {
+      if (!pendingUsername) return;
+      await enforceSingleDevice(pendingUsername, true);
+      localStorage.setItem('gemluck_logged_user', pendingUsername);
+      user.username = pendingUsername;
+      document.getElementById('loginModal').classList.add('hidden');
+      await loadUserData(pendingUsername);
+    }
+
     document.getElementById('authForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const robloxUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
-      const email = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value;
+      const rawUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
+      const rawPassword = document.getElementById('passwordInput').value.trim();
+      const cleanUser = rawUser.toLowerCase();
       const errBox = document.getElementById('authErrorAlert');
       const errText = document.getElementById('authErrorMsg');
+      const forceBtn = document.getElementById('forceOverrideBtn');
       const submitBtn = document.getElementById('authSubmitBtn');
 
+      pendingUsername = cleanUser;
       submitBtn.disabled = true;
       submitBtn.textContent = 'Verifying...';
       errBox.classList.add('hidden');
+      forceBtn.classList.add('hidden');
 
       try {
-        let userCred;
+        const passHash = await hashPassword(rawPassword);
+        const userRef = db.ref('user_vault/' + cleanUser);
+        const snap = await userRef.once('value');
+        const account = snap.val();
+
         if (authMode === 'register') {
-          userCred = await auth.createUserWithEmailAndPassword(email, password);
-          await db.ref('user_profiles/' + userCred.user.uid).set({
-            username: robloxUser,
-            email: email,
+          if (account) {
+            throw new Error(`@${rawUser} already exists. Please choose Log In!`);
+          }
+          await userRef.set({
+            username: rawUser,
+            hash: passHash,
             balance: 10000000,
             totalWagered: 0,
             createdAt: Date.now()
           });
         } else {
-          userCred = await auth.signInWithEmailAndPassword(email, password);
+          if (!account) {
+            throw new Error(`@${rawUser} does not exist. Please Register first!`);
+          }
+          if (account.hash !== passHash) {
+            throw new Error("Incorrect Password/PIN!");
+          }
         }
 
-        user.uid = userCred.user.uid;
-        user.username = robloxUser;
+        const lockGranted = await enforceSingleDevice(cleanUser);
+        if (!lockGranted) {
+          errBox.classList.remove('hidden');
+          forceBtn.classList.remove('hidden');
+          errText.textContent = `@${rawUser} is logged in on another device!`;
+          submitBtn.disabled = false;
+          submitBtn.textContent = authMode === 'login' ? 'Enter VIP Arena' : 'Create VIP Account';
+          return;
+        }
 
-        await enforceSingleDevice(user.uid);
+        localStorage.setItem('gemluck_logged_user', cleanUser);
+        user.username = rawUser;
         document.getElementById('loginModal').classList.add('hidden');
-        await loadUserData(user.uid);
+        await loadUserData(cleanUser);
       } catch (err) {
         errBox.classList.remove('hidden');
         errText.textContent = err.message;
@@ -621,33 +697,37 @@
       }
     });
 
-    async function loadUserData(uid) {
-      const snap = await db.ref('user_profiles/' + uid).once('value');
+    async function loadUserData(cleanUser) {
+      const snap = await db.ref('user_vault/' + cleanUser).once('value');
       const data = snap.val() || {};
-      user.balance = data.balance || 10000000;
-      user.username = data.username || user.username;
+      user.balance = typeof data.balance === 'number' ? data.balance : 10000000;
+      user.username = data.username || cleanUser;
 
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
       document.getElementById('roleBadge').textContent = 'VIP MEMBER';
     }
 
-    auth.onAuthStateChanged(async (firebaseUser) => {
-      if (firebaseUser) {
-        user.uid = firebaseUser.uid;
-        await enforceSingleDevice(user.uid);
-        document.getElementById('loginModal').classList.add('hidden');
-        await loadUserData(user.uid);
-      } else {
-        document.getElementById('loginModal').classList.remove('hidden');
+    window.addEventListener('DOMContentLoaded', async () => {
+      initMinesBoard();
+      const savedUser = localStorage.getItem('gemluck_logged_user');
+      if (savedUser) {
+        const allowed = await enforceSingleDevice(savedUser);
+        if (allowed) {
+          user.username = savedUser;
+          document.getElementById('loginModal').classList.add('hidden');
+          await loadUserData(savedUser);
+        } else {
+          document.getElementById('loginModal').classList.remove('hidden');
+        }
       }
     });
 
     async function handleLogout() {
-      if (user.uid) {
-        await db.ref('active_sessions/' + user.uid).remove();
+      if (user.username !== 'guest') {
+        await db.ref('active_sessions/' + user.username.toLowerCase()).remove();
       }
       if (heartbeatTimer) clearInterval(heartbeatTimer);
-      await auth.signOut();
+      localStorage.removeItem('gemluck_logged_user');
       location.reload();
     }
 
@@ -660,14 +740,14 @@
       document.getElementById('supportModal').classList.remove('hidden');
     }
 
+    /* Support Channels & Tickets Engine */
     async function sendSupportTicket() {
-      if (!user.uid) return alert("Log in first!");
+      if (user.username === 'guest') return alert("Please log in first!");
       const type = document.getElementById('supportTicketType').value;
       const diamonds = parseInt(document.getElementById('supportTicketDiamonds').value) || 0;
       const notes = document.getElementById('supportMessageInput').value.trim();
 
-      await db.ref('support_tickets').push({
-        uid: user.uid,
+      const newRef = await db.ref('support_tickets').push({
         username: user.username,
         type: type,
         diamonds: diamonds,
@@ -676,8 +756,96 @@
         timestamp: Date.now()
       });
 
-      alert("Ticket submitted!");
+      await db.ref(`ticket_channels/${newRef.key}/messages`).push({
+        sender: 'GemluckSupport',
+        text: `Welcome @${user.username}. Chat is open. You can send transaction receipts, messages, and photos here directly.`,
+        isStaff: true,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
       toggleModal('supportModal');
+      openTicketChannel(newRef.key);
+    }
+
+    function openTicketChannel(ticketId) {
+      currentActiveChannelId = ticketId;
+      document.getElementById('channelTitle').textContent = `Ticket #${ticketId.slice(-5)}`;
+      document.getElementById('ticketChannelModal').classList.remove('hidden');
+
+      const logs = document.getElementById('channelChatLogs');
+      logs.innerHTML = '';
+
+      const msgsRef = db.ref(`ticket_channels/${ticketId}/messages`);
+      if (activeChannelListener) msgsRef.off('child_added', activeChannelListener);
+
+      activeChannelListener = msgsRef.on('child_added', (snap) => {
+        const msg = snap.val();
+        if (msg) renderChannelMessage(msg);
+      });
+    }
+
+    function renderChannelMessage(msg) {
+      const logs = document.getElementById('channelChatLogs');
+      const isMe = msg.sender.toLowerCase() === user.username.toLowerCase();
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+
+      let imgHtml = msg.image ? `<div class="mt-1.5"><img src="${msg.image}" class="rounded-xl max-h-40 border border-darkBorder object-contain"></div>` : '';
+
+      msgDiv.innerHTML = `
+        <div class="text-[9px] text-slate-400 mb-0.5">
+          <span class="${msg.isStaff ? 'text-amber-400 font-bold' : 'text-sky-400'}">@${msg.sender}</span> • ${msg.time || ''}
+        </div>
+        <div class="p-3 rounded-2xl text-xs max-w-[85%] ${isMe ? 'bg-sky-600/30 border border-sky-500/40 text-sky-100' : 'bg-darkSurface border border-darkBorder text-slate-200'}">
+          ${msg.text ? `<div>${msg.text}</div>` : ''}
+          ${imgHtml}
+        </div>
+      `;
+      logs.appendChild(msgDiv);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function handleChannelImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          channelPendingImageBase64 = evt.target.result;
+          document.getElementById('channelImagePreviewNote').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function handleSendChannelMessage(e) {
+      e.preventDefault();
+      if (!currentActiveChannelId) return;
+      const input = document.getElementById('channelChatInput');
+      const text = input.value.trim();
+      if (!text && !channelPendingImageBase64) return;
+
+      await db.ref(`ticket_channels/${currentActiveChannelId}/messages`).push({
+        sender: user.username,
+        text: text || '',
+        image: channelPendingImageBase64 || null,
+        isStaff: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      });
+
+      input.value = '';
+      channelPendingImageBase64 = null;
+      document.getElementById('channelMsgFile').value = '';
+      document.getElementById('channelImagePreviewNote').classList.add('hidden');
+    }
+
+    function closeTicketChannelModal() {
+      if (currentActiveChannelId && activeChannelListener) {
+        db.ref(`ticket_channels/${currentActiveChannelId}/messages`).off('child_added', activeChannelListener);
+      }
+      currentActiveChannelId = null;
+      document.getElementById('ticketChannelModal').classList.add('hidden');
     }
 
     /* ====================================================================
@@ -732,8 +900,9 @@
         if (bet > user.balance) return alert("Insufficient balance!");
         user.balance -= bet;
         document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-        if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
-
+        if (user.username !== 'guest') {
+          db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        }
         minesBet = bet;
         minesActive = true;
         minesOpened = 0;
@@ -777,7 +946,9 @@
       const won = Math.floor(minesBet * mult);
       user.balance += won;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+      if (user.username !== 'guest') {
+        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+      }
       minesActive = false;
       document.getElementById('minesActionBtn').textContent = 'START GAME';
 
@@ -813,7 +984,9 @@
 
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+      if (user.username !== 'guest') {
+        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+      }
 
       coinFlipping = true;
       document.getElementById('coinFlipBtn').disabled = true;
@@ -831,7 +1004,9 @@
           const payout = Math.floor(bet * 1.96);
           user.balance += payout;
           document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-          if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+          if (user.username !== 'guest') {
+            db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+          }
           document.getElementById('coinResultNotice').textContent = `Won! +${payout.toLocaleString()} 💎`;
           document.getElementById('coinResultNotice').className = 'font-mono text-xs uppercase text-amber-400 font-bold';
         } else {
@@ -864,7 +1039,9 @@
 
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+      if (user.username !== 'guest') {
+        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+      }
 
       const target = parseInt(document.getElementById('diceSlider').value);
       const mult = parseFloat(document.getElementById('diceMultiplier').textContent);
@@ -877,7 +1054,9 @@
         const payout = Math.floor(bet * mult);
         user.balance += payout;
         document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-        if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+        if (user.username !== 'guest') {
+          db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        }
         document.getElementById('diceStatusNotice').textContent = `Winner! Rolled ${roll}`;
         document.getElementById('diceStatusNotice').className = 'font-mono text-xs uppercase text-emerald-400 font-bold';
       } else {
@@ -904,7 +1083,9 @@
 
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+      if (user.username !== 'guest') {
+        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+      }
 
       let outcome = Math.floor(Math.random() * 37);
       document.getElementById('rouletteResultNumber').textContent = outcome;
@@ -918,7 +1099,9 @@
         const payout = bet * mult;
         user.balance += payout;
         document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-        if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+        if (user.username !== 'guest') {
+          db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+        }
         document.getElementById('rouletteStatus').textContent = `Landed ${outcome}! Won ${payout.toLocaleString()} 💎`;
         document.getElementById('rouletteStatus').className = 'font-mono text-xs uppercase text-amber-400 font-bold';
       } else {
@@ -962,7 +1145,9 @@
 
       user.balance -= bet;
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+      if (user.username !== 'guest') {
+        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+      }
 
       bjBet = bet;
       bjGameActive = true;
@@ -1014,7 +1199,9 @@
         user.balance += bjBet;
       }
       document.getElementById('userBalance').textContent = user.balance.toLocaleString();
-      if (user.uid) db.ref('user_profiles/' + user.uid + '/balance').set(user.balance);
+      if (user.username !== 'guest') {
+        db.ref('user_vault/' + user.username.toLowerCase() + '/balance').set(user.balance);
+      }
     }
 
     const allGames = ['mines', 'coinflip', 'dice', 'roulette', 'blackjack'];
@@ -1032,7 +1219,7 @@
       e.preventDefault();
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
-      if (!text || !user.uid) return;
+      if (!text || user.username === 'guest') return;
       await db.ref('chat_messages').push({
         sender: user.username,
         text: text,
@@ -1057,8 +1244,6 @@
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
     });
-
-    initMinesBoard();
   </script>
 </body>
 </html>
