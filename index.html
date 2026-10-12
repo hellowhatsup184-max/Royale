@@ -80,7 +80,7 @@
       </div>
       <h3 class="text-sm font-display font-black text-rose-400 uppercase tracking-widest">Active Elsewhere</h3>
       <p class="text-xs text-slate-300 leading-relaxed font-sans">
-        This account signed in on another device or tab. Concurrent active sessions are blocked.
+        This account has been accessed on another device or tab.
       </p>
       <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl bg-darkSurface border border-darkBorder hover:border-slate-500 text-slate-200 text-xs font-bold uppercase transition">
         Reconnect On This Device
@@ -93,7 +93,7 @@
     <div class="w-full max-w-md bg-darkCard border border-darkBorder rounded-3xl p-8 shadow-2xl relative">
       <div class="text-center mb-6">
         <h2 class="font-display text-2xl font-black gold-gradient-text uppercase tracking-widest">Gemluck VIP</h2>
-        <p class="text-xs text-slate-400 font-mono mt-1">HIGH-ROLLER DIAMOND CASINO (MIN 4M 💎)</p>
+        <p class="text-xs text-slate-400 font-mono mt-1">DIAMOND ARCADE &amp; VIP LOUNGE (MIN 4M 💎)</p>
       </div>
 
       <!-- Mode Switcher -->
@@ -104,15 +104,15 @@
 
       <form id="authForm" class="space-y-4">
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Roblox Username *</label>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Username *</label>
           <div class="relative">
             <span class="absolute left-3.5 top-3.5 text-slate-500 font-mono">@</span>
-            <input type="text" id="robloxInput" required placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-9 pr-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
+            <input type="text" id="userInput" required placeholder="username" class="w-full bg-darkSurface border border-darkBorder rounded-2xl pl-9 pr-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Secret Password / PIN *</label>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 font-mono mb-1.5">Password / PIN *</label>
           <input type="password" id="passwordInput" required placeholder="••••••••" minlength="4" class="w-full bg-darkSurface border border-darkBorder rounded-2xl px-4 py-3 text-sm text-slate-100 font-mono focus:outline-none focus:border-amber-400 transition">
           <p class="text-[10px] text-slate-500 mt-1 font-mono">Minimum 4 characters</p>
         </div>
@@ -123,7 +123,7 @@
             <span id="authErrorMsg">Error occurred.</span>
           </div>
           <button type="button" id="forceOverrideBtn" onclick="forceTakeoverLogin()" class="hidden w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 font-bold rounded-xl text-[11px] transition uppercase">
-            Force Relinquish Other Device &amp; Enter Here
+            Force Relinquish Other Device &amp; Enter
           </button>
         </div>
 
@@ -172,10 +172,10 @@
     </div>
   </header>
 
-  <!-- ==================== MAIN CONTENT ==================== -->
+  <!-- ==================== MAIN ARENA ==================== -->
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
     
-    <!-- Games Area (2 Columns) -->
+    <!-- Games Area -->
     <div class="lg:col-span-2 flex flex-col gap-6">
       
       <!-- VIP Leaks & Live Stream Banner -->
@@ -492,7 +492,7 @@
         <i class="fa-solid fa-envelope-open-text text-amber-400 text-xl"></i>
         <div>
           <span class="font-bold font-display uppercase tracking-wider block">In-Game Mailbox Deposit:</span>
-          <span>Send in-game mailbox deposit to Roblox username <b class="text-white font-mono bg-amber-500/30 px-1.5 py-0.5 rounded">@Gemluck99</b> to receive diamond credits. Submit ticket below!</span>
+          <span>Send in-game mailbox deposit to username <b class="text-white font-mono bg-amber-500/30 px-1.5 py-0.5 rounded">@Gemluck99</b> to receive diamond credits. Submit ticket below!</span>
         </div>
       </div>
 
@@ -528,13 +528,17 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // SUPERUSERS AND ADMINS LIST EMPTIED (Assign manually later)
+    const PRIMARY_ADMINS = [];
+    const SUPPORT_STAFF = [];
+
     const VIP_REWARD_DISCORD = 'https://discord.gg/ravage';
     let authMode = 'login';
     let pendingUsername = '';
 
-    // Fast SHA-256 for secure in-database client password verification
+    // SHA-256 for secure password hashing directly inside database
     async function hashPassword(str) {
-      const buffer = new TextEncoder().encode(str + "_gemluck_salt");
+      const buffer = new TextEncoder().encode(str + "_gemluck_salt_2026");
       const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
       return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
@@ -575,43 +579,50 @@
       }
     }
 
+    /* FIREWALL & SINGLE-DEVICE SESSION ENGINE */
     async function enforceSingleDevice(cleanUser, forceOverride = false) {
       const sessionRef = db.ref('active_sessions/' + cleanUser);
-      const snap = await sessionRef.once('value');
-      const data = snap.val();
-      const now = Date.now();
+      
+      try {
+        const snap = await sessionRef.once('value');
+        const data = snap.val();
+        const now = Date.now();
 
-      if (!forceOverride && data && data.token && data.token !== myDeviceToken) {
-        if (data.expiresAt && now < data.expiresAt) {
-          return false; // Active lock held by other device
+        if (!forceOverride && data && data.token && data.token !== myDeviceToken) {
+          if (data.expiresAt && now < data.expiresAt) {
+            return false;
+          }
         }
+
+        await sessionRef.set({
+          token: myDeviceToken,
+          lastSeen: now,
+          expiresAt: now + 12000
+        });
+
+        if (activeSessionListener) sessionRef.off('value', activeSessionListener);
+        activeSessionListener = sessionRef.on('value', (s) => {
+          const val = s.val();
+          if (val && val.token && val.token !== myDeviceToken) {
+            triggerRemoteKick();
+          }
+        });
+
+        if (heartbeatTimer) clearInterval(heartbeatTimer);
+        heartbeatTimer = setInterval(() => {
+          if (user.username !== 'guest') {
+            sessionRef.update({
+              lastSeen: Date.now(),
+              expiresAt: Date.now() + 12000
+            });
+          }
+        }, 3000);
+
+        return true;
+      } catch (err) {
+        console.warn("Session check fallback:", err);
+        return true;
       }
-
-      await sessionRef.set({
-        token: myDeviceToken,
-        lastSeen: now,
-        expiresAt: now + 12000
-      });
-
-      if (activeSessionListener) sessionRef.off('value', activeSessionListener);
-      activeSessionListener = sessionRef.on('value', (s) => {
-        const val = s.val();
-        if (val && val.token && val.token !== myDeviceToken) {
-          triggerRemoteKick();
-        }
-      });
-
-      if (heartbeatTimer) clearInterval(heartbeatTimer);
-      heartbeatTimer = setInterval(() => {
-        if (user.username !== 'guest') {
-          sessionRef.update({
-            lastSeen: Date.now(),
-            expiresAt: Date.now() + 12000
-          });
-        }
-      }, 3000);
-
-      return true;
     }
 
     function triggerRemoteKick() {
@@ -634,7 +645,7 @@
 
     document.getElementById('authForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const rawUser = document.getElementById('robloxInput').value.trim().replace(/^@/, '');
+      const rawUser = document.getElementById('userInput').value.trim().replace(/^@/, '');
       const rawPassword = document.getElementById('passwordInput').value.trim();
       const cleanUser = rawUser.toLowerCase();
       const errBox = document.getElementById('authErrorAlert');
@@ -759,7 +770,7 @@
       await db.ref(`ticket_channels/${newRef.key}/messages`).push({
         sender: 'GemluckSupport',
         text: `Welcome @${user.username}. Chat is open. You can send transaction receipts, messages, and photos here directly.`,
-        isStaff: true,
+        isStaff: false,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       });
